@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronRight, HelpCircle } from "lucide-react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { Search, ChevronRight, HelpCircle, Sparkles, Zap, Shield } from "lucide-react";
+import faqHeroBg from "@/assets/faq-hero-bg.jpg";
 
 const faqs = [
   {
@@ -60,6 +61,11 @@ const faqs = [
 export default function FAQ() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const { scrollY } = useScroll();
+  
+  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
 
   const filteredFaqs = faqs.filter(faq =>
     faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,41 +76,175 @@ export default function FAQ() {
     <div className="min-h-screen flex flex-col">
       <Topbar />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background border-b border-border/40">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDU5LDEzMCwyNDYsMC4wNSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50" />
-        
-        <div className="container mx-auto px-4 py-16 md:py-24 relative">
+      {/* Hero Section with Background Image */}
+      <section className="relative overflow-hidden border-b border-border/40">
+        {/* Background Image with Overlay */}
+        <motion.div 
+          className="absolute inset-0"
+          style={{ y: heroY }}
+        >
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: `url(${faqHeroBg})`,
+              filter: 'brightness(0.4)'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+        </motion.div>
+
+        {/* Animated Particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-primary/30 rounded-full"
+              initial={{ 
+                x: Math.random() * window.innerWidth, 
+                y: Math.random() * 600,
+                scale: Math.random() * 0.5 + 0.5
+              }}
+              animate={{
+                y: [null, Math.random() * 600],
+                x: [null, Math.random() * window.innerWidth],
+                scale: [null, Math.random() * 0.5 + 0.5],
+                opacity: [0.3, 0.8, 0.3]
+              }}
+              transition={{
+                duration: Math.random() * 10 + 10,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Gradient Orbs */}
+        <div className="absolute inset-0 overflow-hidden">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            className="absolute top-20 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+        </div>
+        
+        <div className="container mx-auto px-4 py-20 md:py-32 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto text-center space-y-6"
+            style={{ opacity: heroOpacity, scale: heroScale }}
+            className="max-w-3xl mx-auto text-center space-y-8"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium mb-4">
-              <HelpCircle className="h-4 w-4 text-primary" />
-              <span>Help Center</span>
-            </div>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-medium mb-4 border border-primary/20"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="h-4 w-4 text-primary" />
+              </motion.div>
+              <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent font-semibold">
+                Help Center
+              </span>
+            </motion.div>
             
-            <h1 className="text-4xl md:text-5xl font-bold">
-              How can we help you?
-            </h1>
+            <motion.h1 
+              className="text-5xl md:text-7xl font-bold"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+                How can we
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-primary via-cyan-400 to-primary bg-clip-text text-transparent animate-glow-pulse">
+                help you?
+              </span>
+            </motion.h1>
             
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <motion.p 
+              className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
               Welcome to our Help Center! Here, you'll find answers to frequently asked questions, 
               helpful guides, and useful tips to assist you in getting the most out of CrewDog.
-            </p>
+            </motion.p>
 
-            {/* Search Bar */}
-            <div className="relative max-w-xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search for help..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-12 pr-4 text-base glass-card border-2"
-              />
-            </div>
+            {/* Premium Search Bar */}
+            <motion.div 
+              className="relative max-w-xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-cyan-400/20 rounded-2xl blur-xl" />
+              <div className="relative">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                <Input
+                  type="text"
+                  placeholder="Search for help..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-16 pl-14 pr-5 text-base glass-card border-2 border-primary/30 rounded-2xl focus:border-primary/60 transition-all shadow-xl"
+                />
+                <motion.div
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Zap className="h-5 w-5 text-primary" />
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Trust Indicators */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center justify-center gap-8 pt-8"
+            >
+              <div className="flex items-center gap-2 text-sm">
+                <Shield className="h-4 w-4 text-primary" />
+                <span className="text-foreground/70">Secure</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-foreground/70">24/7 Support</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Zap className="h-4 w-4 text-primary" />
+                <span className="text-foreground/70">Instant Answers</span>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -115,27 +255,77 @@ export default function FAQ() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left Sidebar */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
               className="lg:col-span-4"
             >
-              <div className="lg:sticky lg:top-24 space-y-4">
-                <div className="text-sm font-medium text-primary uppercase tracking-wider">
-                  Support
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold">FAQs</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Have questions? We've got answers! Check out our Frequently Asked Questions (FAQs) 
-                  to find quick solutions to common queries. Save time and get the information you need 
-                  right here.
-                </p>
-                <Link 
-                  to="/support" 
-                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium mt-6"
+              <div className="lg:sticky lg:top-24 space-y-6">
+                <motion.div 
+                  className="relative"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  Contact Support
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
+                  <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-cyan-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative glass-card p-6 rounded-2xl border border-primary/20">
+                    <div className="text-sm font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                      </motion.div>
+                      Support
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-br from-foreground to-primary bg-clip-text text-transparent">
+                      FAQs
+                    </h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Have questions? We've got answers! Check out our Frequently Asked Questions (FAQs) 
+                      to find quick solutions to common queries. Save time and get the information you need 
+                      right here.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Link 
+                    to="/support" 
+                    className="group inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors"
+                  >
+                    <span>Contact Support</span>
+                    <motion.div
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </motion.div>
+                  </Link>
+                </motion.div>
+
+                {/* Quick Stats */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="grid grid-cols-2 gap-4 pt-6"
+                >
+                  <div className="glass-card p-4 rounded-xl border border-border/50">
+                    <div className="text-2xl font-bold text-primary mb-1">12</div>
+                    <div className="text-xs text-muted-foreground">Questions</div>
+                  </div>
+                  <div className="glass-card p-4 rounded-xl border border-border/50">
+                    <div className="text-2xl font-bold text-primary mb-1">24/7</div>
+                    <div className="text-xs text-muted-foreground">Support</div>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
 
@@ -153,21 +343,45 @@ export default function FAQ() {
                     {filteredFaqs.map((faq, index) => (
                       <motion.div
                         key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ delay: index * 0.05 }}
+                        whileHover={{ scale: 1.01, y: -2 }}
                       >
                         <button
                           onClick={() => setExpandedId(expandedId === index ? null : index)}
-                          className="w-full text-left p-6 rounded-xl glass-card border border-border hover:border-primary/50 transition-all group"
+                          className="relative w-full text-left p-6 rounded-2xl glass-card border border-border hover:border-primary/50 transition-all group overflow-hidden"
                         >
-                          <div className="flex items-center justify-between gap-4">
-                            <span className="font-medium text-lg pr-4">{faq.question}</span>
-                            <ChevronRight 
-                              className={`h-5 w-5 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
-                                expandedId === index ? 'rotate-90 text-primary' : ''
-                              }`}
-                            />
+                          {/* Hover gradient effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-cyan-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          
+                          {/* Animated corner accent */}
+                          <motion.div
+                            className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full"
+                            initial={{ scale: 0, opacity: 0 }}
+                            whileHover={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+
+                          <div className="relative flex items-center justify-between gap-4">
+                            <span className="font-semibold text-lg pr-4 group-hover:text-primary transition-colors">
+                              {faq.question}
+                            </span>
+                            <motion.div
+                              animate={{ 
+                                rotate: expandedId === index ? 90 : 0,
+                                scale: expandedId === index ? 1.1 : 1
+                              }}
+                              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                              className="flex-shrink-0"
+                            >
+                              <ChevronRight 
+                                className={`h-6 w-6 transition-colors ${
+                                  expandedId === index ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
+                                }`}
+                              />
+                            </motion.div>
                           </div>
                           
                           <AnimatePresence>
@@ -176,12 +390,29 @@ export default function FAQ() {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
                                 className="overflow-hidden"
                               >
-                                <p className="mt-4 text-muted-foreground leading-relaxed border-t border-border pt-4">
-                                  {faq.answer}
-                                </p>
+                                <motion.div
+                                  initial={{ y: -10 }}
+                                  animate={{ y: 0 }}
+                                  transition={{ delay: 0.1 }}
+                                  className="relative"
+                                >
+                                  <div className="mt-4 pt-4 border-t border-border/50">
+                                    <p className="text-muted-foreground leading-relaxed">
+                                      {faq.answer}
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Decorative gradient line */}
+                                  <motion.div
+                                    initial={{ scaleX: 0 }}
+                                    animate={{ scaleX: 1 }}
+                                    transition={{ delay: 0.2, duration: 0.5 }}
+                                    className="mt-4 h-1 bg-gradient-to-r from-primary via-cyan-400 to-transparent rounded-full"
+                                  />
+                                </motion.div>
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -192,19 +423,38 @@ export default function FAQ() {
                 ) : (
                   <motion.div
                     key="no-results"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-center py-12 glass-card rounded-xl p-8"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="text-center py-16 glass-card rounded-2xl p-8 border border-primary/20"
                   >
-                    <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No results found</h3>
-                    <p className="text-muted-foreground">
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Search className="h-16 w-16 text-primary mx-auto mb-4" />
+                    </motion.div>
+                    <h3 className="text-xl font-semibold mb-2">No results found</h3>
+                    <p className="text-muted-foreground mb-6">
                       Try different keywords or{" "}
-                      <Link to="/support" className="text-primary hover:underline">
+                      <Link to="/support" className="text-primary hover:underline font-medium">
                         contact support
                       </Link>
                     </p>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                      >
+                        Clear Search
+                      </button>
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
