@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,38 +7,38 @@ import { Label } from "@/components/ui/label";
 import { Topbar } from "@/components/layout/Topbar";
 import { motion } from "framer-motion";
 import { Chrome, ArrowLeft } from "lucide-react";
+import { useMockAuth } from "@/hooks/useMockAuth";
+import { toast } from "sonner";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useMockAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/run");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
-    if (!email || !password) {
-      setError("Please fill in all fields");
+    if (!email) {
+      setError("Please enter an email");
       return;
     }
 
-    if (!isLogin && password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (isLogin) {
-      // Login logic will be implemented
-      console.log("Login:", { email, password });
-    } else {
-      // Register logic will be implemented
-      setSuccess("Account created successfully! You can now log in.");
-      setTimeout(() => setIsLogin(true), 2000);
-    }
+    // Mock login - no password required for testing
+    login(email);
+    toast.success(isLogin ? "Logged in successfully!" : "Account created successfully!");
+    navigate("/run");
   };
 
   return (
@@ -74,11 +74,11 @@ export default function Login() {
               </div>
             )}
 
-            {success && (
-              <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm">
-                {success}
-              </div>
-            )}
+            <div className="mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
+              <p className="text-muted-foreground">
+                💡 <strong>Demo mode:</strong> Just enter any email to log in. No password required!
+              </p>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -95,7 +95,7 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Password (optional for demo)</Label>
                 <Input
                   id="password"
                   type="password"
@@ -103,24 +103,8 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-11"
-                  required
                 />
               </div>
-
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="h-11"
-                    required
-                  />
-                </div>
-              )}
 
               <Button type="submit" className="w-full h-11 magnetic-button" size="lg">
                 {isLogin ? "Sign In" : "Create Account"}
@@ -147,7 +131,6 @@ export default function Login() {
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError("");
-                  setSuccess("");
                 }}
                 className="text-primary hover:underline"
               >

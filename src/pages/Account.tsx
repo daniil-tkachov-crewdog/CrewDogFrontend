@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMockAuth } from "@/hooks/useMockAuth";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function Account() {
   const navigate = useNavigate();
+  const { user: authUser, isAuthenticated, logout } = useMockAuth();
   const [activeTab, setActiveTab] = useState("general");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDownsellModal, setShowDownsellModal] = useState(false);
@@ -39,11 +42,18 @@ export default function Account() {
   const [cancelOtherReason, setCancelOtherReason] = useState("");
   const [expandedHistory, setExpandedHistory] = useState<number[]>([]);
 
-  // Mock data
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // User data from auth
   const user = {
-    name: "John Smith",
-    email: "john@example.com",
-    plan: "Free",
+    name: authUser?.name || "User",
+    email: authUser?.email || "",
+    plan: authUser?.plan || "Free",
     quota: { used: 2, total: 3 },
     subscriptionStatus: "active",
     renewalDate: "February 1, 2025"
@@ -105,7 +115,11 @@ export default function Account() {
             </Link>
             <Button 
               variant="ghost" 
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                logout();
+                toast.success("Logged out successfully");
+                navigate("/");
+              }}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useMockAuth } from "@/hooks/useMockAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, Loader2, ExternalLink, CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function Run() {
+  const { user, isAuthenticated } = useMockAuth();
   const [includeLeads, setIncludeLeads] = useState(false);
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -19,9 +21,9 @@ export default function Run() {
   const [results, setResults] = useState<any>(null);
   const [error, setError] = useState("");
 
-  // Mock plan data - will be replaced with real data
-  const plan = "Free";
-  const quota = { used: 0, total: 3 };
+  // User's plan data
+  const plan = user?.plan || "Free";
+  const quota = { used: 2, total: isAuthenticated ? 3 : 1 };
   const renewalDate = "30 days";
 
   const handleSubmit = (e: React.FormEvent) => {
