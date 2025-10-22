@@ -78,7 +78,7 @@ export default function FAQ() {
       
       {/* Hero Section with Background Image */}
       <section className="relative overflow-hidden border-b border-border/40">
-        {/* Background Image with Strong Overlay */}
+        {/* Background Image with Overlay */}
         <motion.div 
           className="absolute inset-0"
           style={{ y: heroY }}
@@ -87,12 +87,11 @@ export default function FAQ() {
             className="absolute inset-0 bg-cover bg-center"
             style={{ 
               backgroundImage: `url(${faqHeroBg})`,
-              filter: 'brightness(0.3)'
+              filter: 'brightness(0.4)'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-background/60 via-primary/30 to-background/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-          <div className="absolute inset-0 bg-background/40" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </motion.div>
 
         {/* Animated Particles */}
@@ -100,7 +99,7 @@ export default function FAQ() {
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-primary/40 rounded-full"
+              className="absolute w-1 h-1 bg-primary/30 rounded-full"
               initial={{ 
                 x: Math.random() * window.innerWidth, 
                 y: Math.random() * 600,
@@ -161,7 +160,7 @@ export default function FAQ() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-background/80 backdrop-blur-xl text-sm font-medium mb-4 border-2 border-primary/30 shadow-2xl"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-medium mb-4 border border-primary/20"
             >
               <motion.div
                 animate={{ rotate: 360 }}
@@ -175,50 +174,75 @@ export default function FAQ() {
             </motion.div>
             
             <motion.h1 
-              className="text-5xl md:text-7xl font-bold drop-shadow-2xl"
+              className="text-5xl md:text-7xl font-bold"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              style={{ textShadow: '0 0 40px rgba(0,0,0,0.5)' }}
             >
-              <span className="text-white">
+              <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
                 How can we
               </span>
               <br />
-              <span className="bg-gradient-to-r from-primary via-cyan-400 to-primary bg-clip-text text-transparent drop-shadow-2xl">
+              <span className="bg-gradient-to-r from-primary via-cyan-400 to-primary bg-clip-text text-transparent animate-glow-pulse">
                 help you?
               </span>
             </motion.h1>
             
             <motion.p 
-              className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed drop-shadow-lg"
+              className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              style={{ textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}
             >
               Welcome to our Help Center! Here, you'll find answers to frequently asked questions, 
               helpful guides, and useful tips to assist you in getting the most out of CrewDog.
             </motion.p>
 
+            {/* Premium Search Bar */}
+            <motion.div 
+              className="relative max-w-xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-cyan-400/20 rounded-2xl blur-xl" />
+              <div className="relative">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                <Input
+                  type="text"
+                  placeholder="Search for help..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-16 pl-14 pr-5 text-base glass-card border-2 border-primary/30 rounded-2xl focus:border-primary/60 transition-all shadow-xl"
+                />
+                <motion.div
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Zap className="h-5 w-5 text-primary" />
+                </motion.div>
+              </div>
+            </motion.div>
+
             {/* Trust Indicators */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.5 }}
               className="flex items-center justify-center gap-8 pt-8"
             >
-              <div className="flex items-center gap-2 text-sm bg-background/80 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/20 shadow-xl">
+              <div className="flex items-center gap-2 text-sm">
                 <Shield className="h-4 w-4 text-primary" />
-                <span className="text-foreground font-medium">Secure</span>
+                <span className="text-foreground/70">Secure</span>
               </div>
-              <div className="flex items-center gap-2 text-sm bg-background/80 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/20 shadow-xl">
+              <div className="flex items-center gap-2 text-sm">
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-foreground font-medium">24/7 Support</span>
+                <span className="text-foreground/70">24/7 Support</span>
               </div>
-              <div className="flex items-center gap-2 text-sm bg-background/80 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/20 shadow-xl">
+              <div className="flex items-center gap-2 text-sm">
                 <Zap className="h-4 w-4 text-primary" />
-                <span className="text-foreground font-medium">Instant Answers</span>
+                <span className="text-foreground/70">Instant Answers</span>
               </div>
             </motion.div>
           </motion.div>
@@ -228,34 +252,6 @@ export default function FAQ() {
       {/* FAQ Content */}
       <main className="flex-1 py-12 md:py-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          {/* Search Bar Below Hero */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-2xl mx-auto mb-12"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-cyan-400/20 rounded-2xl blur-xl" />
-              <div className="relative">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
-                <Input
-                  type="text"
-                  placeholder="Search for help..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-16 pl-14 pr-14 text-base glass-card border-2 border-primary/30 rounded-2xl focus:border-primary/60 transition-all shadow-xl"
-                />
-                <motion.div
-                  className="absolute right-5 top-1/2 -translate-y-1/2"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <Zap className="h-5 w-5 text-primary" />
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left Sidebar */}
             <motion.div
