@@ -196,27 +196,94 @@ export default function Account() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background relative overflow-hidden">
       <Topbar />
       
-      {/* Floating Background Elements */}
+      {/* Tech Grid Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, hsl(var(--primary) / 0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--primary) / 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px'
+          }}
+        />
+        {/* Scan lines */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent"
+          animate={{
+            y: ['-100%', '200%']
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'linear'
+          }}
+        />
+      </div>
+      
+      {/* Floating Holographic Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(10)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-64 h-64 bg-primary/5 rounded-full blur-3xl"
+            className="absolute rounded-full"
+            style={{
+              width: Math.random() * 400 + 100,
+              height: Math.random() * 400 + 100,
+              background: `radial-gradient(circle, hsl(var(--primary) / ${Math.random() * 0.15}) 0%, transparent 70%)`,
+              filter: 'blur(40px)',
+            }}
             initial={{ 
               x: Math.random() * window.innerWidth,
               y: Math.random() * window.innerHeight,
+              scale: 0.5,
             }}
             animate={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: [
+                Math.random() * window.innerWidth,
+                Math.random() * window.innerWidth,
+                Math.random() * window.innerWidth,
+              ],
+              y: [
+                Math.random() * window.innerHeight,
+                Math.random() * window.innerHeight,
+                Math.random() * window.innerHeight,
+              ],
+              scale: [0.5, 1, 0.5],
+              opacity: [0.3, 0.6, 0.3],
             }}
             transition={{
-              duration: 20 + Math.random() * 10,
+              duration: 20 + Math.random() * 15,
               repeat: Infinity,
-              repeatType: "reverse",
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Particle System */}
+      <div className="fixed inset-0 pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            className="absolute w-1 h-1 bg-primary/40 rounded-full"
+            initial={{
+              x: Math.random() * window.innerWidth,
+              y: window.innerHeight + 20,
+            }}
+            animate={{
+              y: -20,
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 5 + Math.random() * 5,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: 'linear',
             }}
           />
         ))}
@@ -257,97 +324,202 @@ export default function Account() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="p-8 glass-card mb-8 relative overflow-hidden">
-              {/* Animated Background Gradient */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-primary/10 via-purple-500/10 to-pink-500/10"
-                animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                }}
-                transition={{
-                  duration: 10,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                style={{ backgroundSize: "200% 200%" }}
-              />
+            <Card className="p-8 glass-card mb-8 relative overflow-hidden border-2 border-primary/20">
+              {/* Holographic Background Effect */}
+              <div className="absolute inset-0">
+                <motion.div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, transparent 50%, hsl(var(--primary) / 0.15) 100%)',
+                  }}
+                  animate={{
+                    backgroundPosition: ['0% 0%', '100% 100%'],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    repeatType: 'reverse',
+                  }}
+                />
+                
+                {/* Tech Corner Accents */}
+                <div className="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-primary/30" />
+                <div className="absolute top-0 right-0 w-32 h-32 border-r-2 border-t-2 border-primary/30" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 border-l-2 border-b-2 border-primary/30" />
+                <div className="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-primary/30" />
+                
+                {/* Animated Pulse Lines */}
+                <motion.div
+                  className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
+                  animate={{
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                  }}
+                />
+              </div>
 
-              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                {/* Avatar */}
+              <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                {/* Enhanced Avatar */}
                 <motion.div 
                   className="relative group"
                   whileHover={{ scale: 1.05 }}
                 >
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary via-purple-500 to-pink-500 p-1">
-                    <div className="w-full h-full rounded-full bg-background flex items-center justify-center text-4xl font-bold">
+                  {/* Outer ring animation */}
+                  <motion.div
+                    className="absolute -inset-4 rounded-full"
+                    style={{
+                      background: 'conic-gradient(from 0deg, hsl(var(--primary)), hsl(var(--primary) / 0.5), hsl(var(--primary)), hsl(var(--primary) / 0.5), hsl(var(--primary)))',
+                    }}
+                    animate={{
+                      rotate: 360,
+                    }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+                  
+                  {/* Middle ring */}
+                  <motion.div
+                    className="absolute -inset-3 rounded-full bg-background"
+                  />
+                  
+                  {/* Gradient border */}
+                  <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-primary via-purple-500 to-pink-500 p-1">
+                    <div className="w-full h-full rounded-full bg-background flex items-center justify-center text-4xl font-bold relative overflow-hidden group-hover:bg-gradient-to-br group-hover:from-background group-hover:to-primary/10 transition-all">
                       {user.name.charAt(0).toUpperCase()}
+                      
+                      {/* Scan effect on hover */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/30 to-transparent"
+                        initial={{ y: '-100%' }}
+                        whileHover={{ y: '100%' }}
+                        transition={{ duration: 0.8 }}
+                      />
                     </div>
                   </div>
-                  <button className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 shadow-lg group-hover:scale-110 transition-transform">
+                  
+                  <motion.button 
+                    className="absolute bottom-0 right-0 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-full p-2.5 shadow-lg group-hover:shadow-primary/50 border border-primary/20"
+                    whileHover={{ scale: 1.1, rotate: 15 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <Camera className="h-4 w-4" />
-                  </button>
+                  </motion.button>
+                  
+                  {/* Glow effect */}
                   <motion.div
-                    className="absolute -inset-2 bg-primary/20 rounded-full blur-xl"
+                    className="absolute -inset-6 bg-primary/20 rounded-full blur-2xl"
                     animate={{
-                      scale: [1, 1.2, 1],
+                      scale: [1, 1.3, 1],
                       opacity: [0.3, 0.6, 0.3],
                     }}
                     transition={{
-                      duration: 3,
+                      duration: 4,
                       repeat: Infinity,
                     }}
                   />
                 </motion.div>
 
-                {/* User Info */}
+                {/* Enhanced User Info */}
                 <div className="flex-1 text-center md:text-left">
-                  <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
-                    <h1 className="text-3xl font-bold">{user.name}</h1>
+                  <div className="flex items-center gap-3 justify-center md:justify-start mb-3">
+                    <motion.h1 
+                      className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-primary to-foreground"
+                      style={{ backgroundSize: '200% auto' }}
+                      animate={{
+                        backgroundPosition: ['0% center', '200% center', '0% center'],
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                      }}
+                    >
+                      {user.name}
+                    </motion.h1>
                     {user.plan !== "Free" && (
                       <motion.div
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
+                        className="relative"
+                        whileHover={{ rotate: 360, scale: 1.2 }}
+                        transition={{ duration: 0.6 }}
                       >
-                        <Crown className="h-6 w-6 text-yellow-500" />
+                        <Crown className="h-7 w-7 text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                        <motion.div
+                          className="absolute inset-0"
+                          animate={{
+                            boxShadow: [
+                              '0 0 10px rgba(234,179,8,0.5)',
+                              '0 0 20px rgba(234,179,8,0.8)',
+                              '0 0 10px rgba(234,179,8,0.5)',
+                            ],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                          }}
+                        />
                       </motion.div>
                     )}
                   </div>
-                  <p className="text-muted-foreground mb-4">{user.email}</p>
+                  <p className="text-muted-foreground mb-5 flex items-center gap-2 justify-center md:justify-start">
+                    <Mail className="h-4 w-4" />
+                    {user.email}
+                  </p>
                   <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                    <Badge variant="secondary" className="gap-1">
-                      <Calendar className="h-3 w-3" />
+                    <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all">
+                      <Calendar className="h-3.5 w-3.5" />
                       Member since {user.memberSince}
                     </Badge>
-                    <Badge variant="outline" className="gap-1">
-                      <Activity className="h-3 w-3" />
+                    <Badge variant="outline" className="gap-1.5 px-3 py-1.5 hover:border-primary/40 transition-all">
+                      <Activity className="h-3.5 w-3.5" />
                       {user.totalSearches} searches
                     </Badge>
-                    <Badge variant="outline" className="gap-1 bg-green-500/10 text-green-500 border-green-500/20">
-                      <TrendingUp className="h-3 w-3" />
+                    <Badge variant="outline" className="gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-500 border-green-500/30 hover:bg-green-500/20 transition-all">
+                      <TrendingUp className="h-3.5 w-3.5" />
                       {user.successRate}% success rate
                     </Badge>
                   </div>
                 </div>
 
-                {/* Quick Stats */}
+                {/* Enhanced Quick Stats */}
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { label: "Searches", value: user.totalSearches, icon: Briefcase },
-                    { label: "Success", value: `${user.successRate}%`, icon: Target },
-                    { label: "Tier", value: user.plan, icon: Crown },
+                    { label: "Searches", value: user.totalSearches, icon: Briefcase, color: "from-blue-500 to-cyan-500" },
+                    { label: "Success", value: `${user.successRate}%`, icon: Target, color: "from-green-500 to-emerald-500" },
+                    { label: "Tier", value: user.plan, icon: Crown, color: "from-yellow-500 to-orange-500" },
                   ].map((stat, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.2 + index * 0.1 }}
-                      whileHover={{ scale: 1.05, y: -5 }}
-                      className="text-center"
+                      whileHover={{ scale: 1.08, y: -8 }}
+                      className="relative"
                     >
-                      <Card className="p-4 glass-card hover:shadow-lg transition-all group cursor-pointer">
-                        <stat.icon className="h-6 w-6 mx-auto mb-2 text-primary group-hover:scale-110 transition-transform" />
-                        <div className="text-2xl font-bold mb-1">{stat.value}</div>
-                        <div className="text-xs text-muted-foreground">{stat.label}</div>
+                      <Card className="p-5 glass-card hover:shadow-2xl hover:shadow-primary/20 transition-all group cursor-pointer border border-primary/10 relative overflow-hidden">
+                        {/* Animated gradient background */}
+                        <motion.div
+                          className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity`}
+                        />
+                        
+                        {/* Content */}
+                        <div className="relative z-10">
+                          <div className={`mx-auto mb-3 w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} p-0.5 group-hover:scale-110 transition-transform`}>
+                            <div className="w-full h-full rounded-xl bg-background/95 flex items-center justify-center">
+                              <stat.icon className="h-6 w-6 bg-clip-text text-transparent bg-gradient-to-br" style={{ backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))` }} />
+                            </div>
+                          </div>
+                          <div className="text-3xl font-bold mb-1 text-center">{stat.value}</div>
+                          <div className="text-xs text-muted-foreground text-center font-medium">{stat.label}</div>
+                        </div>
+                        
+                        {/* Corner accents */}
+                        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </Card>
                     </motion.div>
                   ))}
@@ -362,28 +534,60 @@ export default function Account() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="p-6 glass-card">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-4 mb-8 h-auto p-1 gap-2">
-                  {[
-                    { value: "general", icon: User, label: "Profile" },
-                    { value: "history", icon: History, label: "Activity" },
-                    { value: "settings", icon: Settings, label: "Settings" },
-                    { value: "support", icon: HelpCircle, label: "Help" },
-                  ].map((tab, index) => (
-                    <TabsTrigger 
-                      key={tab.value}
-                      value={tab.value}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-                    >
-                      <tab.icon className="mr-2 h-4 w-4" />
-                      <span className="hidden sm:inline">{tab.label}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+            <Card className="p-8 glass-card border-2 border-primary/20 relative overflow-hidden">
+              {/* Tech background effect */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_hsl(var(--primary)_/_0.05),transparent_70%)]" />
+              
+              <div className="relative z-10">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="grid w-full grid-cols-4 mb-10 h-auto p-1.5 gap-3 bg-muted/30 backdrop-blur-xl border border-primary/10">
+                    {[
+                      { value: "general", icon: User, label: "Profile", gradient: "from-blue-500 to-cyan-500" },
+                      { value: "history", icon: History, label: "Activity", gradient: "from-purple-500 to-pink-500" },
+                      { value: "settings", icon: Settings, label: "Settings", gradient: "from-orange-500 to-red-500" },
+                      { value: "support", icon: HelpCircle, label: "Help", gradient: "from-green-500 to-emerald-500" },
+                    ].map((tab, index) => (
+                      <motion.div
+                        key={tab.value}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <TabsTrigger 
+                          value={tab.value}
+                          className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:text-white transition-all h-12 group overflow-hidden"
+                          style={{
+                            backgroundImage: activeTab === tab.value 
+                              ? `linear-gradient(to right, var(--tw-gradient-stops))` 
+                              : 'none',
+                          }}
+                        >
+                          {/* Hover gradient */}
+                          <motion.div
+                            className={`absolute inset-0 bg-gradient-to-r ${tab.gradient} opacity-0 group-hover:opacity-10 transition-opacity`}
+                          />
+                          
+                          {/* Content */}
+                          <div className="relative z-10 flex items-center gap-2">
+                            <tab.icon className="h-4 w-4" />
+                            <span className="hidden sm:inline font-medium">{tab.label}</span>
+                          </div>
+                          
+                          {/* Active indicator */}
+                          {activeTab === tab.value && (
+                            <motion.div
+                              layoutId="activeTab"
+                              className="absolute bottom-0 left-0 right-0 h-1 bg-white/50"
+                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                            />
+                          )}
+                        </TabsTrigger>
+                      </motion.div>
+                    ))}
+                  </TabsList>
 
-                {/* General Tab */}
-                <TabsContent value="general" className="space-y-6">
+                  {/* General Tab */}
+                  <TabsContent value="general" className="space-y-6">
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -1008,8 +1212,9 @@ export default function Account() {
                       </div>
                     </Card>
                   </motion.div>
-                </TabsContent>
-              </Tabs>
+                  </TabsContent>
+                </Tabs>
+              </div>
             </Card>
           </motion.div>
         </div>
