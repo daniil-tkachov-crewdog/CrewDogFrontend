@@ -1,17 +1,31 @@
 import { Link } from "react-router-dom";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, Lock, Shield, Eye, Database, Clock, UserCheck, Bell, Mail } from "lucide-react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { ArrowLeft, Lock, Shield, Eye, Database, Clock, UserCheck, Bell, Mail, CheckCircle2, Sparkles } from "lucide-react";
 import faqHeroBg from "@/assets/faq-hero-bg.jpg";
 
 export default function Privacy() {
   const { scrollY } = useScroll();
+  const { scrollYProgress } = useScroll();
+  
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Reading Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-400 to-primary z-50 origin-left"
+        style={{ scaleX }}
+      />
+      
       <Topbar />
       
       {/* Hero Section */}
@@ -33,7 +47,7 @@ export default function Privacy() {
 
         {/* Animated Particles */}
         <div className="absolute inset-0 overflow-hidden">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-cyan-400/30 rounded-full"
@@ -53,6 +67,37 @@ export default function Privacy() {
               }}
             />
           ))}
+        </div>
+
+        {/* Floating Gradient Orbs */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute top-20 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              x: [0, 50, 0],
+              y: [0, 30, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.3, 1],
+              x: [0, -50, 0],
+              y: [0, -30, 0],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
         </div>
 
         <div className="container mx-auto px-4 py-16 md:py-24 relative">
@@ -119,11 +164,13 @@ export default function Privacy() {
             {[
               {
                 icon: Database,
+                color: "from-blue-500 to-cyan-500",
                 title: "1. Information We Collect",
                 content: "We collect information you provide directly to us, including when you create an account, run job searches, or contact us for support. This may include your name, email address, and the job descriptions you submit for analysis."
               },
               {
                 icon: Eye,
+                color: "from-purple-500 to-pink-500",
                 title: "2. How We Use Your Information",
                 content: "We use the information we collect to:",
                 list: [
@@ -136,31 +183,37 @@ export default function Privacy() {
               },
               {
                 icon: UserCheck,
+                color: "from-green-500 to-emerald-500",
                 title: "3. Information Sharing",
                 content: "We do not share your personal information with third parties except as described in this policy. We may share information with service providers who perform services on our behalf, such as hosting and data analysis."
               },
               {
                 icon: Shield,
+                color: "from-primary to-cyan-500",
                 title: "4. Data Security",
                 content: "We take reasonable measures to help protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction."
               },
               {
                 icon: Clock,
+                color: "from-orange-500 to-red-500",
                 title: "5. Data Retention",
                 content: "We retain your account information for as long as your account is active or as needed to provide you services. Search history may be deleted automatically after a specified period."
               },
               {
                 icon: UserCheck,
+                color: "from-indigo-500 to-purple-500",
                 title: "6. Your Rights",
                 content: "You have the right to access, update, or delete your personal information at any time through your account settings. You may also contact us to request deletion of your account."
               },
               {
                 icon: Bell,
+                color: "from-yellow-500 to-orange-500",
                 title: "7. Changes to This Policy",
                 content: "We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the effective date."
               },
               {
                 icon: Mail,
+                color: "from-cyan-500 to-blue-500",
                 title: "8. Contact Us",
                 content: "If you have any questions about this privacy policy, please contact us through our support page.",
                 hasLink: true
@@ -174,20 +227,54 @@ export default function Privacy() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ delay: index * 0.05 }}
-                  whileHover={{ scale: 1.01, y: -2 }}
                   className="relative group"
                 >
-                  <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 to-cyan-400/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative glass-card p-8 rounded-2xl border border-border/50 hover:border-primary/30 transition-all">
+                  {/* Animated gradient background on hover */}
+                  <motion.div 
+                    className={`absolute -inset-4 bg-gradient-to-r ${section.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity`}
+                    initial={false}
+                    whileHover={{ scale: 1.05 }}
+                  />
+                  
+                  {/* Animated border gradient */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${section.color} opacity-20`} />
+                  </motion.div>
+
+                  <motion.div 
+                    className="relative glass-card p-8 rounded-2xl border border-border/50 hover:border-primary/30 transition-all overflow-hidden"
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    {/* Decorative corner elements */}
+                    <motion.div
+                      className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${section.color} opacity-5 rounded-bl-full`}
+                      initial={{ scale: 0, rotate: 0 }}
+                      whileHover={{ scale: 1, rotate: 10 }}
+                      transition={{ duration: 0.4 }}
+                    />
+                    <motion.div
+                      className={`absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr ${section.color} opacity-5 rounded-tr-full`}
+                      initial={{ scale: 0, rotate: 0 }}
+                      whileHover={{ scale: 1, rotate: -10 }}
+                      transition={{ duration: 0.4, delay: 0.1 }}
+                    />
+
                     <div className="flex items-start gap-4">
                       <motion.div
-                        className="mt-1"
+                        className={`mt-1 p-3 rounded-xl bg-gradient-to-br ${section.color} shadow-lg`}
                         whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 400 }}
                       >
-                        <IconComponent className="h-5 w-5 text-primary" />
+                        <IconComponent className="h-5 w-5 text-white" />
                       </motion.div>
                       <div className="flex-1 space-y-4">
-                        <h2 className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                        <h2 className={`text-xl md:text-2xl font-semibold bg-gradient-to-r ${section.color} bg-clip-text text-transparent`}>
                           {section.title}
                         </h2>
                         <p className="text-muted-foreground leading-relaxed">
@@ -195,14 +282,20 @@ export default function Privacy() {
                           {section.hasLink && (
                             <>
                               {" "}
-                              <Link to="/support" className="text-primary hover:underline font-medium">
+                              <Link to="/support" className="text-primary hover:underline font-medium inline-flex items-center gap-1 group/link">
                                 support page
+                                <motion.span
+                                  animate={{ x: [0, 3, 0] }}
+                                  transition={{ duration: 1.5, repeat: Infinity }}
+                                >
+                                  →
+                                </motion.span>
                               </Link>.
                             </>
                           )}
                         </p>
                         {section.list && (
-                          <ul className="space-y-2 mt-4">
+                          <ul className="space-y-3 mt-4">
                             {section.list.map((item, i) => (
                               <motion.li
                                 key={i}
@@ -210,17 +303,23 @@ export default function Privacy() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.1 }}
-                                className="flex items-start gap-3 text-muted-foreground"
+                                whileHover={{ x: 4 }}
+                                className="flex items-start gap-3 text-muted-foreground group/item"
                               >
-                                <Shield className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                                <span>{item}</span>
+                                <motion.div
+                                  whileHover={{ scale: 1.2, rotate: 360 }}
+                                  transition={{ duration: 0.5 }}
+                                >
+                                  <CheckCircle2 className={`h-4 w-4 bg-gradient-to-br ${section.color} bg-clip-text text-transparent mt-0.5 flex-shrink-0`} />
+                                </motion.div>
+                                <span className="group-hover/item:text-foreground transition-colors">{item}</span>
                               </motion.li>
                             ))}
                           </ul>
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               );
             })}
