@@ -134,10 +134,12 @@ export default function Login() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 md:mb-3 tracking-tight">
-              Welcome Back Creative!
+              {isLogin ? "Welcome Back!" : "Start Your Journey"}
             </h1>
             <p className="text-sm md:text-base text-muted-foreground flex items-center gap-2">
-              We Are Happy To See You Again
+              {isLogin 
+                ? "Sign in to continue your career search" 
+                : "Create an account to find your dream job"}
               <Sparkles className="w-4 h-4 text-primary" />
             </p>
           </motion.div>
@@ -315,9 +317,7 @@ export default function Login() {
                   </motion.div>
                   <motion.button
                     type="button"
-                    onClick={() => toast.info("Password reset link sent!", {
-                      description: "Check your email for the reset link"
-                    })}
+                    onClick={() => navigate("/forgot-password")}
                     className="text-xs sm:text-sm text-primary hover:underline font-medium"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -464,37 +464,6 @@ export default function Login() {
                 }}
               />
             ))}
-          </div>
-
-          {/* Glass Footer Text Box */}
-          <div className="absolute bottom-6 sm:bottom-10 left-6 sm:left-10 right-6 sm:right-10 z-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              whileHover={{ scale: 1.02 }}
-              className="backdrop-blur-xl bg-white/5 rounded-2xl sm:rounded-[1.75rem] p-4 sm:p-6 border border-white/10 shadow-2xl"
-            >
-              <p className="text-white/70 text-[10px] sm:text-xs leading-relaxed">
-                <span className="text-white/90 font-medium">© 2025 CrewDog. All rights reserved.</span>
-                <br />
-                Unauthorized use or reproduction of any content or materials from this site is
-                prohibited. For more information, visit our{" "}
-                <motion.span 
-                  className="text-primary-foreground/90 font-medium cursor-pointer"
-                  whileHover={{ color: "rgba(255,255,255,0.95)" }}
-                >
-                  Terms of Service
-                </motion.span>{" "}
-                and{" "}
-                <motion.span 
-                  className="text-primary-foreground/90 font-medium cursor-pointer"
-                  whileHover={{ color: "rgba(255,255,255,0.95)" }}
-                >
-                  Privacy Policy
-                </motion.span>.
-              </p>
-            </motion.div>
           </div>
         </div>
       </motion.div>
