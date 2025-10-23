@@ -168,10 +168,10 @@ export default function Run() {
       </div>
 
       <main className="flex-1 flex flex-col relative">
-        <div className="container mx-auto px-4 flex-1 flex flex-col py-4">
+        <div className="container mx-auto px-4 flex-1 flex flex-col py-8">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors w-fit"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors w-fit"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -190,24 +190,22 @@ export default function Run() {
                 <div className="w-full max-w-2xl">
 
                   {/* Centered Search Form */}
-                  <Card className="relative backdrop-blur-xl bg-gradient-to-br from-card/90 to-card/70 border-2 border-primary/20 p-6 shadow-2xl">
+                  <Card className="relative backdrop-blur-xl bg-card/80 border-2 border-primary/10 p-8 shadow-xl">
                     {/* Subtle gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] rounded-lg pointer-events-none" />
-                    <div className="absolute -inset-px bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg blur-xl opacity-50 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-accent/[0.02] rounded-lg pointer-events-none" />
                     
                     <div className="relative">
-                      <div className="mb-4 text-center">
-                        <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 mb-2 shadow-lg backdrop-blur-sm">
-                          <Sparkles className="h-5 w-5 text-primary" />
+                      <div className="mb-6 text-center">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 mb-3">
+                          <Sparkles className="h-6 w-6 text-primary" />
                         </div>
-                        <h1 className="text-xl font-bold mb-0.5 bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text">AI Job Search</h1>
-                        <p className="text-xs text-muted-foreground/90">Find companies and decision makers instantly</p>
+                        <h1 className="text-2xl font-semibold mb-1">AI Job Search</h1>
+                        <p className="text-sm text-muted-foreground">Find companies and decision makers instantly</p>
                       </div>
 
-                <form onSubmit={handleSubmit} className="space-y-3.5">
-                  <div className="space-y-3">
-                    <div className="group relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-4">
+                    <div className="group">
                       <Input
                         type="url"
                         placeholder="https://linkedin.com/jobs/..."
@@ -216,41 +214,40 @@ export default function Run() {
                           setJobUrl(e.target.value);
                           if (e.target.value) setJobDescription("");
                         }}
-                        className="relative h-10 text-sm border-primary/20 bg-background/80 backdrop-blur-sm focus:border-primary/40 focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                        className="h-11 border-border/50 bg-background/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
                         disabled={isLoading}
                       />
                     </div>
 
-                    <div className="relative py-1">
+                    <div className="relative">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gradient-to-r from-transparent via-border to-transparent" />
+                        <div className="w-full border-t border-border/50" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="bg-card px-3 py-0.5 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider rounded-full border border-border/50 backdrop-blur-sm">or</span>
+                        <span className="bg-card px-3 text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">or</span>
                       </div>
                     </div>
 
-                    <div className="group relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+                    <div className="group">
                       <Textarea
-                        placeholder="Paste job description (min. 300 chars, include location)"
+                        placeholder="Paste full job description...&#10;&#10;• Minimum 300 characters&#10;• Include location&#10;• More detail = better results"
                         value={jobDescription}
                         onChange={(e) => {
                           setJobDescription(e.target.value);
                           if (e.target.value) setJobUrl("");
                         }}
-                        className="relative min-h-[90px] resize-none text-sm border-primary/20 bg-background/80 backdrop-blur-sm focus:border-primary/40 focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                        className="min-h-[130px] resize-none border-border/50 bg-background/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
                         disabled={isLoading}
                       />
                       {jobDescription && (
-                        <div className="mt-1.5 flex items-center gap-2">
-                          <div className="flex-1 h-1 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm shadow-inner">
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-muted/50 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-primary via-primary to-accent transition-all duration-300 shadow-sm"
+                              className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
                               style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
                             />
                           </div>
-                          <span className="text-xs font-semibold text-muted-foreground tabular-nums">
+                          <span className="text-xs font-medium text-muted-foreground tabular-nums">
                             {jobDescription.length}/300
                           </span>
                         </div>
@@ -258,46 +255,36 @@ export default function Run() {
                     </div>
                   </div>
 
-                  <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity blur" />
-                    <label className="relative flex items-center gap-2.5 p-2.5 border-2 border-primary/20 rounded-lg cursor-pointer bg-gradient-to-br from-primary/[0.03] to-accent/[0.03] hover:from-primary/[0.08] hover:to-accent/[0.08] hover:border-primary/30 transition-all backdrop-blur-sm shadow-sm">
-                      <input
-                        type="checkbox"
-                        checked={includeLeads}
-                        onChange={(e) => setIncludeLeads(e.target.checked)}
-                        className="w-4 h-4 rounded border-primary/30 accent-primary shadow-sm"
-                        disabled={isLoading}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-semibold flex items-center gap-1.5">
-                          Include potential leads
-                          <span className="px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-md shadow-sm">
-                            Pro
-                          </span>
-                        </div>
-                        <div className="text-xs text-muted-foreground/90">Additional decision-makers</div>
-                      </div>
-                      <Sparkles className="h-4 w-4 text-primary/70 group-hover:text-primary transition-colors flex-shrink-0" />
-                    </label>
-                  </div>
+                  <label className="flex items-center gap-3 p-3.5 border border-primary/10 rounded-lg cursor-pointer hover:bg-primary/5 hover:border-primary/20 transition-all group">
+                    <input
+                      type="checkbox"
+                      checked={includeLeads}
+                      onChange={(e) => setIncludeLeads(e.target.checked)}
+                      className="w-4 h-4 rounded border-input accent-primary"
+                      disabled={isLoading}
+                    />
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">Include potential leads</div>
+                      <div className="text-xs text-muted-foreground">Find additional contacts beyond hiring managers</div>
+                    </div>
+                    <Sparkles className="h-4 w-4 text-primary/60 group-hover:text-primary transition-colors" />
+                  </label>
 
                   <Button
                     type="submit"
-                    className="relative w-full h-10 gap-2 text-sm font-semibold shadow-lg hover:shadow-xl transition-all overflow-hidden group bg-gradient-to-r from-primary to-accent"
+                    className="w-full h-11 gap-2 font-medium shadow-lg hover:shadow-xl transition-all"
                     disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.15)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
                     {isLoading ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin relative z-10" />
-                        <span className="relative z-10">Analyzing...</span>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Analyzing...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-4 w-4 relative z-10" />
-                        <span className="relative z-10">Run AI Search</span>
-                        <Send className="h-4 w-4 relative z-10 group-hover:translate-x-0.5 transition-transform" />
+                        <Sparkles className="h-4 w-4" />
+                        Run AI Search
+                        <Send className="h-4 w-4" />
                       </>
                     )}
                   </Button>
