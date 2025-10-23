@@ -191,100 +191,150 @@ export default function Run() {
                 <div className="w-full max-w-2xl">
 
                   {/* Centered Search Form */}
-                  <Card className="glass-card p-10 border-primary/10 shadow-2xl">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-4">
-                    <Input
-                      type="url"
-                      placeholder="🔗 Paste LinkedIn job URL here..."
-                      value={jobUrl}
-                      onChange={(e) => {
-                        setJobUrl(e.target.value);
-                        if (e.target.value) setJobDescription("");
-                      }}
-                      className="h-14 text-base border-primary/20 focus:border-primary/40 bg-background/50"
-                      disabled={isLoading}
-                    />
-
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-border" />
+                  <Card className="glass-card p-12 border-primary/10 shadow-2xl backdrop-blur-xl">
+                    <div className="mb-8 text-center">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 mb-4">
+                        <Sparkles className="h-8 w-8 text-primary" />
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-3 py-1 rounded-full text-muted-foreground font-medium">
-                          or paste description
+                      <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        AI Search Assistant
+                      </h1>
+                      <p className="text-muted-foreground">
+                        Discover companies and key contacts from any job posting
+                      </p>
+                    </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-5">
+                    {/* URL Input with Premium Styling */}
+                    <div className="group">
+                      <label className="block text-sm font-medium mb-2 text-foreground/80">
+                        LinkedIn Job URL
+                      </label>
+                      <div className="relative">
+                        <Input
+                          type="url"
+                          placeholder="https://linkedin.com/jobs/..."
+                          value={jobUrl}
+                          onChange={(e) => {
+                            setJobUrl(e.target.value);
+                            if (e.target.value) setJobDescription("");
+                          }}
+                          className="h-14 text-base pl-4 pr-4 bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl shadow-sm hover:shadow-md focus:shadow-lg"
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Elegant Divider */}
+                    <div className="relative py-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gradient-to-r from-transparent via-border to-transparent" />
+                      </div>
+                      <div className="relative flex justify-center">
+                        <span className="bg-card px-6 py-1.5 text-xs font-semibold text-muted-foreground/60 tracking-wider uppercase rounded-full border border-border/50">
+                          Or provide details
                         </span>
                       </div>
                     </div>
 
-                    <Textarea
-                      placeholder="📝 Paste full job description here...&#10;&#10;Requirements:&#10;• Minimum 300 characters&#10;• Include location information&#10;• More details = better results"
-                      value={jobDescription}
-                      onChange={(e) => {
-                        setJobDescription(e.target.value);
-                        if (e.target.value) setJobUrl("");
-                      }}
-                      className="min-h-[140px] resize-none text-base border-primary/20 focus:border-primary/40 bg-background/50"
-                      disabled={isLoading}
-                    />
-                    {jobDescription && (
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                            style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
-                          />
+                    {/* Description Textarea with Premium Styling */}
+                    <div className="group">
+                      <label className="block text-sm font-medium mb-2 text-foreground/80">
+                        Job Description
+                      </label>
+                      <Textarea
+                        placeholder="Paste the complete job description here. Include details like role, requirements, location, and company info for best results..."
+                        value={jobDescription}
+                        onChange={(e) => {
+                          setJobDescription(e.target.value);
+                          if (e.target.value) setJobUrl("");
+                        }}
+                        className="min-h-[160px] resize-none text-base p-4 bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl shadow-sm hover:shadow-md focus:shadow-lg"
+                        disabled={isLoading}
+                      />
+                      {jobDescription && (
+                        <div className="mt-3 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
+                              <div 
+                                className="h-full bg-gradient-to-r from-primary via-primary to-accent transition-all duration-500 rounded-full"
+                                style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-semibold text-muted-foreground min-w-[90px] text-right tabular-nums">
+                              {jobDescription.length} / 300
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs">
+                            <div className={`w-2 h-2 rounded-full transition-colors ${
+                              jobDescription.length >= 300 ? 'bg-green-500' : 'bg-amber-500'
+                            }`} />
+                            <span className="text-muted-foreground">
+                              {jobDescription.length >= 300 
+                                ? 'Minimum requirement met' 
+                                : `${300 - jobDescription.length} more characters needed`}
+                            </span>
+                          </div>
                         </div>
-                        <span className="text-xs text-muted-foreground font-medium min-w-[80px] text-right">
-                          {jobDescription.length} / 300
-                        </span>
-                      </div>
-                    )}
+                      )}
+                      <p className="mt-2 text-xs text-muted-foreground/70">
+                        💡 Tip: Include location information for accurate results
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Include Leads Option */}
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={includeLeads}
-                          onChange={(e) => setIncludeLeads(e.target.checked)}
-                          className="sr-only peer"
-                          disabled={isLoading}
-                        />
-                        <div className="w-11 h-6 bg-muted rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300" />
-                        <div className="absolute left-1 top-1 w-4 h-4 bg-background rounded-full transition-transform duration-300 peer-checked:translate-x-5 shadow-sm" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm group-hover:text-primary transition-colors">
-                          Include Potential Leads Search
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Find additional contacts beyond hiring managers
-                        </p>
-                      </div>
-                      <Sparkles className="h-5 w-5 text-primary/60 group-hover:text-primary transition-colors" />
-                    </label>
+                  {/* Premium Leads Toggle */}
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative p-5 rounded-2xl bg-gradient-to-br from-primary/[0.07] via-background/50 to-accent/[0.07] border-2 border-primary/10 backdrop-blur-sm hover:border-primary/20 transition-all duration-300">
+                      <label className="flex items-center gap-4 cursor-pointer">
+                        <div className="relative flex-shrink-0">
+                          <input
+                            type="checkbox"
+                            checked={includeLeads}
+                            onChange={(e) => setIncludeLeads(e.target.checked)}
+                            className="sr-only peer"
+                            disabled={isLoading}
+                          />
+                          <div className="w-14 h-7 bg-muted/80 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300 shadow-inner" />
+                          <div className="absolute left-1 top-1 w-5 h-5 bg-background rounded-full transition-all duration-300 peer-checked:translate-x-7 shadow-lg" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-base mb-0.5 flex items-center gap-2">
+                            Include Potential Leads Search
+                            <span className="px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-full">
+                              Pro
+                            </span>
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Discover additional decision-makers and influencers beyond the hiring manager
+                          </p>
+                        </div>
+                        <Sparkles className="h-6 w-6 text-primary/70 flex-shrink-0 group-hover:text-primary transition-colors" />
+                      </label>
+                    </div>
                   </div>
 
+                  {/* Premium CTA Button */}
                   <Button
                     type="submit"
-                    className="w-full h-14 text-base gap-3 magnetic-button glow-effect font-semibold relative overflow-hidden group"
+                    className="w-full h-16 text-lg gap-3 font-bold relative overflow-hidden group bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:shadow-primary/25 transition-all duration-300 rounded-xl"
                     disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
                     size="lg"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-shimmer opacity-0 group-hover:opacity-20 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-[position:-100%_0,0_0] bg-no-repeat group-hover:bg-[position:200%_0,0_0] transition-[background-position] duration-1000" />
                     {isLoading ? (
                       <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Analyzing with AI
+                        <Loader2 className="h-6 w-6 animate-spin relative z-10" />
+                        <span className="relative z-10">Analyzing with AI</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-5 w-5" />
-                        Run AI Search
-                        <Send className="h-5 w-5" />
+                        <Sparkles className="h-6 w-6 relative z-10" />
+                        <span className="relative z-10">Run AI Search</span>
+                        <Send className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </Button>
