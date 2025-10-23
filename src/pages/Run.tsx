@@ -26,6 +26,7 @@ export default function Run() {
   const { user, isAuthenticated, incrementSearches } = useMockAuth();
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
+  const [includeLeads, setIncludeLeads] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult | null>(null);
 
@@ -131,75 +132,52 @@ export default function Run() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
+      {/* Premium Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <div className="absolute top-20 right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
+      
       <Topbar />
 
-      <main className="flex-1 flex flex-col">
-        <div className="container mx-auto px-4 max-w-5xl flex-1 flex flex-col py-6">
+      {/* Floating Quota Badge */}
+      <div className="fixed top-20 right-4 z-50">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className={`glass-card px-3 py-2 rounded-full shadow-lg ${getPlanColor()}`}
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold">
+            {getPlanIcon()}
+            <span>{plan}</span>
+            {!hasUnlimitedSearches && (
+              <>
+                <span className="opacity-50">•</span>
+                <span>{searchesUsed}/{totalSearches}</span>
+              </>
+            )}
+            {hasUnlimitedSearches && (
+              <>
+                <span className="opacity-50">•</span>
+                <span>∞</span>
+              </>
+            )}
+          </div>
+        </motion.div>
+      </div>
+
+      <main className="flex-1 flex flex-col relative">
+        <div className="container mx-auto px-4 max-w-4xl flex-1 flex flex-col py-8">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors w-fit"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors w-fit"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            Back
           </Link>
 
-          {/* Premium Plan Badge */}
-          <div className="mb-6">
-            <Card className="glass-card overflow-hidden">
-              <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${getPlanColor()}`}>
-                    {getPlanIcon()}
-                    {plan} Plan
-                  </div>
-                  {!hasUnlimitedSearches ? (
-                    <div className="text-sm">
-                      <span className="font-semibold text-foreground">{searchesUsed}</span>
-                      <span className="text-muted-foreground"> / {totalSearches} searches used</span>
-                    </div>
-                  ) : (
-                    <div className="text-sm">
-                      <span className="font-semibold text-foreground">∞</span>
-                      <span className="text-muted-foreground"> Unlimited searches</span>
-                    </div>
-                  )}
-                </div>
-                {plan !== "Admin" && (
-                  <Link to="/pricing">
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Zap className="h-4 w-4" />
-                      Upgrade
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </Card>
-          </div>
-
           {/* Chat-like Interface */}
-          <div className="flex-1 flex flex-col gap-4 max-w-3xl mx-auto w-full">
-            {/* Welcome Message */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4"
-            >
-              <Card className="glass-card p-6 border-primary/20">
-                <div className="flex gap-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-lg">AI Job Search Assistant</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      I'll help you find company information and key contacts from job postings.
-                      Simply paste a LinkedIn job URL or provide a detailed job description (300+ characters with location).
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+          <div className="flex-1 flex flex-col gap-6 max-w-3xl mx-auto w-full">
 
             {/* Results Display */}
             <AnimatePresence mode="wait">
@@ -300,72 +278,118 @@ export default function Run() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Card className="glass-card p-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
+              <Card className="glass-card p-8 border-primary/10 shadow-2xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-4">
                     <Input
                       type="url"
-                      placeholder="Paste LinkedIn job URL..."
+                      placeholder="🔗 Paste LinkedIn job URL here..."
                       value={jobUrl}
                       onChange={(e) => {
                         setJobUrl(e.target.value);
                         if (e.target.value) setJobDescription("");
                       }}
-                      className="h-12 text-base"
+                      className="h-14 text-base border-primary/20 focus:border-primary/40 bg-background/50"
                       disabled={isLoading}
                     />
-                  </div>
 
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <div className="h-px bg-border flex-1" />
-                    <span>OR</span>
-                    <div className="h-px bg-border flex-1" />
-                  </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-3 py-1 rounded-full text-muted-foreground font-medium">
+                          or paste description
+                        </span>
+                      </div>
+                    </div>
 
-                  <div className="space-y-2">
                     <Textarea
-                      placeholder="Paste full job description here (min. 300 characters, include location)..."
+                      placeholder="📝 Paste full job description here...&#10;&#10;Requirements:&#10;• Minimum 300 characters&#10;• Include location information&#10;• More details = better results"
                       value={jobDescription}
                       onChange={(e) => {
                         setJobDescription(e.target.value);
                         if (e.target.value) setJobUrl("");
                       }}
-                      className="min-h-[120px] resize-none text-base"
+                      className="min-h-[140px] resize-none text-base border-primary/20 focus:border-primary/40 bg-background/50"
                       disabled={isLoading}
                     />
                     {jobDescription && (
-                      <p className="text-xs text-muted-foreground">
-                        {jobDescription.length} / 300 characters
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
+                            style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground font-medium min-w-[80px] text-right">
+                          {jobDescription.length} / 300
+                        </span>
+                      </div>
                     )}
+                  </div>
+
+                  {/* Include Leads Option */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={includeLeads}
+                          onChange={(e) => setIncludeLeads(e.target.checked)}
+                          className="sr-only peer"
+                          disabled={isLoading}
+                        />
+                        <div className="w-11 h-6 bg-muted rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300" />
+                        <div className="absolute left-1 top-1 w-4 h-4 bg-background rounded-full transition-transform duration-300 peer-checked:translate-x-5 shadow-sm" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                          Include Potential Leads Search
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Find additional contacts beyond hiring managers
+                        </p>
+                      </div>
+                      <Sparkles className="h-5 w-5 text-primary/60 group-hover:text-primary transition-colors" />
+                    </label>
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-base gap-2 magnetic-button"
+                    className="w-full h-14 text-base gap-3 magnetic-button glow-effect font-semibold relative overflow-hidden group"
                     disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
                     size="lg"
                   >
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-shimmer opacity-0 group-hover:opacity-20 transition-opacity" />
                     {isLoading ? (
                       <>
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        Analyzing...
+                        Analyzing with AI
                       </>
                     ) : (
                       <>
-                        <Send className="h-5 w-5" />
+                        <Sparkles className="h-5 w-5" />
                         Run AI Search
+                        <Send className="h-5 w-5" />
                       </>
                     )}
                   </Button>
 
                   {!canSearch && !hasUnlimitedSearches && (
-                    <p className="text-sm text-center text-muted-foreground">
-                      Search limit reached.{" "}
-                      <Link to="/pricing" className="text-primary hover:underline">
-                        Upgrade to continue
-                      </Link>
-                    </p>
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-center p-4 rounded-lg bg-destructive/10 border border-destructive/20"
+                    >
+                      <p className="text-sm font-medium text-destructive">
+                        Search limit reached.{" "}
+                        <Link to="/pricing" className="underline hover:no-underline">
+                          Upgrade to Pro
+                        </Link>
+                        {" "}for 50 searches/month
+                      </p>
+                    </motion.div>
                   )}
                 </form>
               </Card>
