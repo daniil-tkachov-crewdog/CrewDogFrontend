@@ -96,10 +96,11 @@ export default function Login() {
         className="relative w-full h-screen bg-card shadow-[0_20px_80px_rgba(0,0,0,0.15)] overflow-hidden flex"
       >
         {/* Left Side - Form */}
-        <div className="w-full lg:w-1/2 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-center bg-card/95 backdrop-blur-sm overflow-y-auto">
+        <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 xl:p-12 flex flex-col justify-center bg-card/95 backdrop-blur-sm overflow-hidden">
+          <div className="w-full max-w-[480px] mx-auto space-y-[clamp(1rem,2vh,2rem)]">
           {/* Logo with animation */}
           <motion.div
-            className="flex items-center gap-3 mb-8 md:mb-10"
+            className="flex items-center gap-3 mb-[clamp(1rem,2vh,1.5rem)]"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -116,15 +117,15 @@ export default function Login() {
 
           {/* Welcome Message with animation */}
           <motion.div
-            className="mb-8 md:mb-10"
+            className="mb-[clamp(1rem,2vh,1.5rem)]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 md:mb-3 tracking-tight">
+            <h1 className="text-[clamp(1.5rem,4vw,2rem)] font-bold text-foreground mb-2 tracking-tight">
               {isLogin ? "Welcome Back!" : "Start Your Journey"}
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground flex items-center gap-2">
+            <p className="text-[clamp(0.875rem,1.5vw,1rem)] text-muted-foreground flex items-center gap-2">
               {isLogin ? "Sign in to continue your career search" : "Create an account to find your dream job"}
               <Sparkles className="w-4 h-4 text-primary" />
             </p>
@@ -132,7 +133,7 @@ export default function Login() {
 
           {/* Tab Switcher with animation */}
           <motion.div
-            className="flex gap-2 sm:gap-3 mb-8 md:mb-10"
+            className="flex gap-2 mb-[clamp(1rem,2vh,1.5rem)]"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -142,7 +143,7 @@ export default function Login() {
                 setIsLogin(true);
                 toast.info("Switched to Sign In");
               }}
-              className={`flex-1 py-3 sm:py-3.5 px-4 sm:px-8 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+              className={`flex-1 py-[clamp(0.625rem,1.5vh,0.875rem)] px-4 rounded-full text-[clamp(0.875rem,1.5vw,1rem)] font-medium transition-all duration-300 ${
                 isLogin
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                   : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -157,7 +158,7 @@ export default function Login() {
                 setIsLogin(false);
                 toast.info("Switched to Sign Up");
               }}
-              className={`flex-1 py-3 sm:py-3.5 px-4 sm:px-8 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+              className={`flex-1 py-[clamp(0.625rem,1.5vh,0.875rem)] px-4 rounded-full text-[clamp(0.875rem,1.5vw,1rem)] font-medium transition-all duration-300 ${
                 !isLogin
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                   : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -170,7 +171,7 @@ export default function Login() {
           </motion.div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-[clamp(0.875rem,1.5vh,1.25rem)]">
             {/* Email Input with animation */}
             <motion.div
               className="relative"
@@ -185,7 +186,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 onFocus={() => setEmailFocused(true)}
                 onBlur={() => setEmailFocused(false)}
-                className="pl-5 pr-12 h-12 sm:h-14 rounded-full bg-muted/40 border border-muted hover:border-muted-foreground/20 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                className="pl-5 pr-12 h-[clamp(2.75rem,6vh,3.5rem)] rounded-full bg-muted/40 border border-muted hover:border-muted-foreground/20 focus:border-primary transition-all duration-300 text-[clamp(0.875rem,1.5vw,1rem)]"
                 disabled={isLoading}
               />
               <motion.div
@@ -213,7 +214,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
-                className="pl-5 pr-12 h-12 sm:h-14 rounded-full bg-muted/40 border border-muted hover:border-muted-foreground/20 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                className="pl-5 pr-12 h-[clamp(2.75rem,6vh,3.5rem)] rounded-full bg-muted/40 border border-muted hover:border-muted-foreground/20 focus:border-primary transition-all duration-300 text-[clamp(0.875rem,1.5vw,1rem)]"
                 disabled={isLoading}
               />
               <motion.button
@@ -258,7 +259,7 @@ export default function Login() {
                     placeholder="Confirm your password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-5 pr-12 h-12 sm:h-14 rounded-full bg-muted/40 border border-muted hover:border-muted-foreground/20 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                    className="pl-5 pr-12 h-[clamp(2.75rem,6vh,3.5rem)] rounded-full bg-muted/40 border border-muted hover:border-muted-foreground/20 focus:border-primary transition-all duration-300 text-[clamp(0.875rem,1.5vw,1rem)]"
                     disabled={isLoading}
                   />
                   <Lock className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -289,7 +290,7 @@ export default function Login() {
                     />
                     <label
                       htmlFor="remember"
-                      className="text-xs sm:text-sm text-muted-foreground cursor-pointer select-none"
+                      className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-muted-foreground cursor-pointer select-none"
                     >
                       Remember me
                     </label>
@@ -297,7 +298,7 @@ export default function Login() {
                   <motion.button
                     type="button"
                     onClick={() => navigate("/forgot-password")}
-                    className="text-xs sm:text-sm text-primary hover:underline font-medium"
+                    className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-primary hover:underline font-medium"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -316,7 +317,7 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 sm:h-14 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm sm:text-base font-semibold shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-[clamp(2.75rem,6vh,3.5rem)] rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[clamp(0.875rem,1.5vw,1rem)] font-semibold shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <motion.div className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -340,7 +341,7 @@ export default function Login() {
 
             {/* Divider with animation */}
             <motion.div
-              className="relative my-6 sm:my-8"
+              className="relative my-[clamp(1rem,2vh,1.5rem)]"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
@@ -348,14 +349,14 @@ export default function Login() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-muted/50" />
               </div>
-              <div className="relative flex justify-center text-xs sm:text-sm">
-                <span className="bg-card px-4 sm:px-5 text-muted-foreground font-medium">OR</span>
+              <div className="relative flex justify-center text-[clamp(0.75rem,1.5vw,0.875rem)]">
+                <span className="bg-card px-4 text-muted-foreground font-medium">OR</span>
               </div>
             </motion.div>
 
             {/* Social Login Buttons with animations */}
             <motion.div
-              className="space-y-3 sm:space-y-3.5"
+              className="space-y-[clamp(0.75rem,1.5vh,1rem)]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
@@ -370,14 +371,15 @@ export default function Login() {
                     })
                   }
                   disabled={isLoading}
-                  className="w-full h-12 sm:h-14 rounded-full border-2 text-sm sm:text-base font-medium hover:bg-muted/30 transition-all disabled:opacity-50"
+                  className="w-full h-[clamp(2.75rem,6vh,3.5rem)] rounded-full border-2 text-[clamp(0.875rem,1.5vw,1rem)] font-medium hover:bg-muted/30 transition-all disabled:opacity-50"
                 >
-                  <Chrome className="w-5 h-5 mr-2 sm:mr-3" />
+                  <Chrome className="w-5 h-5 mr-2" />
                   Log in with Google
                 </Button>
               </motion.div>
             </motion.div>
           </form>
+          </div>
         </div>
 
         {/* Right Side - Blue Fluid Background Image */}
