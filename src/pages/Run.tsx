@@ -50,11 +50,11 @@ export default function Run() {
   const getPlanColor = () => {
     switch (plan) {
       case "Admin":
-        return "bg-gradient-to-r from-amber-500 to-orange-500 text-white";
+        return "bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400";
       case "Pro":
-        return "bg-gradient-to-r from-primary to-accent text-primary-foreground";
+        return "bg-primary/10 border-primary/20 text-primary";
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-muted/50 border-border text-muted-foreground";
     }
   };
 
@@ -134,7 +134,11 @@ export default function Run() {
   const hasSearched = results !== null || isLoading;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
+      {/* Subtle tech background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.05),transparent_50%),radial-gradient(circle_at_70%_80%,hsl(var(--accent)/0.05),transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+      
       <Topbar />
 
       {/* Floating Quota Badge */}
@@ -142,20 +146,20 @@ export default function Run() {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className={`glass-card px-3 py-2 rounded-full shadow-lg ${getPlanColor()}`}
+          className={`backdrop-blur-lg px-3 py-1.5 rounded-full shadow-lg border ${getPlanColor()}`}
         >
-          <div className="flex items-center gap-2 text-xs font-semibold">
+          <div className="flex items-center gap-2 text-xs font-medium">
             {getPlanIcon()}
             <span>{plan}</span>
             {!hasUnlimitedSearches && (
               <>
-                <span className="opacity-50">•</span>
-                <span>{searchesUsed}/{totalSearches}</span>
+                <span className="opacity-40">•</span>
+                <span className="tabular-nums">{searchesUsed}/{totalSearches}</span>
               </>
             )}
             {hasUnlimitedSearches && (
               <>
-                <span className="opacity-50">•</span>
+                <span className="opacity-40">•</span>
                 <span>∞</span>
               </>
             )}
@@ -186,79 +190,100 @@ export default function Run() {
                 <div className="w-full max-w-2xl">
 
                   {/* Centered Search Form */}
-                  <Card className="border p-8">
+                  <Card className="relative backdrop-blur-xl bg-card/80 border-2 border-primary/10 p-8 shadow-xl">
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-accent/[0.02] rounded-lg pointer-events-none" />
+                    
+                    <div className="relative">
+                      <div className="mb-6 text-center">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 mb-3">
+                          <Sparkles className="h-6 w-6 text-primary" />
+                        </div>
+                        <h1 className="text-2xl font-semibold mb-1">AI Job Search</h1>
+                        <p className="text-sm text-muted-foreground">Find companies and decision makers instantly</p>
+                      </div>
+
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-4">
-                    <Input
-                      type="url"
-                      placeholder="Paste LinkedIn job URL"
-                      value={jobUrl}
-                      onChange={(e) => {
-                        setJobUrl(e.target.value);
-                        if (e.target.value) setJobDescription("");
-                      }}
-                      className="h-10"
-                      disabled={isLoading}
-                    />
+                    <div className="group">
+                      <Input
+                        type="url"
+                        placeholder="https://linkedin.com/jobs/..."
+                        value={jobUrl}
+                        onChange={(e) => {
+                          setJobUrl(e.target.value);
+                          if (e.target.value) setJobDescription("");
+                        }}
+                        className="h-11 border-border/50 bg-background/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                        disabled={isLoading}
+                      />
+                    </div>
 
                     <div className="relative">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t" />
+                        <div className="w-full border-t border-border/50" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="bg-background px-2 text-xs text-muted-foreground">or</span>
+                        <span className="bg-card px-3 text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">or</span>
                       </div>
                     </div>
 
-                    <Textarea
-                      placeholder="Paste job description (min. 300 characters, include location)"
-                      value={jobDescription}
-                      onChange={(e) => {
-                        setJobDescription(e.target.value);
-                        if (e.target.value) setJobUrl("");
-                      }}
-                      className="min-h-[120px] resize-none"
-                      disabled={isLoading}
-                    />
-                    {jobDescription && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all"
-                            style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
-                          />
+                    <div className="group">
+                      <Textarea
+                        placeholder="Paste full job description...&#10;&#10;• Minimum 300 characters&#10;• Include location&#10;• More detail = better results"
+                        value={jobDescription}
+                        onChange={(e) => {
+                          setJobDescription(e.target.value);
+                          if (e.target.value) setJobUrl("");
+                        }}
+                        className="min-h-[130px] resize-none border-border/50 bg-background/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                        disabled={isLoading}
+                      />
+                      {jobDescription && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
+                              style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-medium text-muted-foreground tabular-nums">
+                            {jobDescription.length}/300
+                          </span>
                         </div>
-                        <span className="tabular-nums">{jobDescription.length}/300</span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
 
-                  <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent/5 transition-colors">
+                  <label className="flex items-center gap-3 p-3.5 border border-primary/10 rounded-lg cursor-pointer hover:bg-primary/5 hover:border-primary/20 transition-all group">
                     <input
                       type="checkbox"
                       checked={includeLeads}
                       onChange={(e) => setIncludeLeads(e.target.checked)}
-                      className="w-4 h-4 rounded border-input"
+                      className="w-4 h-4 rounded border-input accent-primary"
                       disabled={isLoading}
                     />
-                    <div className="flex-1 text-sm">
-                      Include potential leads search
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">Include potential leads</div>
+                      <div className="text-xs text-muted-foreground">Find additional contacts beyond hiring managers</div>
                     </div>
+                    <Sparkles className="h-4 w-4 text-primary/60 group-hover:text-primary transition-colors" />
                   </label>
 
                   <Button
                     type="submit"
-                    className="w-full gap-2"
+                    className="w-full h-11 gap-2 font-medium shadow-lg hover:shadow-xl transition-all"
                     disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
                   >
                     {isLoading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Searching...
+                        Analyzing...
                       </>
                     ) : (
                       <>
-                        Run Search
+                        <Sparkles className="h-4 w-4" />
+                        Run AI Search
                         <Send className="h-4 w-4" />
                       </>
                     )}
@@ -279,7 +304,8 @@ export default function Run() {
                       </p>
                     </motion.div>
                   )}
-                    </form>
+                </form>
+                    </div>
                   </Card>
                 </div>
               </motion.div>
@@ -298,8 +324,13 @@ export default function Run() {
                   animate={{ opacity: 1, x: 0 }}
                   className="lg:col-span-1"
                 >
-                  <Card className="border p-5 h-full">
-                    <h2 className="text-sm font-semibold mb-4">Search Query</h2>
+                  <Card className="backdrop-blur-xl bg-card/80 border-2 border-primary/10 p-6 h-full shadow-lg">
+                    <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border/50">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                      </div>
+                      <h2 className="text-sm font-semibold">Search Query</h2>
+                    </div>
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="space-y-3">
                         <Input
@@ -310,16 +341,16 @@ export default function Run() {
                             setJobUrl(e.target.value);
                             if (e.target.value) setJobDescription("");
                           }}
-                          className="h-9 text-sm"
+                          className="h-9 text-sm border-border/50 bg-background/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
                           disabled={isLoading}
                         />
 
                         <div className="relative">
                           <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t" />
+                            <div className="w-full border-t border-border/50" />
                           </div>
                           <div className="relative flex justify-center">
-                            <span className="bg-background px-2 text-xs text-muted-foreground">or</span>
+                            <span className="bg-card px-2 text-xs text-muted-foreground/70 uppercase tracking-wide">or</span>
                           </div>
                         </div>
 
@@ -330,36 +361,36 @@ export default function Run() {
                             setJobDescription(e.target.value);
                             if (e.target.value) setJobUrl("");
                           }}
-                          className="min-h-[80px] resize-none text-sm"
+                          className="min-h-[80px] resize-none text-sm border-border/50 bg-background/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
                           disabled={isLoading}
                         />
                         {jobDescription && (
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1 bg-muted/50 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-primary transition-all"
+                                className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
                                 style={{ width: `${Math.min((jobDescription.length / 300) * 100, 100)}%` }}
                               />
                             </div>
-                            <span className="tabular-nums">{jobDescription.length}/300</span>
+                            <span className="text-xs text-muted-foreground tabular-nums">{jobDescription.length}/300</span>
                           </div>
                         )}
                       </div>
 
-                      <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-accent/5 transition-colors">
+                      <label className="flex items-center gap-2 p-2.5 border border-primary/10 rounded cursor-pointer hover:bg-primary/5 hover:border-primary/20 transition-all">
                         <input
                           type="checkbox"
                           checked={includeLeads}
                           onChange={(e) => setIncludeLeads(e.target.checked)}
-                          className="w-4 h-4 rounded"
+                          className="w-4 h-4 rounded accent-primary"
                           disabled={isLoading}
                         />
-                        <span className="text-xs">Include leads</span>
+                        <span className="text-xs font-medium">Include leads</span>
                       </label>
 
                       <Button
                         type="submit"
-                        className="w-full h-9 text-sm gap-2"
+                        className="w-full h-9 text-sm gap-2 shadow-md hover:shadow-lg transition-all"
                         disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
                       >
                         {isLoading ? (
