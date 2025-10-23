@@ -51,16 +51,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-8 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-6 lg:p-8 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden">
       {/* Subtle ambient background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-muted/20 via-transparent to-transparent" />
       
-      {/* Main Card Container - Centered and Full */}
+      {/* Main Card Container - Full Screen Feel */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative w-full max-w-7xl h-[700px] bg-card rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] overflow-hidden flex"
+        className="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)] bg-card rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] overflow-hidden flex"
       >
         {/* Left Side - Form */}
         <div className="w-full lg:w-1/2 p-16 flex flex-col justify-center bg-card/95 backdrop-blur-sm">
