@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plane, User, Sparkles, Zap, Search, Menu, X } from "lucide-react";
+import { Plane, User, Sparkles, Zap, Search, Menu, X, Moon, Sun } from "lucide-react";
 import { useMockAuth } from "@/hooks/useMockAuth";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 export const Topbar = () => {
   const { isAuthenticated, user } = useMockAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
   const { scrollY } = useScroll();
   
   const headerBackground = useTransform(
@@ -116,6 +118,23 @@ export const Topbar = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
+          {/* Theme Toggle */}
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="relative group overflow-hidden"
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100"
+                transition={{ duration: 0.3 }}
+              />
+            </Button>
+          </motion.div>
+          
           {isAuthenticated ? (
             <>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -237,6 +256,17 @@ export const Topbar = () => {
         transition={{ duration: 0.3 }}
       >
         <div className="container mx-auto px-4 py-6 space-y-4 border-t border-border/40">
+          {/* Theme Toggle Mobile */}
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute left-8 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="ml-6">Toggle Theme</span>
+          </Button>
+          
           {isAuthenticated ? (
             <>
               <Link to="/run" onClick={() => setIsMobileMenuOpen(false)}>
