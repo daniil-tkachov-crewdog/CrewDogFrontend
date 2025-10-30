@@ -1,24 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Plane,
-  User,
-  Sparkles,
-  Zap,
-  Search,
-  Menu,
-  X,
-  Moon,
-  Sun,
-  LogOut,
-} from "lucide-react";
+import { Plane, User, Sparkles, Zap, Menu, X, Moon, Sun } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/auth/AuthProvider";
 
 export const Topbar = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user } = useAuth();
   const isAuthenticated = !!user;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,16 +16,7 @@ export const Topbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const headerBackground = useTransform(
-    scrollY,
-    [0, 100],
-    ["rgba(var(--background), 0.80)", "rgba(var(--background), 0.95)"]
-  );
-  const headerBlur = useTransform(
-    scrollY,
-    [0, 100],
-    ["blur(8px)", "blur(16px)"]
-  );
+  const headerOpacity = useTransform(scrollY, [0, 100], [0.8, 0.95]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -53,22 +33,10 @@ export const Topbar = () => {
   const isActive = (path: string) =>
     activePath === path ? "text-foreground" : "text-foreground/80";
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate("/login");
-    } catch {
-      // no-op; toast already handled at adapter layer if you add it there
-    }
-  };
-
   return (
     <motion.header
-      className="sticky top-0 z-50 w-full border-b border-border/40 backdrop-blur-xl"
-      style={{
-        backgroundColor: headerBackground as any,
-        backdropFilter: headerBlur as any,
-      }}
+      className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl"
+      style={{ opacity: headerOpacity as any }}
     >
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 opacity-50 pointer-events-none" />
@@ -163,82 +131,35 @@ export const Topbar = () => {
             </Button>
           </motion.div>
 
-          {isAuthenticated ? (
-            <>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+          {/* Always show Account */}
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link to="/account" aria-label="Account">
+              <Button
+                variant="ghost"
+                className={`relative group overflow-hidden ${isActive(
+                  "/account"
+                )}`}
               >
-                <Link to="/run" aria-label="Run Search">
-                  <Button
-                    variant="ghost"
-                    className={`relative group overflow-hidden ${isActive(
-                      "/run"
-                    )}`}
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      <Search className="h-4 w-4" />
-                      Run Search
-                    </span>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100"
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Button>
-                </Link>
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link to="/account" aria-label="Account">
-                  <Button
-                    variant="ghost"
-                    className={`relative group overflow-hidden ${isActive(
-                      "/account"
-                    )}`}
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      <motion.div
-                        className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center"
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.6 }}
-                      >
-                        <User className="h-4 w-4 text-primary-foreground" />
-                      </motion.div>
-                      {user?.name || user?.email}
-                    </span>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100"
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Button>
-                </Link>
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  variant="ghost"
-                  onClick={handleLogout}
-                  className="relative group overflow-hidden"
-                  aria-label="Logout"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </span>
+                <span className="relative z-10 flex items-center gap-2">
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100"
-                    transition={{ duration: 0.3 }}
-                  />
-                </Button>
-              </motion.div>
-            </>
-          ) : (
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <User className="h-4 w-4 text-primary-foreground" />
+                  </motion.div>
+                  {isAuthenticated ? user?.name || user?.email : "Account"}
+                </span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100"
+                  transition={{ duration: 0.3 }}
+                />
+              </Button>
+            </Link>
+          </motion.div>
+
+          {/* For guests, keep Login and Get Started */}
+          {!isAuthenticated && (
             <>
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -346,30 +267,15 @@ export const Topbar = () => {
             <span className="ml-6">Toggle Theme</span>
           </Button>
 
-          {isAuthenticated ? (
-            <>
-              <Link to="/run">
-                <Button variant="ghost" className="w-full justify-start">
-                  <Search className="mr-2 h-4 w-4" />
-                  Run Search
-                </Button>
-              </Link>
-              <Link to="/account">
-                <Button variant="ghost" className="w-full justify-start">
-                  <User className="mr-2 h-4 w-4" />
-                  {user?.name || user?.email}
-                </Button>
-              </Link>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-            </>
-          ) : (
+          {/* Always show Account in mobile */}
+          <Link to="/account">
+            <Button variant="ghost" className="w-full justify-start">
+              <User className="mr-2 h-4 w-4" />
+              {isAuthenticated ? user?.name || user?.email : "Account"}
+            </Button>
+          </Link>
+
+          {!isAuthenticated ? (
             <>
               <Link to="/login">
                 <Button variant="ghost" className="w-full">
@@ -383,7 +289,7 @@ export const Topbar = () => {
                 </Button>
               </Link>
             </>
-          )}
+          ) : null}
         </div>
       </motion.div>
     </motion.header>

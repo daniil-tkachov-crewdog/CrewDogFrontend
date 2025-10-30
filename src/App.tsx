@@ -50,14 +50,6 @@ const App = () => (
               />
 
               <Route
-                path="/run"
-                element={
-                  <RequireAuth>
-                    <Run />
-                  </RequireAuth>
-                }
-              />
-              <Route
                 path="/account"
                 element={
                   <RequireAuth>

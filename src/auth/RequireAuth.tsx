@@ -1,20 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "@/auth/AuthProvider";
 
-export const RequireAuth: React.FC<React.PropsWithChildren> = ({
-  children,
-}) => {
+export const RequireAuth = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  const loc = useLocation();
+  const location = useLocation();
 
-  if (loading) return null; // TODO: replace with a skeleton/spinner if desired
-  if (!user)
-    return (
-      <Navigate
-        to={`/login?from=${encodeURIComponent(loc.pathname)}`}
-        replace
-      />
-    );
+  // Avoid flicker/bounce while auth initializes
+  if (loading) return null; // or a full-page spinner
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
 
   return <>{children}</>;
 };
