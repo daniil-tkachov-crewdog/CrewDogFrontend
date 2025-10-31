@@ -19,6 +19,14 @@
 
   <body>
     <div id="root"></div>
+
+    <!-- Optional runtime override for the direct n8n webhook.
+         If you set VITE_N8N_GATECRASHER_URL in .env files, you can remove this.
+         This wins over env and ensures we always hit n8n directly (no proxy timeouts). -->
+    <script>
+      window.__N8N_GATECRASHER_URL = "https://crewdog.app.n8n.cloud/webhook/gatecrasher";
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

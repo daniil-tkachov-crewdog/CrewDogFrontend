@@ -25,23 +25,43 @@ export type RunResponse = {
   [k: string]: any;
 };
 
+/** Prefer the legacy direct webhook if provided (fixes JD_link 500s) */
+const DIRECT_GATECRASHER =
+  (window as any).__N8N_GATECRASHER_URL ||
+  (import.meta as any).env?.VITE_N8N_GATECRASHER_URL ||
+  "";
+
 /** Call your backend → n8n webhook (no backend changes needed) */
 export async function runSearch(payload: RunPayload): Promise<RunResponse> {
-  const res = await fetch(
-    `${(API_BASE || "").replace(/\/$/, "")}/n8n/gatecrasher`,
-    {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        JD: payload.JD || "",
-        JD_link: payload.JD_link || "",
-        JH_tickbox: payload.includeLeads ? "yes" : "no",
-        // mirror old form’s saver flag (kept as "No")
-        "Save to the doc file and the spreadsheet? (+10 sec)": "No",
-      }),
-    }
-  );
+  const base = (API_BASE || "").replace(/\/$/, "");
+  const url =
+    (DIRECT_GATECRASHER && String(DIRECT_GATECRASHER).replace(/\/$/, "")) ||
+    `${base}/n8n/gatecrasher`;
+
+  // Small guard: ensure JD_link is a proper absolute URL if present
+  if (payload.JD_link && !/^https?:\/\//i.test(payload.JD_link)) {
+    throw new Error("Please include http(s):// in the Job URL");
+  }
+
+  const body = JSON.stringify({
+    JD: (payload.JD || "").trim(),
+    JD_link: (payload.JD_link || "").trim(),
+    JH_tickbox: payload.includeLeads ? "yes" : "no",
+    // mirror old form’s saver flag (kept as "No")
+    "Save to the doc file and the spreadsheet? (+10 sec)": "No",
+  });
+
+  // If we're hitting our own API (same origin / proxied), include cookies.
+  // For direct n8n webhook (legacy behavior), avoid sending cookies.
+  const sameOrigin =
+    url.startsWith(window.location.origin) || url.startsWith("/");
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    ...(sameOrigin ? { credentials: "include" } : {}),
+    body,
+  });
 
   // Try to parse JSON; if text, attempt JSON; else return as-is
   const ct = (res.headers.get("content-type") || "").toLowerCase();

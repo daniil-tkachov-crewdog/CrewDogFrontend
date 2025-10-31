@@ -1,6 +1,9 @@
 import { API_BASE } from "@/lib/config";
 import { getIdentity } from "@/lib/supabase";
 
+/** =========================
+ * Account Summary (existing)
+ * ========================= */
 export type RawSummary = {
   status?: string;
   unlimited?: boolean;
@@ -54,7 +57,7 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
 
   let remaining = [
     s?.creditsRemaining,
-    s?.remainingCredits, // 👈 now part of RawSummary type
+    s?.remainingCredits,
     s?.searches?.remaining,
     s?.quota?.remaining,
   ]
@@ -106,4 +109,17 @@ export async function fetchAccountSummary(): Promise<NormalizedSummary> {
   );
   if (!res.ok) return normalizeSummary({ status: "none", creditsRemaining: 3 });
   return normalizeSummary(await res.json());
+}
+
+/** =========================
+ * NEW: consumeOneCredit
+ * ========================= */
+export async function consumeOneCredit(userId?: string) {
+  if (!userId) return;
+  await fetch(`${API_BASE.replace(/\/$/, "")}/account/consume`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId }),
+  });
 }

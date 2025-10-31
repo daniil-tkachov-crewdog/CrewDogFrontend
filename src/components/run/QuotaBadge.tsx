@@ -1,45 +1,53 @@
-// src/components/run/QuotaBadge.tsx
-import { useEffect, useState } from "react";
+// src/features/run/QuotaBadge.tsx
+import { useAuth } from "@/auth/AuthProvider";
+import { Crown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import { Crown, Sparkles, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 import { fetchAccountSummary } from "@/services/account";
 
+function isAdminUser(user: any) {
+  const app = user?.app_metadata ?? {};
+  const u = user?.user_metadata ?? {};
+  const role = app.role ?? u.role ?? user?.role;
+  return (
+    role === "ADMIN" ||
+    role === "admin" ||
+    app.isAdmin === true ||
+    u.isAdmin === true
+  );
+}
+
 export default function QuotaBadge() {
-  const [plan, setPlan] = useState<"Admin" | "Pro" | "Free">("Free");
-  const [cap, setCap] = useState<number>(3);
+  const { user } = useAuth();
+  const [cap, setCap] = useState<number>(0);
   const [used, setUsed] = useState<number>(0);
   const [unlimited, setUnlimited] = useState<boolean>(false);
 
   useEffect(() => {
+    let mounted = true;
     (async () => {
-      const s = await fetchAccountSummary();
-      const _plan: "Admin" | "Pro" | "Free" = s.unlimited
-        ? "Admin"
-        : s.pro
-        ? "Pro"
-        : "Free";
-      setPlan(_plan);
-      setCap(s.cap);
-      setUsed(s.used);
-      setUnlimited(!!s.unlimited);
+      try {
+        const s = await fetchAccountSummary();
+        if (!mounted) return;
+        setCap(s.cap ?? 0);
+        setUsed(s.used ?? 0);
+        setUnlimited(Boolean(s.unlimited));
+      } catch {}
     })();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const icon =
-    plan === "Admin" ? (
-      <Crown className="h-4 w-4" />
-    ) : plan === "Pro" ? (
-      <Zap className="h-4 w-4" />
-    ) : (
-      <Sparkles className="h-4 w-4" />
-    );
+  const admin = isAdminUser(user);
+  const plan = admin ? "Admin" : unlimited ? "Pro" : "Free";
+  const hasUnlimited = admin || unlimited;
 
   const color =
     plan === "Admin"
       ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
-      : plan === "Pro"
-      ? "bg-gradient-to-r from-primary to-accent text-primary-foreground"
       : "bg-muted text-muted-foreground";
+  const Icon = plan === "Admin" ? Crown : Sparkles;
 
   return (
     <div className="fixed top-20 right-4 z-50">
@@ -49,10 +57,15 @@ export default function QuotaBadge() {
         className={`glass-card px-3 py-2 rounded-full shadow-lg ${color}`}
       >
         <div className="flex items-center gap-2 text-xs font-semibold">
-          {icon}
+          <Icon className="h-4 w-4" />
           <span>{plan}</span>
-          <span className="opacity-50">•</span>
-          <span>{unlimited ? "∞" : `${used}/${cap}`}</span>
+          {hasUnlimited ? (
+            <span>• ∞</span>
+          ) : (
+            <span>
+              • {used}/{cap}
+            </span>
+          )}
         </div>
       </motion.div>
     </div>
