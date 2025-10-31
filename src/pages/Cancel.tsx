@@ -1,15 +1,25 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Topbar } from "@/components/layout/Topbar";
 import { motion } from "framer-motion";
 import { XCircle } from "lucide-react";
+import { gaEvent } from "@/analytics/gtm";
 
 export default function Cancel() {
+  useEffect(() => {
+    (window as any).dataLayer = (window as any).dataLayer || [];
+    (window as any).dataLayer.push({ event: "checkout_cancel" });
+    try {
+      gaEvent("checkout_cancel");
+    } catch {}
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Topbar />
-      
+
       <main className="flex-1 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -22,10 +32,11 @@ export default function Cancel() {
                 <XCircle className="h-8 w-8 text-muted-foreground" />
               </div>
             </div>
-            
+
             <h1 className="text-3xl font-bold mb-4">Payment Cancelled</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Your payment was cancelled. No charges have been made to your account.
+              Your payment was cancelled. No charges have been made to your
+              account.
             </p>
 
             <div className="space-y-3">

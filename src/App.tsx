@@ -22,8 +22,15 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { RequireAuth } from "./auth/RequireAuth";
 import Verify from "./pages/Verify";
 import ResetPassword from "./pages/ResetPassword";
+import ConsentBanner from "@/components/ConsentBanner";
+import usePageViews from "@/analytics/usePageViews";
 
 const queryClient = new QueryClient();
+
+function AnalyticsBoot() {
+  usePageViews();
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -33,6 +40,9 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            
+            <AnalyticsBoot />
+
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<Home />} />
@@ -48,7 +58,6 @@ const App = () => (
                   </RequireAuth>
                 }
               />
-
               <Route
                 path="/account"
                 element={
@@ -64,9 +73,11 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/success" element={<Success />} />
               <Route path="/cancel" element={<Cancel />} />
-              {/* Catch-all */}
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
+
+            <ConsentBanner />
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

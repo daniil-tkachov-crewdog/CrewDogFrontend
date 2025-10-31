@@ -103,7 +103,7 @@ export default function RunPage() {
       return;
     }
 
-    // GA4: submit
+    // ✅ GA4: submit (matches legacy)
     (window as any).dataLayer = (window as any).dataLayer || [];
     (window as any).dataLayer.push({
       event: "run_search",
@@ -135,7 +135,7 @@ export default function RunPage() {
         }),
       ]);
 
-      // GA4: success
+      // ✅ GA4: success (matches legacy)
       (window as any).dataLayer.push({
         event: "run_search_success",
         with_leads: includeLeads,
@@ -156,7 +156,7 @@ export default function RunPage() {
         description: "Found company & contacts.",
       });
     } catch (err: any) {
-      // GA4: error
+      // ✅ GA4: error (matches legacy)
       (window as any).dataLayer.push({
         event: "run_search_error",
         message: err?.message || String(err),

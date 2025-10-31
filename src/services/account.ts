@@ -24,6 +24,8 @@ export type RawSummary = {
 export type NormalizedSummary = {
   pro: boolean;
   unlimited: boolean;
+  /** NEW: carry admin bit through so UI can label Admin correctly */
+  isAdmin: boolean;
   cap: number;
   used: number;
   remaining: number | null;
@@ -37,10 +39,11 @@ export type NormalizedSummary = {
 const num = (v: any, d = NaN) => (Number.isFinite(Number(v)) ? Number(v) : d);
 
 export function normalizeSummary(s?: RawSummary): NormalizedSummary {
+  const isAdmin = s?.isAdmin === true; // preserve server admin flag
+
+  // If admin -> unlimited, regardless of other fields
   const unlimited =
-    s?.unlimited === true ||
-    s?.isAdmin === true ||
-    s?.creditsRemaining === null;
+    isAdmin || s?.unlimited === true || s?.creditsRemaining === null;
 
   const status = String(s?.status || "none").toLowerCase();
   const pro = ["active", "trialing", "past_due", "unpaid"].includes(status);
@@ -86,6 +89,7 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
   return {
     pro,
     unlimited,
+    isAdmin,
     cap,
     used: Math.max(0, Number.isFinite(used) ? (used as number) : 0),
     remaining: unlimited
@@ -103,9 +107,7 @@ export async function fetchAccountSummary(): Promise<NormalizedSummary> {
 
   const res = await fetch(
     `${API_BASE.replace(/\/$/, "")}/account/summary/${userId}`,
-    {
-      credentials: "include",
-    }
+    { credentials: "include" }
   );
   if (!res.ok) return normalizeSummary({ status: "none", creditsRemaining: 3 });
   return normalizeSummary(await res.json());
