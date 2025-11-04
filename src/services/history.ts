@@ -1,15 +1,9 @@
+// src/services/history.ts
 import { API_BASE } from "@/lib/config";
 import { getIdentity } from "@/lib/supabase";
+import type { SearchRow, HistoryResp } from "@/types/account";
 
-/** ========== existing: history listing ========== */
-export type HistoryItem = {
-  id: string;
-  jobTitle?: string;
-  companyName?: string;
-  createdAt?: string;
-  jdExcerpt?: string;
-  hrContacts?: { name?: string; profileUrl?: string }[];
-};
+export type HistoryItem = SearchRow; // keep existing imports stable
 
 export async function fetchSearchHistory({
   limit = 5,
@@ -17,7 +11,7 @@ export async function fetchSearchHistory({
 }: {
   limit?: number;
   cursor?: string | null;
-}) {
+}): Promise<HistoryResp> {
   const { userId } = await getIdentity();
   if (!userId) return { ok: true, items: [], nextCursor: null };
 
@@ -29,21 +23,17 @@ export async function fetchSearchHistory({
 
   const res = await fetch(url.toString(), { credentials: "include" });
   if (!res.ok) throw new Error("History fetch failed");
-  return res.json() as Promise<{
-    ok: boolean;
-    items: HistoryItem[];
-    nextCursor: string | null;
-  }>;
+  return (await res.json()) as HistoryResp;
 }
 
-/** ========== NEW: history logger (parity with old site) ========== */
+/** Mirror old-site semantics for saving a run item */
 export async function logHistory(args: {
   userId?: string;
   summary: {
     company?: string;
     website?: string;
     careerPage?: string;
-    contacts?: Array<{ name: string; role?: string; linkedIn?: string }>;
+    contacts?: Array<{ name?: string; role?: string; linkedIn?: string }>;
     sniff_out_clues?: string;
   };
   jobUrl: string;

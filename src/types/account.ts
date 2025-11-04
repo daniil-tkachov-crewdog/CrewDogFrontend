@@ -1,3 +1,5 @@
+// src/types/account.ts
+
 export type Price = {
   amount?: number;
   currency?: string;
@@ -21,7 +23,7 @@ export type SummaryRaw = {
 };
 
 export type NormalizedSummary = {
-  status: string;
+  status: string; // ← carry raw subscription status through
   pro: boolean;
   cap: number;
   used: number;
@@ -45,4 +47,16 @@ export type HistoryResp = {
   ok: boolean;
   items: SearchRow[];
   nextCursor?: string | null;
+};
+
+export type AccountUser = {
+  id: string;
+  name: string;
+  email: string;
+  plan: "Free" | "Pro" | "Admin" | string;
+  renewalDate?: string | null;
+  quota: {
+    used: number;
+    total: number;
+  };
 };

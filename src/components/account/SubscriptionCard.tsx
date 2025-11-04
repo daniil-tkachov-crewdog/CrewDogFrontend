@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, CheckCircle2, Crown, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { AccountUser } from "@/data/account.types";
+import type { AccountUser } from "@/types/account";
+import type { NormalizedSummary } from "@/types/account";
+
 import { notify } from "@/lib/notify";
-import { startCheckout, renewNow, confirmIfRequired } from "@/services/billing";
-import type { NormalizedSummary } from "@/services/account";
+import {
+  startCheckout,
+  renewNow,
+  confirmIfRequired,
+  openBillingPortal, // keep if you added Manage Billing
+} from "@/services/billing";
 
 export default function SubscriptionCard({
   user,
@@ -55,6 +61,14 @@ export default function SubscriptionCard({
       await onRefresh();
     } catch (e: any) {
       notify(e?.message || "Could not renew now.", "error");
+    }
+  };
+
+  const handleManageBilling = async () => {
+    try {
+      await openBillingPortal();
+    } catch (e: any) {
+      notify(e?.message || "Could not open billing portal.", "error");
     }
   };
 
@@ -143,11 +157,20 @@ export default function SubscriptionCard({
                 Upgrade Plan
               </Button>
             )}
+
+            {/* Manage Billing available to paying users (non-unlimited) */}
+            {pro && !unlimited && (
+              <Button variant="outline" size="lg" onClick={handleManageBilling}>
+                Manage Billing
+              </Button>
+            )}
+
             {pro && !unlimited && atCap && (
               <Button size="lg" className="flex-1" onClick={handleRenewNow}>
                 Renew now
               </Button>
             )}
+
             {pro && (
               <Button variant="outline" size="lg" onClick={onCancel}>
                 Cancel

@@ -1,15 +1,12 @@
+// src/services/account.ts
 import { API_BASE } from "@/lib/config";
 import { getIdentity } from "@/lib/supabase";
 
-/** =========================
- * Account Summary (existing)
- * ========================= */
 export type RawSummary = {
   status?: string;
   unlimited?: boolean;
   isAdmin?: boolean;
   creditsRemaining?: number | null;
-  /** Some backends use this name – include it to avoid TS error */
   remainingCredits?: number | null;
   searchCap?: number;
   cap?: number;
@@ -19,12 +16,14 @@ export type RawSummary = {
   renewalDate?: string | null;
   cancelAtPeriodEnd?: boolean;
   price?: { amount: number; currency: string; interval: "month" | "year" };
+  /** backend sometimes sends either of these */
+  freeTryUsed?: boolean;
+  has_claimed_free_try?: boolean;
 };
 
 export type NormalizedSummary = {
   pro: boolean;
   unlimited: boolean;
-  /** NEW: carry admin bit through so UI can label Admin correctly */
   isAdmin: boolean;
   cap: number;
   used: number;
@@ -34,14 +33,16 @@ export type NormalizedSummary = {
   price?:
     | { amount: number; currency: string; interval: "month" | "year" }
     | undefined;
+  /** optional: handy for debugging/labels */
+  status?: string;
 };
 
+const FREE_CAP = 3;
+const PRO_CAP = 25;
 const num = (v: any, d = NaN) => (Number.isFinite(Number(v)) ? Number(v) : d);
 
 export function normalizeSummary(s?: RawSummary): NormalizedSummary {
-  const isAdmin = s?.isAdmin === true; // preserve server admin flag
-
-  // If admin -> unlimited, regardless of other fields
+  const isAdmin = s?.isAdmin === true;
   const unlimited =
     isAdmin || s?.unlimited === true || s?.creditsRemaining === null;
 
@@ -53,10 +54,11 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
     s?.cap,
     s?.searches?.cap,
     s?.quota?.cap,
-    pro ? 25 : 3,
+    pro ? PRO_CAP : FREE_CAP,
   ];
   const cap =
-    capCandidates.map((v) => num(v)).find(Number.isFinite) ?? (pro ? 25 : 3);
+    capCandidates.map((v) => num(v)).find(Number.isFinite) ??
+    (pro ? PRO_CAP : FREE_CAP);
 
   let remaining = [
     s?.creditsRemaining,
@@ -71,6 +73,7 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
     .map((v) => num(v))
     .find(Number.isFinite);
 
+  // derive the missing side if only one is present
   if (
     !Number.isFinite(used) &&
     Number.isFinite(cap) &&
@@ -86,6 +89,15 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
     remaining = Math.max(0, cap - (used as number));
   }
 
+  // 🔓 Free-plan “first run” override (parity with old site):
+  // if user is NOT pro, NOT unlimited, and backend says freeTryUsed === false,
+  // force the UI to 0/3 so brand-new users never start at 3/3.
+  const freeTryUsed = s?.freeTryUsed ?? s?.has_claimed_free_try;
+  if (!unlimited && !pro && freeTryUsed === false) {
+    used = 0;
+    remaining = FREE_CAP;
+  }
+
   return {
     pro,
     unlimited,
@@ -98,6 +110,7 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
     renewalDate: s?.renewalDate || null,
     cancelAtPeriodEnd: !!s?.cancelAtPeriodEnd,
     price: s?.price,
+    status: s?.status,
   };
 }
 
@@ -122,6 +135,6 @@ export async function consumeOneCredit(userId?: string) {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId }),
+    body: JSON.stringify({ userId}),
   });
 }
