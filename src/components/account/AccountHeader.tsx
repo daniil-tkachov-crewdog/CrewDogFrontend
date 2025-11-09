@@ -1,10 +1,24 @@
+// src/components/account/AccountHeader.tsx
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Activity, Briefcase, Calendar, Crown, Target } from "lucide-react";
-import type { AccountUser } from "../data/account.types";
+import { Briefcase, Crown } from "lucide-react";
+import type { AccountUser } from "@/types/account";
+import type { NormalizedSummary } from "@/services/account";
 
-export default function AccountHeader({ user }: { user: AccountUser }) {
+export default function AccountHeader({
+  user,
+  summary,
+}: {
+  user: AccountUser;
+  summary: NormalizedSummary | null | undefined;
+}) {
+  const pro = summary?.pro ?? user.plan !== "Free";
+  const unlimited = summary?.unlimited ?? false;
+
+  const planLabel = unlimited ? "Admin" : pro ? "Pro" : "Free";
+  const searchesUsed = summary?.used ?? user.quota?.used ?? 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +51,7 @@ export default function AccountHeader({ user }: { user: AccountUser }) {
           <div className="flex-1 text-center md:text-left">
             <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
               <h1 className="text-3xl font-bold">{user.name}</h1>
-              {user.plan !== "Free" && (
+              {(pro || unlimited) && (
                 <motion.div
                   whileHover={{ rotate: 360 }}
                   transition={{ duration: 0.5 }}
@@ -45,33 +59,18 @@ export default function AccountHeader({ user }: { user: AccountUser }) {
                   <Crown className="h-6 w-6 text-yellow-500" />
                 </motion.div>
               )}
+              <Badge className="bg-gradient-to-r from-primary to-purple-500">
+                {planLabel}
+              </Badge>
             </div>
             <p className="text-muted-foreground mb-4">{user.email}</p>
-            <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-              <Badge variant="secondary" className="gap-1">
-                <Calendar className="h-3 w-3" />
-                Member since {user.memberSince}
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <Activity className="h-3 w-3" />
-                {user.totalSearches} searches
-              </Badge>
-              <Badge
-                variant="outline"
-                className="gap-1 bg-green-500/10 text-green-500 border-green-500/20"
-              >
-                <Target className="h-3 w-3" />
-                {user.successRate}% success rate
-              </Badge>
-            </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Searches", value: user.totalSearches, icon: Briefcase },
-              { label: "Success", value: `${user.successRate}%`, icon: Target },
-              { label: "Tier", value: user.plan, icon: Crown },
+              { label: "Searches", value: searchesUsed, icon: Briefcase },
+              { label: "Tier", value: planLabel, icon: Crown },
             ].map((s, i) => (
               <motion.div
                 key={i}

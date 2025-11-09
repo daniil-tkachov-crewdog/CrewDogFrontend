@@ -1,3 +1,4 @@
+// src/pages/account.tsx
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/AuthProvider";
@@ -155,7 +156,7 @@ export default function AccountPage() {
             </button>
           </motion.div>
 
-          <AccountHeader user={user} />
+          <AccountHeader user={user} summary={summary} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -206,19 +207,19 @@ export default function AccountPage() {
                     onRefresh={refreshSummary}
                     onCancel={handleStartCancel}
                   />
-                  <AchievementsGrid achievements={accountAchievements} />
+                  {/* <AchievementsGrid achievements={accountAchievements} /> */}
                 </TabsContent>
 
                 <TabsContent value="history" className="space-y-8">
-                  <ActivityLog items={accountActivity} />
+                  {/* <ActivityLog items={accountActivity} /> */}
                   {/* New SearchHistory fetches its own data */}
                   <SearchHistory />
                 </TabsContent>
 
                 <TabsContent value="settings" className="space-y-8">
                   <SecuritySection />
-                  <NotificationsSection />
-                  <DataPrivacySection />
+                  {/* <NotificationsSection />
+                  <DataPrivacySection /> */}
                 </TabsContent>
 
                 <TabsContent value="support" className="space-y-8">

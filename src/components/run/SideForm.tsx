@@ -28,14 +28,13 @@ export default function SideForm({
   canSearch,
   onSubmit,
 }: Props) {
-  const jdLen = jobDescription?.length ?? 0;
-
   return (
     <Card className="glass-card p-6 h-full">
       <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
         <Sparkles className="h-5 w-5 text-primary" />
         Search Query
       </h2>
+
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-3">
           <Input
@@ -69,19 +68,7 @@ export default function SideForm({
             className="min-h-[100px] resize-none text-sm border-primary/20 bg-background/50"
             disabled={isLoading}
           />
-          {jobDescription && (
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-primary to-accent transition-all"
-                  style={{ width: `${Math.min((jdLen / 300) * 100, 100)}%` }}
-                />
-              </div>
-              <span className="text-xs text-muted-foreground min-w-[60px] text-right">
-                {jdLen}/300
-              </span>
-            </div>
-          )}
+
           <p className="text-xs text-muted-foreground/70">
             ⚠️ Location is mandatory for best results.
           </p>

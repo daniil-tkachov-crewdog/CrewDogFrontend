@@ -94,16 +94,16 @@ export default function CenteredForm({
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
-                    <div
+                    {/* <div
                       className="h-full bg-gradient-to-r from-primary via-primary to-accent transition-all duration-500 rounded-full"
                       style={{
                         width: `${Math.min((jdLen / 300) * 100, 100)}%`,
                       }}
-                    />
+                    /> */}
                   </div>
-                  <span className="text-xs font-semibold text-muted-foreground min-w-[90px] text-right tabular-nums">
+                  {/* <span className="text-xs font-semibold text-muted-foreground min-w-[90px] text-right tabular-nums">
                     {jdLen} / 300
-                  </span>
+                  </span> */}
                 </div>
               </div>
             )}

@@ -88,8 +88,7 @@ export const Footer = () => {
             </div>
 
             <p className="text-sm text-muted-foreground leading-relaxed">
-              The LinkedIn Job Recommendation Engine that transforms your job
-              search with AI-powered insights and precision matching.
+              Find jobs before they are publicly advertised.
             </p>
 
             {/* Social Links */}
@@ -142,14 +141,14 @@ export const Footer = () => {
               links: [
                 { to: "/run", label: "Run Search" },
                 { to: "/pricing", label: "Pricing" },
-                { to: "/faq", label: "FAQ" },
+                // { to: "/faq", label: "FAQ" },
               ],
             },
             {
               title: "Support",
               links: [
                 { to: "/support", label: "Contact" },
-                { to: "/faq", label: "Help Center" },
+                { to: "/faq", label: "FAQ" },
                 { to: "/account", label: "My Account" },
               ],
             },

@@ -48,13 +48,13 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Topbar />
-      
+
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDU5LDEzMCwyNDYsMC4xKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
-          
+
           <div className="container mx-auto px-4 py-20 md:py-32 relative">
             <motion.div
               initial="initial"
@@ -68,24 +68,44 @@ export default function Home() {
                   <span>Skip the middleman. Apply smarter.</span>
                 </div>
               </motion.div>
-              
-              <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold tracking-tight">
+
+              <motion.h1
+                variants={fadeInUp}
+                className="text-5xl md:text-7xl font-bold tracking-tight"
+              >
                 The LinkedIn Job
-                <span className="block text-primary">Recommendation Engine</span>
+                <span className="block text-primary">
+                  Recommendation Engine
+                </span>
               </motion.h1>
-              
-              <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-                Find the real employer behind recruiter posts. Stop wasting time on middlemen and apply directly to decision makers.
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
+              >
+                Find the employers and LinkedIn contacts behind any job
+                description. Go direct to the decision makers instead of wasting
+                time on recruiters.
               </motion.p>
-              
-              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+
+              <motion.div
+                variants={fadeInUp}
+                className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
+              >
                 <Link to="/run">
-                  <Button size="lg" className="text-lg px-8 py-6 magnetic-button glow-effect">
+                  <Button
+                    size="lg"
+                    className="text-lg px-8 py-6 magnetic-button glow-effect"
+                  >
                     Start Free Search
                   </Button>
                 </Link>
                 <Link to="/faq">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="text-lg px-8 py-6"
+                  >
                     Learn More
                   </Button>
                 </Link>
@@ -104,7 +124,9 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="text-center space-y-2"
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary">{counts.searches.toLocaleString()}+</div>
+                <div className="text-4xl md:text-5xl font-bold text-primary">
+                  {counts.searches.toLocaleString()}+
+                </div>
                 <div className="text-muted-foreground">Searches Completed</div>
               </motion.div>
               <motion.div
@@ -114,7 +136,9 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="text-center space-y-2"
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary">{counts.jobs.toLocaleString()}+</div>
+                <div className="text-4xl md:text-5xl font-bold text-primary">
+                  {counts.jobs.toLocaleString()}+
+                </div>
                 <div className="text-muted-foreground">Jobs Analyzed</div>
               </motion.div>
               <motion.div
@@ -124,7 +148,9 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="text-center space-y-2"
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary">{counts.success}%</div>
+                <div className="text-4xl md:text-5xl font-bold text-primary">
+                  {counts.success}%
+                </div>
                 <div className="text-muted-foreground">Success Rate</div>
               </motion.div>
             </div>
@@ -143,10 +169,14 @@ export default function Home() {
               viewport={{ once: true }}
               className="max-w-3xl mx-auto text-center space-y-6 mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-bold">What is CrewDog?</h2>
+              <h2 className="text-4xl md:text-5xl font-bold">
+                What is CrewDog?
+              </h2>
               <p className="text-xl text-muted-foreground">
-                CrewDog analyzes LinkedIn job posts to identify the actual hiring company behind recruiter listings. 
-                Get direct application routes and skip the middleman entirely.
+                CrewDog identifies employers and relevant LinkedIn contacts from
+                any job description so users can go directly. It bypasses
+                recruiters and enables early outreach before roles are publicly
+                visible.
               </p>
             </motion.div>
 
@@ -161,9 +191,12 @@ export default function Home() {
                   <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <Search className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">Intelligent Analysis</h3>
+                  <h3 className="text-xl font-semibold mb-3">
+                    Intelligent Analysis
+                  </h3>
                   <p className="text-muted-foreground">
-                    Our AI analyzes job descriptions to trace the real employer, even when posts are made by third-party recruiters.
+                    Our AI analyzes job descriptions to trace the real employer,
+                    even when posts are made by third-party recruiters.
                   </p>
                 </Card>
               </motion.div>
@@ -180,7 +213,8 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Direct Routes</h3>
                   <p className="text-muted-foreground">
-                    Get company websites, career pages, and hiring manager contacts to bypass recruiters and apply directly.
+                    Get company websites, career pages, and hiring manager
+                    contacts to bypass recruiters and apply directly.
                   </p>
                 </Card>
               </motion.div>
@@ -197,7 +231,8 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Higher Success</h3>
                   <p className="text-muted-foreground">
-                    Direct applications have significantly higher response rates than going through third-party recruiters.
+                    Direct applications have significantly higher response rates
+                    than going through third-party recruiters.
                   </p>
                 </Card>
               </motion.div>
@@ -214,9 +249,12 @@ export default function Home() {
               viewport={{ once: true }}
               className="max-w-3xl mx-auto text-center space-y-6 mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-bold">Why Job Hunters Use CrewDog</h2>
+              <h2 className="text-4xl md:text-5xl font-bold">
+                Why Job Hunters Use CrewDog
+              </h2>
               <p className="text-xl text-muted-foreground">
-                Stop losing opportunities to recruiter filters and middlemen fees
+                Stop losing opportunities to recruiter filters and middlemen
+                fees
               </p>
             </motion.div>
 
@@ -225,9 +263,8 @@ export default function Home() {
                 "Get past recruiter gatekeepers who filter out qualified candidates",
                 "Apply directly to hiring managers and decision makers",
                 "Avoid having your details shared without consent",
-                "Skip the recruiter markup on your potential salary",
                 "Build direct relationships with employers",
-                "Increase response rates by 3-5x with direct applications"
+                "Cut employer finder fees by going direct to the people hiring",
               ].map((benefit, index) => (
                 <motion.div
                   key={index}
@@ -256,7 +293,8 @@ export default function Home() {
             >
               <h2 className="text-4xl md:text-5xl font-bold">What You Get</h2>
               <p className="text-xl text-muted-foreground">
-                Comprehensive intelligence to bypass recruiters and connect directly
+                Comprehensive intelligence to bypass recruiters and connect
+                directly on LinkedIn.
               </p>
             </motion.div>
 
@@ -295,13 +333,16 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <Card className="max-w-3xl mx-auto p-12 text-center glass-card glow-effect">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Ready to Find Real Opportunities?
+                Find roles before they are publicly advertised.
               </h2>
               <p className="text-xl text-muted-foreground mb-8">
                 Start your first search free. No credit card required.
               </p>
               <Link to="/run">
-                <Button size="lg" className="text-lg px-12 py-6 magnetic-button">
+                <Button
+                  size="lg"
+                  className="text-lg px-12 py-6 magnetic-button"
+                >
                   Start Your Search Now
                 </Button>
               </Link>

@@ -7,133 +7,149 @@ import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, Send, Mail, MessageCircle, Phone, Clock, CheckCircle2, Sparkles, HeadphonesIcon, Zap, Shield } from "lucide-react";
+import {
+  ArrowLeft,
+  Send,
+  HeadphonesIcon,
+  Clock,
+  CheckCircle2,
+  Sparkles,
+  Zap,
+  Shield,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { sendSupportMessage } from "@/services/support";
 import faqHeroBg from "@/assets/faq-hero-bg.jpg";
-
-const contactMethods = [
-  {
-    icon: Mail,
-    title: "Email Support",
-    description: "Get a response within 24 hours",
-    detail: "support@crewdog.com",
-    color: "from-blue-500 to-cyan-500",
-    action: "Send Email"
-  },
-  {
-    icon: MessageCircle,
-    title: "Live Chat",
-    description: "Chat with our team instantly",
-    detail: "Available 9 AM - 6 PM GMT",
-    color: "from-primary to-purple-500",
-    action: "Start Chat"
-  },
-  {
-    icon: Phone,
-    title: "Phone Support",
-    description: "Speak with an expert",
-    detail: "+44 20 1234 5678",
-    color: "from-green-500 to-emerald-500",
-    action: "Call Now"
-  }
-];
 
 const faqs = [
   {
     question: "How quickly will I get a response?",
-    answer: "We typically respond to all inquiries within 24 hours during business days. For urgent issues, our live chat support is available during business hours for immediate assistance."
+    answer:
+      "We typically respond to all inquiries within 24 hours during business days. For urgent issues, our live chat support is available during business hours for immediate assistance.",
   },
   {
     question: "What information should I include in my message?",
-    answer: "Please include your account email, a detailed description of your issue or question, and any relevant screenshots. This helps us provide you with faster, more accurate support."
+    answer:
+      "Please include your account email, a detailed description of your issue or question, and any relevant screenshots. This helps us provide you with faster, more accurate support.",
   },
   {
     question: "Do you offer phone support?",
-    answer: "Yes, phone support is available for Pro and Business plan subscribers during business hours (9 AM - 6 PM GMT, Monday to Friday)."
+    answer:
+      "Yes, phone support is available for Pro and Business plan subscribers during business hours (9 AM - 6 PM GMT, Monday to Friday).",
   },
   {
     question: "Can I schedule a demo or consultation?",
-    answer: "Absolutely! Business plan subscribers can schedule dedicated consultation sessions. Contact us through this form or email us directly to arrange a convenient time."
-  }
+    answer:
+      "Absolutely! Business plan subscribers can schedule dedicated consultation sessions. Contact us through this form or email us directly to arrange a convenient time.",
+  },
 ];
 
 export default function Support() {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
-  
+
+  // form state
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(""); // if you have userEmail, set it as initial state here
+  const [topic, setTopic] = useState<string>("");
   const [message, setMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
+
     setError("");
-    
-    // Check honeypot
-    if (honeypot) {
+    setSuccess(false);
+
+    // bot check
+    if (honeypot) return;
+
+    // basic validation to mirror SupportForm behavior
+    const trimmedEmail = email.trim();
+    const trimmedMessage = message.trim();
+
+    if (!trimmedEmail || !trimmedMessage) {
+      const msg = "Email and message are required.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
-    if (!email || !message) {
-      setError("Email and message are required");
-      return;
-    }
+    try {
+      setLoading(true);
+      await sendSupportMessage({
+        email: trimmedEmail,
+        message: trimmedMessage,
+        topic: (topic as any) || "other",
+        // optional: name can be ignored by backend if not expected
+      });
 
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
+      // reset fields similar to SupportForm
       setName("");
       setEmail("");
+      setTopic("");
       setMessage("");
-    }, 1000);
+      setSuccess(true);
+      toast.success("Message sent! We'll get back to you soon.");
+    } catch (err: any) {
+      const msg = err?.message || "Failed to send. Please try again.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Topbar />
-      
+
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <motion.div 
-          className="absolute inset-0"
-          style={{ y: heroY }}
-        >
-          <div 
+        <motion.div className="absolute inset-0" style={{ y: heroY }}>
+          <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ 
+            style={{
               backgroundImage: `url(${faqHeroBg})`,
-              filter: 'brightness(0.4)'
+              filter: "brightness(0.4)",
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-cyan-500/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </motion.div>
 
-        {/* Animated Particles */}
+        {/* Ambient particles */}
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-primary/30 rounded-full"
-              initial={{ 
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
+              initial={{
+                x:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerWidth : 1000),
                 y: Math.random() * 300,
               }}
               animate={{
                 y: [null, Math.random() * 300],
-                opacity: [0.3, 0.8, 0.3]
+                opacity: [0.3, 0.8, 0.3],
               }}
               transition={{
                 duration: Math.random() * 10 + 10,
                 repeat: Infinity,
-                ease: "linear"
+                ease: "linear",
               }}
             />
           ))}
@@ -162,8 +178,8 @@ export default function Support() {
                 24/7 Support
               </span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               className="text-4xl md:text-6xl font-bold"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -173,17 +189,17 @@ export default function Support() {
                 We're Here to Help
               </span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               className="text-lg text-foreground/70 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              Get in touch with our support team. We're committed to helping you succeed.
+              Get in touch with our support team. We're committed to helping you
+              succeed.
             </motion.p>
 
-            {/* Trust Indicators */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -209,55 +225,6 @@ export default function Support() {
 
       <main className="flex-1 py-12 md:py-20">
         <div className="container mx-auto px-4 max-w-7xl">
-          {/* Contact Methods */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
-          >
-            {contactMethods.map((method, index) => {
-              const IconComponent = method.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className="relative group"
-                >
-                  <motion.div 
-                    className={`absolute -inset-4 bg-gradient-to-r ${method.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity`}
-                  />
-                  <div className="relative glass-card p-6 rounded-2xl border border-border/50 hover:border-primary/30 transition-all text-center">
-                    <motion.div
-                      className={`inline-flex p-4 rounded-xl bg-gradient-to-br ${method.color} mb-4 shadow-lg`}
-                      whileHover={{ rotate: 5, scale: 1.1 }}
-                      transition={{ type: "spring", stiffness: 400 }}
-                    >
-                      <IconComponent className="h-6 w-6 text-white" />
-                    </motion.div>
-                    <h3 className={`text-xl font-semibold mb-2 bg-gradient-to-r ${method.color} bg-clip-text text-transparent`}>
-                      {method.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-1">{method.description}</p>
-                    <p className="text-sm font-medium text-foreground mb-4">{method.detail}</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="w-full group-hover:border-primary/50 transition-colors"
-                    >
-                      {method.action}
-                    </Button>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-
-          {/* Contact Form Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
             {/* Form */}
             <motion.div
@@ -276,18 +243,21 @@ export default function Support() {
                 </p>
 
                 {success && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20 text-primary flex items-start gap-3"
                   >
                     <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                    <span>Thank you for your message! We'll get back to you within 24 hours.</span>
+                    <span>
+                      Thank you for your message! We'll get back to you within
+                      24 hours.
+                    </span>
                   </motion.div>
                 )}
 
                 {error && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive"
@@ -303,17 +273,19 @@ export default function Support() {
                     name="website"
                     value={honeypot}
                     onChange={(e) => setHoneypot(e.target.value)}
-                    style={{ position: 'absolute', left: '-9999px' }}
+                    style={{ position: "absolute", left: "-9999px" }}
                     tabIndex={-1}
                     aria-hidden="true"
                   />
 
-                  <motion.div 
+                  <motion.div
                     className="space-y-2"
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
-                    <Label htmlFor="name" className="text-sm font-medium">Name (optional)</Label>
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Name (optional)
+                    </Label>
                     <Input
                       id="name"
                       type="text"
@@ -324,12 +296,14 @@ export default function Support() {
                     />
                   </motion.div>
 
-                  <motion.div 
+                  <motion.div
                     className="space-y-2"
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
-                    <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email *
+                    </Label>
                     <Input
                       id="email"
                       type="email"
@@ -338,15 +312,51 @@ export default function Support() {
                       onChange={(e) => setEmail(e.target.value)}
                       className="h-11 glass-card border-border/50 focus:border-primary/50 transition-colors"
                       required
+                      disabled={loading}
                     />
                   </motion.div>
 
-                  <motion.div 
+                  {/* Subject/Topic to mirror SupportForm */}
+                  <motion.div
                     className="space-y-2"
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
-                    <Label htmlFor="message" className="text-sm font-medium">Message *</Label>
+                    <Label htmlFor="topic" className="text-sm font-medium">
+                      Subject
+                    </Label>
+                    <Select
+                      value={topic}
+                      onValueChange={setTopic}
+                      disabled={loading}
+                    >
+                      <SelectTrigger
+                        id="topic"
+                        className="h-11 glass-card border-border/50 focus:border-primary/50"
+                      >
+                        <SelectValue placeholder="Select a topic" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="technical">
+                          Technical Issue
+                        </SelectItem>
+                        <SelectItem value="billing">
+                          Billing Question
+                        </SelectItem>
+                        <SelectItem value="feature">Feature Request</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    <Label htmlFor="message" className="text-sm font-medium">
+                      Message *
+                    </Label>
                     <Textarea
                       id="message"
                       placeholder="Tell us how we can help..."
@@ -354,6 +364,7 @@ export default function Support() {
                       onChange={(e) => setMessage(e.target.value)}
                       className="min-h-[150px] glass-card border-border/50 focus:border-primary/50 transition-colors resize-none"
                       required
+                      disabled={loading}
                     />
                   </motion.div>
 
@@ -361,9 +372,9 @@ export default function Support() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Button 
-                      type="submit" 
-                      className="w-full h-12 magnetic-button text-base font-medium" 
+                    <Button
+                      type="submit"
+                      className="w-full h-12 magnetic-button text-base font-medium"
                       size="lg"
                       disabled={loading}
                     >
@@ -371,7 +382,11 @@ export default function Support() {
                         <>
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
                             className="mr-2"
                           >
                             <Sparkles className="h-4 w-4" />
@@ -414,14 +429,14 @@ export default function Support() {
                     >
                       <summary className="font-medium cursor-pointer list-none flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
                         <span className="text-sm">{faq.question}</span>
-                        <motion.span 
+                        <motion.span
                           className="text-primary group-open:rotate-180 transition-transform flex-shrink-0 ml-2"
                           animate={{ rotate: 0 }}
                         >
                           ▼
                         </motion.span>
                       </summary>
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         className="px-3 pb-3 pt-2 text-sm text-muted-foreground"
@@ -449,9 +464,15 @@ export default function Support() {
                       <Clock className="h-5 w-5 text-white" />
                     </motion.div>
                     <div>
-                      <h4 className="font-semibold mb-1">Average Response Time</h4>
-                      <p className="text-2xl font-bold text-primary mb-1">&lt; 24 hours</p>
-                      <p className="text-sm text-muted-foreground">During business days</p>
+                      <h4 className="font-semibold mb-1">
+                        Average Response Time
+                      </h4>
+                      <p className="text-2xl font-bold text-primary mb-1">
+                        &lt; 24 hours
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        During business days
+                      </p>
                     </div>
                   </div>
                 </div>
