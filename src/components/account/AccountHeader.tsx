@@ -13,11 +13,15 @@ export default function AccountHeader({
   user: AccountUser;
   summary: NormalizedSummary | null | undefined;
 }) {
-  const pro = summary?.pro ?? user.plan !== "Free";
-  const unlimited = summary?.unlimited ?? false;
+   const pro = summary?.pro ?? false;
+   const unlimited = summary?.unlimited ?? false;
 
-  const planLabel = unlimited ? "Admin" : pro ? "Pro" : "Free";
-  const searchesUsed = summary?.used ?? user.quota?.used ?? 0;
+   const planLabel = unlimited
+     ? "Admin"
+     : summary?.planLabel ?? (pro ? "Pro" : "Free");
+
+   const searchesUsed = summary?.used ?? user.quota?.used ?? 0;
+
 
   return (
     <motion.div

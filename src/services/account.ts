@@ -32,11 +32,44 @@ export type NormalizedSummary = {
     | { amount: number; currency: string; interval: "month" | "year" }
     | undefined;
   status?: string;
+
+  // NEW: UI-friendly plan info
+  planCode?: string; // e.g. 'platinum', 'silver', 'gold', 'business', 'retention', 'legacy_pro', ...
+  planLabel?: string; // e.g. 'Platinum', 'Silver', 'Gold', 'Business', 'Retention', 'Pro', 'Free'
 };
+
 
 const FREE_CAP = 3;
 const PRO_CAP = 25;
 const num = (v: any) => (Number.isFinite(Number(v)) ? Number(v) : NaN);
+
+// Map Stripe price -> plan (based on amount in minor units, GBP)
+function inferPlanFromPrice(
+  s?: RawSummary
+): { code: string; label: string; cap: number } | null {
+  if (!s?.price) return null;
+
+  const currency = (s.price.currency || "").toLowerCase();
+  const amount = s.price.amount; // e.g. 999 for £9.99
+
+  if (currency !== "gbp") return null;
+
+  switch (amount) {
+    case 999:
+      return { code: "platinum", label: "Platinum", cap: 20 };
+    case 2999:
+      return { code: "silver", label: "Silver", cap: 60 };
+    case 9900:
+      return { code: "gold", label: "Gold", cap: 200 };
+    case 29900:
+      return { code: "business", label: "Business", cap: 1000 };
+    case 500:
+      return { code: "retention", label: "Retention", cap: 10 };
+    default:
+      return null; // legacy / unknown plans: will fall back to 25-cap logic
+  }
+}
+
 
 export function normalizeSummary(s?: RawSummary): NormalizedSummary {
   const isAdmin = s?.isAdmin === true;
@@ -46,15 +79,20 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
   const status = String(s?.status || "none").toLowerCase();
   const pro = ["active", "trialing", "past_due", "unpaid"].includes(status);
 
+  // NEW: infer plan from Stripe price (Platinum/Silver/Gold/Business/Retention)
+  const plan = inferPlanFromPrice(s);
+  const planCap = plan?.cap;
+
   const capCandidates = [
     s?.searchCap,
     s?.cap,
     s?.searches?.cap,
     s?.quota?.cap,
-    pro ? PRO_CAP : FREE_CAP,
+    pro ? planCap ?? PRO_CAP : FREE_CAP,
   ];
   const cap =
-    capCandidates.map(num).find(Number.isFinite) ?? (pro ? PRO_CAP : FREE_CAP);
+    capCandidates.map(num).find(Number.isFinite) ??
+    (pro ? planCap ?? PRO_CAP : FREE_CAP);
 
   let remaining = [
     s?.creditsRemaining,
@@ -104,7 +142,7 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
     remaining = FREE_CAP;
   }
 
-  return {
+   return {
     pro,
     unlimited,
     isAdmin,
@@ -117,6 +155,10 @@ export function normalizeSummary(s?: RawSummary): NormalizedSummary {
     cancelAtPeriodEnd: !!s?.cancelAtPeriodEnd,
     price: s?.price,
     status: s?.status,
+
+    // NEW
+    planCode: plan?.code,
+    planLabel: plan ? plan.label : pro ? "Pro" : "Free",
   };
 }
 

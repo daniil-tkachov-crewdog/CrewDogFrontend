@@ -23,15 +23,21 @@ export type SummaryRaw = {
 };
 
 export type NormalizedSummary = {
-  status: string; // ← carry raw subscription status through
   pro: boolean;
+  unlimited: boolean;
+  isAdmin: boolean;
   cap: number;
   used: number;
   remaining: number | null;
   renewalDate: string | null;
-  unlimited: boolean;
-  price?: Price;
   cancelAtPeriodEnd: boolean;
+  price?:
+    | { amount: number; currency: string; interval: "month" | "year" }
+    | undefined;
+  status?: string;
+
+  planCode?: string; // 'platinum' | 'silver' | 'gold' | 'business' | 'retention' | 'legacy_pro' | ...
+  planLabel?: string; // 'Platinum' | 'Silver' | 'Gold' | 'Business' | 'Retention' | 'Free' | 'Admin' | 'Pro'
 };
 
 export type SearchRow = {

@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Gift, Sparkles } from "lucide-react";
-import { cancelSubscription, downgradeToTwoPounds } from "@/services/billing";
+import {
+  cancelSubscription,
+  downgradeToRetentionPlan,
+} from "@/services/billing";
 import { notify } from "@/lib/notify";
 import { useState } from "react";
 
@@ -31,11 +34,19 @@ export default function DownsellModal({
   const accept = async () => {
     setBusy("accept");
     try {
-      await downgradeToTwoPounds();
-      notify("Your subscription price was downgraded to £2/month!", "success");
+      await downgradeToRetentionPlan();
+
+      // 🔹 UPDATED: be explicit that the change applies from the next cycle
+      // notify(
+      //   "Your plan will change to the £5/month retention plan from your next billing cycle. Your current credits stay the same for this period.",
+      //   "success"
+      // );
+
       onAccept();
       onOpenChange(false);
     } catch (e: any) {
+      // Backend will return “Downgrade is only available for Platinum plan users.”
+      // for non-platinum users – we just surface that nicely.
       notify(e?.message || "Plan change failed.", "error");
     } finally {
       setBusy(null);
@@ -47,7 +58,7 @@ export default function DownsellModal({
     try {
       await cancelSubscription();
       notify(
-        "Cancellation scheduled. You keep access until period end.",
+        "Cancellation scheduled. You keep access and credits until your current period ends.",
         "success"
       );
       onCancelAnyway();
@@ -65,11 +76,13 @@ export default function DownsellModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Gift className="h-5 w-5 text-primary" />
-            Special Offer - Stay for £2/month
+            Special Offer – Retention Plan (£5/month)
           </DialogTitle>
           <DialogDescription>
-            We'd love to keep you! How about staying with us for just £2/month
-            instead?
+            We'd love to keep you! Switch to our £5/month retention plan with a
+            smaller bundle of searches. Your current cycle’s credits stay the
+            same; the lower allowance only applies from your next billing
+            period.
           </DialogDescription>
         </DialogHeader>
 
@@ -80,14 +93,15 @@ export default function DownsellModal({
               transition={{ duration: 2, repeat: Infinity }}
               className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent"
             >
-              £2/month
+              £5/month
             </motion.div>
             <Badge variant="outline" className="mb-4">
               <Sparkles className="h-3 w-3 mr-1" />
               Limited time offer
             </Badge>
             <p className="text-sm text-muted-foreground">
-              Keep all premium features at 60% off
+              Keep access on a lighter plan while you’re not searching as much –
+              with your current period’s credits untouched.
             </p>
           </div>
         </Card>

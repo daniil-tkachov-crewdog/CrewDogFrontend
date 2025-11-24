@@ -40,14 +40,24 @@ function getStripe() {
   return stripePromise;
 }
 
-export async function startCheckout() {
+export type PlanCode = "platinum" | "silver" | "gold" | "business";
+
+export async function startCheckout(plan?: PlanCode) {
   const { userId, email } = await getIdentity();
   if (!userId || !email) throw new Error("Sign in first.");
 
+  console.log("🚀 startCheckout payload:", {
+    userId,
+    email,
+    plan,
+  });
+
   const data = await postJSON<{ url: string }>(
     `${base}/stripe/create-checkout-session`,
-    { userId, email }
+    { userId, email, plan }
   );
+
+  console.log("✅ Checkout session response:", data);
 
   if (!data?.url) throw new Error("No checkout URL received.");
   window.location.href = data.url;
@@ -109,12 +119,13 @@ export async function sendCancelFeedback(reason?: string, otherText?: string) {
   });
 }
 
-export async function downgradeToTwoPounds() {
+export async function downgradeToRetentionPlan() {
   const { userId } = await getIdentity();
   if (!userId) throw new Error("Sign in first.");
 
   await postJSON(`${base}/stripe/downgrade`, { userId });
 }
+
 
 // 3DS / SCA helper
 export async function confirmIfRequired(client_secret?: string) {

@@ -98,13 +98,25 @@ export default function QuotaBadge() {
   const plan: Plan = useMemo(() => {
     if (isAdmin) return "Admin";
     if (hasUnlimited) return "Pro";
+
+    // Try to read from user metadata first (if you ever set it)
     const metaPlan = readPlanFromMeta(user);
     if (metaPlan) return metaPlan;
-    if ((capServer ?? 0) >= 25) return "Pro";
+
+    // Fallback: anything above free cap (3) is treated as a paid plan
+    if ((capServer ?? 0) > 3) return "Pro";
+
     return "Free";
   }, [isAdmin, hasUnlimited, user, capServer]);
 
-  const enforcedCap = hasUnlimited ? Infinity : plan === "Pro" ? 25 : 3;
+    const enforcedCap = hasUnlimited
+      ? Infinity
+      : Number.isFinite(capServer as any)
+      ? (capServer as number)
+      : plan === "Pro"
+      ? 20 // safe default if server didn't send a cap
+      : 3;
+
 
   const usedDisplay = hasUnlimited
     ? usedServer
