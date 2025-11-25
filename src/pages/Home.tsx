@@ -83,9 +83,9 @@ export default function Home() {
                 variants={fadeInUp}
                 className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
               >
-                Find the employers and LinkedIn contacts behind any job
-                description. Go direct to the decision makers instead of wasting
-                time on recruiters.
+                Find the real employers and key LinkedIn contacts behind any job
+                description, giving you a direct route to the decision-makers
+                instead of going through recruiters.
               </motion.p>
 
               <motion.div
@@ -173,10 +173,9 @@ export default function Home() {
                 What is CrewDog?
               </h2>
               <p className="text-xl text-muted-foreground">
-                CrewDog identifies employers and relevant LinkedIn contacts from
-                any job description so users can go directly. It bypasses
-                recruiters and enables early outreach before roles are publicly
-                visible.
+                CrewDog identifies the employers and relevant LinkedIn contacts
+                behind any job description, enabling direct outreach and early
+                access to opportunities before they become publicly visible.
               </p>
             </motion.div>
 
@@ -195,8 +194,8 @@ export default function Home() {
                     Intelligent Analysis
                   </h3>
                   <p className="text-muted-foreground">
-                    Our AI analyzes job descriptions to trace the real employer,
-                    even when posts are made by third-party recruiters.
+                    Our AI analyzes any job description to uncover the real
+                    employer, even when it’s posted through a third party.
                   </p>
                 </Card>
               </motion.div>
@@ -253,14 +252,14 @@ export default function Home() {
                 Why Job Hunters Use CrewDog
               </h2>
               <p className="text-xl text-muted-foreground">
-                Stop losing opportunities to recruiter filters and middlemen
-                fees
+                Stop missing opportunities to recruiter filters and middleman
+                fees by going straight to the people who make hiring decisions
               </p>
             </motion.div>
 
             <div className="max-w-2xl mx-auto space-y-4">
               {[
-                "Get past recruiter gatekeepers who filter out qualified candidates",
+                "Bypass recruiter gatekeepers who block direct access to hiring managers",
                 "Apply directly to hiring managers and decision makers",
                 "Avoid having your details shared without consent",
                 "Build direct relationships with employers",

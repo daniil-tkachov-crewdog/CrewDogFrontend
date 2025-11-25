@@ -2,30 +2,160 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CrewDog</title>
-    <meta name="description" content="Find the real employer behind recruiter posts. Skip the middleman and apply directly to decision makers with CrewDog's intelligent job search analysis." />
+
+    <title>
+      CrewDog – The LinkedIn Job Recommendation Engine for Direct Applications
+    </title>
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon-32x32.png"
+    />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://crewdog.app/" />
+
+    <!-- SEO Meta -->
+    <meta
+      name="description"
+      content="CrewDog analyzes LinkedIn job descriptions to find the real employer and key contacts so you can skip recruiters, apply directly to decision-makers, and discover jobs before they are publicly advertised."
+    />
+    <meta
+      name="keywords"
+      content="CrewDog, LinkedIn job search, LinkedIn job recommendation engine, find real employer, bypass recruiters, apply directly to hiring manager, aviation jobs, direct applications, job outreach, job search AI, job intelligence"
+    />
     <meta name="author" content="CrewDog" />
+    <meta name="robots" content="index,follow" />
+    <meta name="language" content="en" />
+    <meta name="distribution" content="global" />
 
-    <meta property="og:title" content="CrewDog - The LinkedIn Job Recommendation Engine" />
-    <meta property="og:description" content="Find the real employer behind recruiter posts. Skip the middleman and apply directly to decision makers." />
+    <!-- Open Graph -->
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:site_name" content="CrewDog" />
+    <meta
+      property="og:title"
+      content="CrewDog – The LinkedIn Job Recommendation Engine"
+    />
+    <meta
+      property="og:description"
+      content="Paste any LinkedIn job description and CrewDog finds the real employer, company website, and hiring manager contacts so you can apply directly."
+    />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://crewdog.app/" />
+    <meta property="og:image" content="/CrewDog-Thumbnail.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="CrewDog – LinkedIn Job Recommendation Engine"
+    />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@crewdog" />
+    <meta
+      name="twitter:title"
+      content="CrewDog – Find the Real Employer Behind LinkedIn Jobs"
+    />
+    <meta
+      name="twitter:description"
+      content="Identify the true hiring company and key LinkedIn contacts behind recruiter job posts. Start a free CrewDog search and apply directly to decision-makers."
+    />
+    <meta name="twitter:image" content="/CrewDog-Thumbnail.png" />
+    <meta name="twitter:image:alt" content="CrewDog product thumbnail" />
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "CrewDog",
+        "url": "https://crewdog.app/",
+        "logo": "https://crewdog.app/CrewDog-Thumbnail.png",
+        "sameAs": [
+          "https://www.linkedin.com",
+          "https://twitter.com/crewdog"
+        ],
+        "description": "CrewDog is a LinkedIn job recommendation engine that finds the real employer and key contacts behind job descriptions so candidates can bypass recruiters and apply directly."
+      }
+    </script>
+
+    <!-- Structured Data: SoftwareApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "CrewDog",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "url": "https://crewdog.app/",
+        "image": "https://crewdog.app/CrewDog-Thumbnail.png",
+        "description": "CrewDog analyzes LinkedIn job descriptions, identifies the actual hiring company, and surfaces key LinkedIn contacts so job seekers can apply directly to decision-makers instead of recruiters.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "GBP",
+          "description": "Start your first CrewDog search for free."
+        }
+      }
+    </script>
+
+    <!-- Structured Data: FAQ -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is CrewDog?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "CrewDog is a LinkedIn job recommendation engine that analyzes job descriptions, finds the real hiring company, and surfaces key LinkedIn contacts so you can apply directly to decision-makers instead of going through recruiters."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does CrewDog help me get more interviews?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "By identifying the real employer and relevant hiring managers behind recruiter job posts, CrewDog enables direct outreach, which leads to significantly higher response and interview rates."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does CrewDog work with LinkedIn job links?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. You can paste any LinkedIn job description into CrewDog and our AI will analyze it to uncover the real employer, company website, and key LinkedIn profiles to contact."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is there a free version of CrewDog?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "CrewDog offers a free search so you can try it before upgrading to a paid plan with more searches and advanced insights."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
 
-    <!-- Optional runtime override for the direct n8n webhook.
-         If you set VITE_N8N_GATECRASHER_URL in .env files, you can remove this.
-         This wins over env and ensures we always hit n8n directly (no proxy timeouts). -->
     <script>
-      window.__N8N_GATECRASHER_URL = "https://crewdog.app.n8n.cloud/webhook/gatecrasher";
+      window.__N8N_GATECRASHER_URL =
+        "https://crewdog.app.n8n.cloud/webhook/gatecrasher";
     </script>
 
-    <!-- Needed by billing.ts (confirmIfRequired) and any window.Stripe(...) calls -->
     <script src="https://js.stripe.com/v3"></script>
 
     <script type="module" src="/src/main.tsx"></script>
