@@ -85,7 +85,7 @@ export default function Home() {
               >
                 Find the real employers and key LinkedIn contacts behind any job
                 description, giving you a direct route to the decision-makers
-                instead of going through recruiters.
+                instead of going through agency recruiters.
               </motion.p>
 
               <motion.div
