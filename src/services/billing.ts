@@ -126,7 +126,6 @@ export async function downgradeToRetentionPlan() {
   await postJSON(`${base}/stripe/downgrade`, { userId });
 }
 
-
 // 3DS / SCA helper
 export async function confirmIfRequired(client_secret?: string) {
   if (!client_secret) return;

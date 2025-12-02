@@ -30,6 +30,7 @@ import {
   fetchAccountSummary,
   type NormalizedSummary,
 } from "@/services/account";
+import { cancelSubscription } from "@/services/billing";
 
 export default function AccountPage() {
   const navigate = useNavigate();
@@ -74,11 +75,32 @@ export default function AccountPage() {
   }, []);
 
   const handleStartCancel = () => {
-    if (summary?.pro || user.plan !== "Free") setShowCancelModal(true);
+    if (summary?.pro || user.plan !== "Free") {
+      setShowCancelModal(true);
+    }
   };
-  const handleCancelContinue = () => {
+  const handleCancelContinue = async () => {
     setShowCancelModal(false);
-    setShowDownsellModal(true);
+
+    // Check if user is platinum
+    const planLabel = summary?.planLabel ?? user.plan;
+    const isPlatinum = planLabel?.toLowerCase().includes("platinum");
+
+    if (isPlatinum) {
+      // Platinum users: show downsell modal with downgrade option
+      setShowDownsellModal(true);
+    } else {
+      // Other pro users: call cancel API directly
+      try {
+        await cancelSubscription();
+        toast.success(
+          "Cancellation scheduled. You keep access and credits until your current period ends."
+        );
+        await refreshSummary();
+      } catch (e: any) {
+        toast.error(e?.message || "Cancel failed.");
+      }
+    }
   };
   const handleCancelFinalize = async () => {
     setShowDownsellModal(false);

@@ -45,6 +45,7 @@ export default function SubscriptionCard({
 
   const pro = summary?.pro ?? false;
   const unlimited = summary?.unlimited ?? false;
+  const cancelAtPeriodEnd = summary?.cancelAtPeriodEnd ?? false;
 
   // ---- FIXED LOGIC ----
   const remainingServer =
@@ -168,218 +169,570 @@ export default function SubscriptionCard({
 
   return (
     <section>
-      <div className="flex items-center gap-2 mb-6">
-        <Crown className="h-5 w-5 text-primary" />
-        <h3 className="text-2xl font-bold tracking-tight">Subscription</h3>
-      </div>
-
-      <Card className="relative overflow-hidden border border-border/70 bg-gradient-to-br from-background via-background/80 to-background/60 p-6 sm:p-8 glass-card group hover:shadow-2xl transition-all duration-300">
+      {/* Section Header */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="flex items-center gap-3 mb-6"
+      >
         <motion.div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/14 via-purple-500/10 to-transparent opacity-80"
-          animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
-          transition={{ duration: 9, repeat: Infinity, repeatType: "reverse" }}
-          style={{ backgroundSize: "220% 220%" }}
-        />
+          className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 backdrop-blur-sm"
+          whileHover={{ scale: 1.05, rotate: 5 }}
+          transition={{ type: "spring", stiffness: 400 }}
+        >
+          <Crown className="h-5 w-5 text-primary" />
+        </motion.div>
+        <h3 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+          Subscription
+        </h3>
+      </motion.div>
 
-        <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-stretch md:justify-between">
-          {/* LEFT */}
-          <div className="flex-1 space-y-4">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge className="text-base px-4 py-1.5 bg-gradient-to-r from-primary to-purple-500 shadow-sm">
-                  {planLabel}
-                </Badge>
-
-                {(pro || unlimited) && (
-                  <Badge
-                    variant="outline"
-                    className="gap-1 text-emerald-400 border-emerald-500/40 bg-emerald-500/5"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Active
-                  </Badge>
-                )}
-              </div>
-
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-                {planSubtitle}
-              </p>
-            </div>
-
-            {(pro || unlimited) && (
-              <motion.div
-                className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/5 px-3 py-1 text-xs text-yellow-300"
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Priority access to the latest features.
-              </motion.div>
-            )}
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex-1 space-y-4 md:max-w-md">
-            <div className="space-y-3 rounded-2xl border border-border/60 bg-background/60 p-4 sm:p-5 shadow-sm backdrop-blur">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase text-muted-foreground">
-                  Monthly Quota
-                </span>
-                <span className="text-sm font-semibold tabular-nums">
-                  {unlimited ? "Unlimited" : `${used} / ${cap} searches`}
-                </span>
-              </div>
-
-              <Progress value={quotaPct} className="h-2.5 rounded-full" />
-
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {getRenewalLabel()}
-                </span>
-                {!unlimited && (
-                  <span className="font-medium tabular-nums">
-                    {remaining} remaining
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex flex-wrap gap-3 pt-1">
-              {!unlimited && !pro && (
-                <Button
-                  className="flex-1 group"
-                  size="lg"
-                  onClick={handleUpgradeClick}
-                >
-                  <Crown className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform" />
-                  Choose a Plan
-                </Button>
-              )}
-
-              {pro && !unlimited && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="min-w-[150px]"
-                  onClick={handleManageBilling}
-                >
-                  Manage Billing
-                </Button>
-              )}
-
-              {pro && !unlimited && atCap && (
-                <Button size="lg" className="flex-1" onClick={handleRenewNow}>
-                  Renew now
-                </Button>
-              )}
-
-              {pro && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="md:ml-auto"
-                  onClick={onCancel}
-                >
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* PLAN MODAL */}
-      <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="max-h-[90vh] sm:max-h-[80vh] sm:max-w-2xl border border-white/10 bg-gradient-to-br from-slate-950/92 via-slate-900/97 to-slate-950/92 backdrop-blur-2xl shadow-2xl p-0 overflow-hidden rounded-2xl sm:rounded-3xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Card className="relative overflow-hidden border-2 border-border/50 bg-gradient-to-br from-background via-background/95 to-background/80 p-0 shadow-2xl hover:shadow-3xl transition-all duration-500 group">
+          {/* Animated Background Gradient */}
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.97 }}
+            className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/8 to-pink-500/5 opacity-60"
+            animate={{
+              backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            style={{ backgroundSize: "300% 300%" }}
+          />
+
+          {/* Shimmer Effect */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+            animate={{
+              x: ["-100%", "100%"],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatDelay: 2,
+              ease: "easeInOut",
+            }}
+          />
+
+          {/* Floating Sparkles */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[...Array(5)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute"
+                initial={{
+                  x: `${20 + i * 20}%`,
+                  y: "100%",
+                }}
+                animate={{
+                  y: ["-10%", "-20%"],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 4 + i * 0.5,
+                  repeat: Infinity,
+                  delay: i * 0.8,
+                  ease: "easeInOut",
+                }}
+              >
+                <Sparkles className="w-3 h-3 text-primary/30" />
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="relative z-10 p-6 sm:p-8">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+              {/* LEFT SECTION */}
+              <div className="flex-1 space-y-6">
+                {/* Plan Badge & Status */}
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Badge className="text-base px-5 py-2 bg-gradient-to-r from-primary via-purple-500 to-pink-500 shadow-lg shadow-primary/25 border-0 font-semibold">
+                        {planLabel}
+                      </Badge>
+                    </motion.div>
+
+                    {(pro || unlimited) && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", delay: 0.2 }}
+                      >
+                        <Badge
+                          variant="outline"
+                          className="gap-1.5 text-emerald-500 border-emerald-500/50 bg-emerald-500/10 px-3 py-1.5 font-medium backdrop-blur-sm"
+                        >
+                          <motion.div
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }}
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                          </motion.div>
+                          Active
+                        </Badge>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
+                    {planSubtitle}
+                  </p>
+                </div>
+
+                {/* Premium Features Badge */}
+                {(pro || unlimited) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="inline-flex items-center gap-2 rounded-xl border border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 px-4 py-2.5 text-sm backdrop-blur-sm"
+                  >
+                    <motion.div
+                      animate={{
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <Sparkles className="h-4 w-4 text-yellow-400" />
+                    </motion.div>
+                    <span className="font-medium text-yellow-200/90">
+                      Priority access to the latest features
+                    </span>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* RIGHT SECTION - Quota Card */}
+              <div className="flex-1 space-y-5 lg:max-w-md">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="space-y-4 rounded-2xl border-2 border-border/40 bg-gradient-to-br from-background/80 via-background/60 to-background/40 p-5 sm:p-6 shadow-xl backdrop-blur-xl"
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                      Monthly Quota
+                    </span>
+                    <motion.span
+                      className="text-sm font-bold tabular-nums bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent"
+                      key={`${used}-${cap}`}
+                      initial={{ scale: 1.2, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                    >
+                      {unlimited ? "Unlimited ∞" : `${used} / ${cap}`}
+                    </motion.span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-2">
+                    <div className="relative h-3 rounded-full bg-muted/50 overflow-hidden backdrop-blur-sm border border-border/30">
+                      <motion.div
+                        className={`absolute inset-y-0 left-0 rounded-full ${
+                          unlimited
+                            ? "bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500"
+                            : quotaPct >= 90
+                            ? "bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500"
+                            : quotaPct >= 70
+                            ? "bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500"
+                            : "bg-gradient-to-r from-blue-500 via-primary to-purple-500"
+                        }`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${quotaPct}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      />
+                    </div>
+                    {!unlimited && quotaPct >= 90 && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs text-orange-400 font-medium flex items-center gap-1.5"
+                      >
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        >
+                          ⚠️
+                        </motion.div>
+                        Running low on searches
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Footer Info */}
+                  <div className="flex items-center justify-between text-xs pt-2 border-t border-border/30">
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5 text-primary" />
+                      {getRenewalLabel()}
+                    </span>
+                    {!unlimited && (
+                      <motion.span
+                        className="font-bold tabular-nums text-foreground"
+                        animate={{ opacity: [0.7, 1, 0.7] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        {remaining} left
+                      </motion.span>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+                  {!unlimited && !pro && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="flex-1"
+                    >
+                      <Button
+                        className="w-full group relative overflow-hidden bg-gradient-to-r from-primary via-purple-500 to-pink-500 hover:shadow-xl hover:shadow-primary/25 transition-all duration-300"
+                        size="lg"
+                        onClick={handleUpgradeClick}
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-primary/0 via-white/20 to-primary/0"
+                          animate={{
+                            x: ["-100%", "200%"],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            repeatDelay: 1,
+                          }}
+                        />
+                        <Crown className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform relative z-10" />
+                        <span className="relative z-10 font-semibold">
+                          Choose a Plan
+                        </span>
+                      </Button>
+                    </motion.div>
+                  )}
+
+                  {pro && !unlimited && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="min-w-[150px] border-2 hover:bg-accent/50 hover:border-primary/50 transition-all"
+                      onClick={handleManageBilling}
+                    >
+                      Manage Billing
+                    </Button>
+                  )}
+
+                  {pro && !unlimited && atCap && (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="flex-1"
+                    >
+                      <Button
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                        onClick={handleRenewNow}
+                      >
+                        Renew Now
+                      </Button>
+                    </motion.div>
+                  )}
+
+                  {pro && !cancelAtPeriodEnd && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="border-2 hover:bg-destructive/10 hover:border-destructive/50 hover:text-destructive transition-all"
+                      onClick={onCancel}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+
+                  {pro && cancelAtPeriodEnd && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="px-4 py-2 rounded-lg border-2 border-orange-500/30 bg-orange-500/10 text-orange-400 text-sm font-medium"
+                    >
+                      ⚠️ Subscription ends on{" "}
+                      {renewalDate
+                        ? new Date(renewalDate).toLocaleDateString(undefined, {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "renewal date"}
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* ENHANCED PLAN MODAL */}
+      <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
+        <DialogContent className="max-h-[90vh] sm:max-h-[85vh] sm:max-w-3xl border-2 border-primary/20 bg-gradient-to-br from-background via-background/98 to-background/95 backdrop-blur-3xl shadow-2xl p-0 overflow-hidden rounded-3xl flex flex-col">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <motion.div
+              className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            <motion.div
+              className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"
+              animate={{
+                scale: [1.2, 1, 1.2],
+                opacity: [0.5, 0.3, 0.5],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.18 }}
-            className="p-5 sm:p-7 space-y-5"
+            transition={{ duration: 0.3, type: "spring" }}
+            className="relative z-10 p-6 sm:p-8 space-y-6 overflow-y-auto max-h-[calc(90vh-2rem)] sm:max-h-[calc(85vh-2rem)] scroll-smooth [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-primary/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-transparent hover:[&::-webkit-scrollbar-thumb]:bg-primary/50"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "hsl(var(--primary) / 0.3) transparent",
+            }}
           >
-            <DialogHeader className="space-y-2">
-              <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl font-semibold">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  <Crown className="h-4 w-4" />
-                </span>
-                Upgrade your plan
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                Choose the plan that fits your hiring volume.
-              </DialogDescription>
+            {/* Header */}
+            <DialogHeader className="space-y-3">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 backdrop-blur-sm"
+                  whileHover={{ scale: 1.05, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <Crown className="h-6 w-6 text-primary" />
+                </motion.div>
+                <div>
+                  <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+                    Upgrade Your Plan
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-muted-foreground mt-1">
+                    Choose the plan that fits your hiring volume and unlock
+                    premium features.
+                  </DialogDescription>
+                </div>
+              </div>
             </DialogHeader>
 
-            <div className="mt-1 grid gap-3 sm:grid-cols-2">
-              {plans.map((p) => {
+            {/* Plans Grid */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {plans.map((p, idx) => {
                 const active = selectedPlan === p.code;
                 return (
-                  <button
+                  <motion.button
                     key={p.code}
                     type="button"
                     onClick={() => setSelectedPlan(p.code)}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className={[
-                      "relative text-left rounded-2xl border px-4 py-4 transition-all",
+                      "relative text-left rounded-2xl border-2 px-5 py-5 transition-all duration-300",
                       active
-                        ? "border-primary/70 from-primary/12 via-primary/5 to-slate-950/80 shadow-primary/20 shadow-lg ring-1 ring-primary/40"
-                        : "border-border/70 from-background via-muted to-background hover:border-primary/40 hover:shadow-primary/10 hover:shadow-md",
-                      "bg-gradient-to-br",
+                        ? "border-primary bg-gradient-to-br from-primary/15 via-primary/8 to-transparent shadow-xl shadow-primary/20 ring-2 ring-primary/30"
+                        : "border-border/50 bg-gradient-to-br from-background via-background/80 to-muted/30 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10",
                     ].join(" ")}
                   >
+                    {/* Popular Badge */}
                     {p.highlight && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary/40 bg-primary/10 px-3 py-0.5 text-[10px] font-semibold uppercase text-primary shadow-sm backdrop-blur-sm">
-                        MOST POPULAR
-                      </span>
+                      <motion.div
+                        initial={{ y: -5, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="absolute -top-3 left-1/2 -translate-x-1/2"
+                      >
+                        <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-primary/50 bg-gradient-to-r from-primary to-purple-500 px-4 py-1 text-[10px] font-bold uppercase text-white shadow-lg backdrop-blur-sm">
+                          <Sparkles className="h-3 w-3" />
+                          Most Popular
+                        </span>
+                      </motion.div>
                     )}
 
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-3">
+                      {/* Plan Header */}
                       <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <span className="font-semibold text-sm sm:text-base">
+                        <div className="space-y-1.5">
+                          <span className="font-bold text-base sm:text-lg flex items-center gap-2">
                             {p.name}
+                            {active && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring" }}
+                              >
+                                <CheckCircle2 className="h-5 w-5 text-primary" />
+                              </motion.div>
+                            )}
                           </span>
-                          <div className="text-[11px] sm:text-xs text-muted-foreground">
-                            Includes{" "}
-                            <span className="font-medium">{p.searches}</span>{" "}
+                          <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                            <span className="font-semibold text-foreground">
+                              {p.searches}
+                            </span>{" "}
                             searches / month
                           </div>
                         </div>
-                        <span className="text-sm sm:text-base font-semibold">
-                          {p.price}
-                        </span>
+                        <div className="text-right">
+                          <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+                            {p.price.split("/")[0]}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            per month
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span>Instant activation. Auto-renews monthly.</span>
-                        {active && (
-                          <span className="inline-flex items-center gap-1 text-primary font-medium">
-                            <CheckCircle2 className="h-3 w-3" />
-                            Selected
-                          </span>
-                        )}
+                      {/* Features */}
+                      <div className="space-y-2 pt-2 border-t border-border/30">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                          <span>Instant activation</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                          <span>Auto-renews monthly</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                          <span>Cancel anytime</span>
+                        </div>
                       </div>
+
+                      {/* Selection indicator */}
+                      {active && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold text-xs"
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          Selected Plan
+                        </motion.div>
+                      )}
                     </div>
-                  </button>
+
+                    {/* Hover glow effect */}
+                    {active && (
+                      <motion.div
+                        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-purple-500/20"
+                        animate={{
+                          opacity: [0.3, 0.6, 0.3],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+                    )}
+                  </motion.button>
                 );
               })}
             </div>
 
-            <DialogFooter className="mt-4 gap-2 sm:gap-3">
+            {/* Trust Indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-wrap items-center justify-center gap-6 px-4 py-3 rounded-xl bg-muted/30 backdrop-blur-sm text-xs text-muted-foreground"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                <span>Secure Payment</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                <span>Money-back Guarantee</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                <span>Cancel Anytime</span>
+              </div>
+            </motion.div>
+
+            {/* Footer Actions */}
+            <DialogFooter className="gap-3 sm:gap-3">
               <Button
                 variant="outline"
                 onClick={() => setPlanDialogOpen(false)}
                 disabled={upgradeBusy}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto border-2"
+                size="lg"
               >
                 Close
               </Button>
               <Button
                 onClick={handleUpgradeConfirm}
-                disabled={upgradeBusy}
-                className="w-full sm:w-auto"
+                disabled={upgradeBusy || !selectedPlan}
+                className="w-full sm:w-auto bg-gradient-to-r from-primary via-purple-500 to-pink-500 hover:shadow-xl hover:shadow-primary/25 disabled:opacity-50 relative overflow-hidden group"
+                size="lg"
               >
-                {upgradeBusy ? "Starting checkout…" : "Continue to Checkout"}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
+                  animate={{
+                    x: upgradeBusy ? ["-100%", "200%"] : "-100%",
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: upgradeBusy ? Infinity : 0,
+                    ease: "linear",
+                  }}
+                />
+                <span className="relative z-10 font-semibold">
+                  {upgradeBusy ? "Processing..." : "Continue to Checkout"}
+                </span>
               </Button>
             </DialogFooter>
           </motion.div>

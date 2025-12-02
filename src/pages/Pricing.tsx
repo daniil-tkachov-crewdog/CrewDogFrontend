@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
@@ -10,9 +11,21 @@ import {
   Star,
   TrendingUp,
   DollarSign,
+  Crown,
 } from "lucide-react";
 import faqHeroBg from "@/assets/faq-hero-bg.jpg";
 import { gaEvent } from "@/analytics/gtm";
+import { useAuth } from "@/auth/AuthProvider";
+import {
+  startCheckout,
+  openBillingPortal,
+  type PlanCode,
+} from "@/services/billing";
+import {
+  fetchAccountSummary,
+  type NormalizedSummary,
+} from "@/services/account";
+import { toast } from "sonner";
 
 const plans = [
   {
@@ -112,12 +125,14 @@ const plans = [
       "Exports, bulk actions & collaboration",
       "Advanced filters, saved views & team sharing",
     ],
-    cta: "Talk to Sales",
+    cta: "Choose Bussiness",
   },
 ];
 
 export default function Pricing() {
-  const [isAnnual, setIsAnnual] = useState(false);
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const [summary, setSummary] = useState<NormalizedSummary | null>(null);
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.1]);
@@ -130,10 +145,21 @@ export default function Pricing() {
     } catch {}
   }, []);
 
-  function handlePlanClick(planName: string, isPaid: boolean) {
-    const billing = isAnnual ? "annual" : "monthly";
+  // Fetch user summary when logged in
+  useEffect(() => {
+    if (user) {
+      fetchAccountSummary()
+        .then(setSummary)
+        .catch(() => {
+          /* ignore */
+        });
+    }
+  }, [user]);
+
+  async function handlePlanClick(planName: string, isPaid: boolean) {
+    const billing = "monthly";
     const price = plans.find((p) => p.name === planName);
-    const amount = isAnnual ? price?.annualPrice : price?.monthlyPrice;
+    const amount = price?.monthlyPrice;
 
     const payload = { plan: planName, billing, amount };
 
@@ -142,11 +168,54 @@ export default function Pricing() {
       gaEvent("select_plan_click", payload);
     } catch {}
 
+    // If user is not logged in, redirect to login
+    if (!user) {
+      navigate("/login?from=/pricing");
+      return;
+    }
+
+    // If user already has an active paid plan, redirect to billing portal
+    if (summary?.pro && !summary?.unlimited) {
+      toast.info(
+        "You already have an active plan. Manage your subscription in the billing portal."
+      );
+      try {
+        await openBillingPortal();
+      } catch (e: any) {
+        toast.error(e?.message || "Unable to open billing portal.");
+      }
+      return;
+    }
+
+    // If it's the free plan, redirect to dashboard
+    if (!isPaid) {
+      navigate("/run");
+      return;
+    }
+
+    // For paid plans, go directly to checkout
     if (isPaid) {
       (window as any).dataLayer.push({ event: "checkout_start", ...payload });
       try {
         gaEvent("checkout_start", payload);
       } catch {}
+
+      // Map plan names to plan codes
+      const planCodeMap: Record<string, PlanCode> = {
+        Platinum: "platinum",
+        Silver: "silver",
+        Gold: "gold",
+        Business: "business",
+      };
+
+      const planCode = planCodeMap[planName];
+      if (planCode) {
+        try {
+          await startCheckout(planCode);
+        } catch (e: any) {
+          toast.error(e?.message || "Unable to start checkout.");
+        }
+      }
     }
   }
 
@@ -227,44 +296,114 @@ export default function Pricing() {
               </h1>
             </div>
 
-            {/* Billing toggle */}
-            <div className="flex flex-col items-center gap-4">
-              <div className="inline-flex items-center gap-4 glass-card px-6 py-3 rounded-full border border-primary/20 bg-background/70 backdrop-blur-md shadow-lg">
-                <span
-                  className={
-                    !isAnnual
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground"
-                  }
+            {/* Current Plan Info for Logged-in Users */}
+            {user && summary && (
+              <div className="flex justify-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="relative group w-full max-w-md"
                 >
-                  Monthly
-                </span>
-                <button
-                  onClick={() => setIsAnnual(!isAnnual)}
-                  className={`relative w-16 h-8 rounded-full transition-colors ${
-                    isAnnual ? "bg-primary" : "bg-border"
-                  }`}
-                >
+                  {/* Glow effect */}
                   <motion.div
-                    className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md"
-                    animate={{ x: isAnnual ? 32 : 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="absolute -inset-1 bg-gradient-to-r from-primary/40 via-purple-500/30 to-primary/40 rounded-3xl blur-xl opacity-60"
+                    animate={{
+                      opacity: [0.4, 0.7, 0.4],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                   />
-                </button>
-                <span
-                  className={
-                    isAnnual
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground"
-                  }
-                >
-                  Annual{" "}
-                  <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                    Save ~2 months
-                  </span>
-                </span>
+
+                  <div className="relative glass-card px-6 py-4 rounded-3xl border border-primary/40 bg-gradient-to-br from-background/95 via-primary/5 to-background/95 backdrop-blur-xl shadow-2xl">
+                    <div className="flex items-center gap-4">
+                      {/* Icon with animated background */}
+                      <motion.div
+                        className="relative"
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-br from-primary to-purple-500 rounded-xl blur-md opacity-50"
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [0.3, 0.6, 0.3],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        />
+                        <div className="relative bg-gradient-to-br from-primary to-purple-500 p-2.5 rounded-xl shadow-lg">
+                          <Crown className="h-5 w-5 text-white" />
+                        </div>
+                      </motion.div>
+
+                      {/* Text content with better hierarchy */}
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">
+                            Your Plan
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg font-bold bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
+                              {summary.planLabel ||
+                                (summary.pro ? "Pro" : "Free")}
+                            </span>
+                            {(summary.pro || summary.unlimited) && (
+                              <motion.span
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                              >
+                                ✓ Active
+                              </motion.span>
+                            )}
+                          </div>
+                        </div>
+                        {!summary.unlimited && summary.remaining !== null && (
+                          <motion.div
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="mt-1.5 flex items-center gap-2 text-sm"
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                              <span className="font-semibold text-foreground tabular-nums">
+                                {summary.remaining}
+                              </span>
+                              <span className="text-muted-foreground">
+                                searches left
+                              </span>
+                            </div>
+                            {summary.cap && (
+                              <span className="text-xs text-muted-foreground/60">
+                                of {summary.cap}
+                              </span>
+                            )}
+                          </motion.div>
+                        )}
+                        {summary.unlimited && (
+                          <motion.div
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="mt-1 text-sm text-muted-foreground"
+                          >
+                            <span className="font-medium text-primary">∞</span>{" "}
+                            Unlimited searches
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -275,7 +414,7 @@ export default function Pricing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 mb-16 items-stretch">
             {plans.map((plan, i) => {
               const IconComponent = plan.icon;
-              const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+              const price = plan.monthlyPrice;
               const isPaid = plan.name !== "Free";
 
               return (
@@ -369,7 +508,7 @@ export default function Pricing() {
                           {price}
                         </span>
                         <span className="text-xs md:text-sm text-muted-foreground">
-                          /{isAnnual && isPaid ? "year" : plan.period}
+                          /{plan.period}
                         </span>
                       </div>
 
@@ -403,21 +542,38 @@ export default function Pricing() {
 
                       {/* CTA – perfectly aligned across all cards */}
                       <div className="mt-auto">
-                        <Button
-                          size="lg"
-                          className="w-full h-11 md:h-12 text-sm md:text-base font-medium magnetic-button transition-transform group-hover:translate-y-[-1px]"
-                          variant={
-                            plan.name === "Free"
-                              ? "outline"
-                              : plan.popular
-                              ? "default"
-                              : "secondary"
-                          }
-                          disabled={plan.disabled}
-                          onClick={() => handlePlanClick(plan.name, isPaid)}
-                        >
-                          {plan.cta}
-                        </Button>
+                        {summary?.pro && !summary?.unlimited && isPaid ? (
+                          <Button
+                            size="lg"
+                            className="w-full h-11 md:h-12 text-sm md:text-base font-medium magnetic-button transition-transform group-hover:translate-y-[-1px]"
+                            variant={
+                              summary.planLabel === plan.name
+                                ? "default"
+                                : "outline"
+                            }
+                            onClick={() => handlePlanClick(plan.name, isPaid)}
+                          >
+                            {summary.planLabel === plan.name
+                              ? "Current Plan ✓"
+                              : "Manage Billing"}
+                          </Button>
+                        ) : (
+                          <Button
+                            size="lg"
+                            className="w-full h-11 md:h-12 text-sm md:text-base font-medium magnetic-button transition-transform group-hover:translate-y-[-1px]"
+                            variant={
+                              plan.name === "Free"
+                                ? "outline"
+                                : plan.popular
+                                ? "default"
+                                : "secondary"
+                            }
+                            disabled={plan.disabled}
+                            onClick={() => handlePlanClick(plan.name, isPaid)}
+                          >
+                            {plan.cta}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
