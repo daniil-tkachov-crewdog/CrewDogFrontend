@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { sendSupportMessage } from "@/services/support";
-import faqHeroBg from "@/assets/faq-hero-bg.jpg";
+import faqHeroBg from "@/assets/faq-hero-bg.png";
 
 const faqs = [
   {
@@ -185,7 +185,7 @@ export default function Support() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="bg-gradient-to-r from-foreground via-primary to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-primary to-cyan-400 bg-clip-text text-transparent">
                 We're Here to Help
               </span>
             </motion.h1>

@@ -3,7 +3,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowLeft, Scale, Shield, FileText, Sparkles, CheckCircle2, AlertCircle, Info } from "lucide-react";
-import faqHeroBg from "@/assets/faq-hero-bg.jpg";
+import faqHeroBg from "@/assets/faq-hero-bg.png";
 
 export default function Terms() {
   const { scrollY } = useScroll();
@@ -130,7 +130,7 @@ export default function Terms() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="bg-gradient-to-r from-foreground via-primary to-purple-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-primary to-purple-400 bg-clip-text text-transparent">
                 Terms of Use
               </span>
             </motion.h1>

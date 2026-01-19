@@ -5,7 +5,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Search, ChevronRight, HelpCircle, Sparkles, Zap, Shield } from "lucide-react";
-import faqHeroBg from "@/assets/faq-hero-bg.jpg";
+import faqHeroBg from "@/assets/faq-hero-bg.png";
 
 const faqs = [
   {
@@ -176,7 +176,7 @@ export default function FAQ() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-white to-primary bg-clip-text text-transparent">
                 How can we
               </span>
               <br />

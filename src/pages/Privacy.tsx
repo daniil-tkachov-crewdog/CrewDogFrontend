@@ -3,7 +3,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowLeft, Lock, Shield, Eye, Database, Clock, UserCheck, Bell, Mail, CheckCircle2, Sparkles } from "lucide-react";
-import faqHeroBg from "@/assets/faq-hero-bg.jpg";
+import faqHeroBg from "@/assets/faq-hero-bg.png";
 
 export default function Privacy() {
   const { scrollY } = useScroll();
@@ -130,7 +130,7 @@ export default function Privacy() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="bg-gradient-to-r from-foreground via-primary to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-primary to-cyan-400 bg-clip-text text-transparent">
                 Privacy Policy
               </span>
             </motion.h1>

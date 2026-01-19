@@ -13,7 +13,7 @@ import {
   DollarSign,
   Crown,
 } from "lucide-react";
-import faqHeroBg from "@/assets/faq-hero-bg.jpg";
+import faqHeroBg from "@/assets/faq-hero-bg.png";
 import { gaEvent } from "@/analytics/gtm";
 import { useAuth } from "@/auth/AuthProvider";
 import {
@@ -291,7 +291,7 @@ export default function Pricing() {
             </motion.div>
 
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-primary to-purple-400 bg-clip-text text-transparent tracking-tight">
+              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-primary to-purple-400 bg-clip-text text-transparent tracking-tight">
                 Choose the plan that matches your search volume
               </h1>
             </div>
