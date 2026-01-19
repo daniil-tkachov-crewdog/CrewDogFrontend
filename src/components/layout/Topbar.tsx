@@ -1,10 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plane, User, Sparkles, Zap, Menu, X, Moon, Sun } from "lucide-react";
+import { User, Sparkles, Zap, Menu, X, Moon, Sun } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/auth/AuthProvider";
+import crewDogLogo from "@/assets/CrewDog-App-Logo.png";
 
 export const Topbar = () => {
   const { user } = useAuth();
@@ -53,40 +54,20 @@ export const Topbar = () => {
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-3 group relative"
+          className="flex items-center group relative"
           aria-label="Go to homepage"
         >
-          <motion.div
-            className="relative p-2.5 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/60 shadow-lg group-hover:shadow-2xl transition-all duration-300"
+          <motion.img
+            src={crewDogLogo}
+            alt="CrewDog Logo"
+            className="h-36 w-36 object-contain"
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400 }}
-          >
-            <Plane className="h-6 w-6 text-primary-foreground" />
-
-            {/* Animated glow ring */}
-            <motion.div
-              className="absolute inset-0 rounded-2xl"
-              animate={{
-                boxShadow: [
-                  "0 0 20px rgba(var(--primary), 0.3)",
-                  "0 0 40px rgba(var(--primary), 0.5)",
-                  "0 0 20px rgba(var(--primary), 0.3)",
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-
-            {/* Sparkle effect */}
-            <motion.div
-              className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-yellow-300 to-orange-500 rounded-full opacity-0 group-hover:opacity-100"
-              animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
-              transition={{ duration: 1, repeat: Infinity }}
-            />
-          </motion.div>
+          />
 
           <motion.div
-            className="relative"
+            className="relative -ml-8"
             whileHover={{ x: 5 }}
             transition={{ type: "spring", stiffness: 300 }}
           >

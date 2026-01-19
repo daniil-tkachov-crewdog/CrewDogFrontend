@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Plane,
   Sparkles,
   Twitter,
   Linkedin,
@@ -9,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { gaEvent } from "@/analytics/gtm";
+import crewDogLogo from "@/assets/CrewDog-App-Logo.png";
 
 export const Footer = () => {
   const navigate = useNavigate();
@@ -56,27 +56,16 @@ export const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex items-center gap-3 group">
-              <motion.div
-                className="relative p-3 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/60 shadow-lg group-hover:shadow-xl transition-all duration-300"
+            <div className="flex items-center group">
+              <motion.img
+                src={crewDogLogo}
+                alt="CrewDog Logo"
+                className="h-36 w-36 object-contain"
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 400 }}
-              >
-                <Plane className="h-7 w-7 text-primary-foreground" />
-                <motion.div
-                  className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  animate={{
-                    boxShadow: [
-                      "0 0 20px rgba(var(--primary), 0.3)",
-                      "0 0 40px rgba(var(--primary), 0.5)",
-                      "0 0 20px rgba(var(--primary), 0.3)",
-                    ],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </motion.div>
+              />
               <motion.div
-                className="relative"
+                className="relative -ml-8"
                 whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
