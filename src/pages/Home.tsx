@@ -73,9 +73,9 @@ export default function Home() {
                 variants={fadeInUp}
                 className="text-5xl md:text-7xl font-bold tracking-tight"
               >
-                The LinkedIn Job
+                Apply Directly Before 
                 <span className="block text-primary">
-                  Recommendation Engine
+                  The Job Is Advertised
                 </span>
               </motion.h1>
 
@@ -83,9 +83,7 @@ export default function Home() {
                 variants={fadeInUp}
                 className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
               >
-                Find the real employers and key LinkedIn contacts behind any job
-                description, giving you a direct route to the decision-makers
-                instead of going through agency recruiters.
+               Turn any job description, from any source, into a list of LinkedIn influencers connected to the hiring decision.
               </motion.p>
 
               <motion.div
@@ -212,8 +210,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Direct Routes</h3>
                   <p className="text-muted-foreground">
-                    Get company websites, career pages, and hiring manager
-                    contacts to bypass recruiters and apply directly.
+                    Discover company websites, career pages, and hiring manager contacts. Apply directly before the job is advertised.
                   </p>
                 </Card>
               </motion.div>
@@ -228,10 +225,9 @@ export default function Home() {
                   <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <TrendingUp className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">Higher Success</h3>
+                  <h3 className="text-xl font-semibold mb-3">Reach out on LinkedIn</h3>
                   <p className="text-muted-foreground">
-                    Direct applications have significantly higher response rates
-                    than going through third-party recruiters.
+                   Going direct results in higher response rates than going through third-party recruiters.
                   </p>
                 </Card>
               </motion.div>
@@ -259,7 +255,6 @@ export default function Home() {
 
             <div className="max-w-2xl mx-auto space-y-4">
               {[
-                "Bypass recruiter gatekeepers who block direct access to hiring managers",
                 "Apply directly to hiring managers and decision makers",
                 "Avoid having your details shared without consent",
                 "Build direct relationships with employers",
@@ -291,10 +286,7 @@ export default function Home() {
               className="max-w-3xl mx-auto text-center space-y-6 mb-16"
             >
               <h2 className="text-4xl md:text-5xl font-bold">What You Get</h2>
-              <p className="text-xl text-muted-foreground">
-                Comprehensive intelligence to bypass recruiters and connect
-                directly on LinkedIn.
-              </p>
+              
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -307,7 +299,6 @@ export default function Home() {
                   <li>• Actual hiring company name</li>
                   <li>• Company website and career page</li>
                   <li>• Industry and size information</li>
-                  <li>• Recent hiring activity</li>
                 </ul>
               </Card>
 
@@ -320,7 +311,7 @@ export default function Home() {
                   <li>• Hiring manager profiles</li>
                   <li>• HR contact information</li>
                   <li>• Team lead connections</li>
-                  <li>• Alternative application methods</li>
+                
                 </ul>
               </Card>
             </div>

@@ -28,10 +28,7 @@ const faqs = [
     question: "Can I search for jobs outside my country?",
     answer: "Yes! CrewDog works with job postings from any location worldwide. Our system is designed to handle international job markets and can identify companies across different regions, as long as location information is included in the job description."
   },
-  {
-    question: "How is this different from LinkedIn Premium?",
-    answer: "While LinkedIn Premium helps you see who viewed your profile and provides InMail credits, CrewDog specifically helps you bypass third-party recruiters to find and contact the actual hiring company directly. We focus on revealing the real employer and providing direct application routes."
-  },
+
   {
     question: "Is my data secure and private?",
     answer: "Absolutely. We take data security seriously and are fully GDPR compliant. We don't share your searches with third parties, don't sell your data, and only store job descriptions temporarily to process your request. Your search history is private and can be deleted at any time from your account."
@@ -54,7 +51,7 @@ const faqs = [
   },
   {
     question: "What if I get incorrect results?",
-    answer: "If you believe a search returned inaccurate information, please contact our support team with the search details. We'll review the case and may offer a search credit. We're constantly improving our algorithms and greatly appreciate feedback to enhance accuracy."
+    answer: "If the results do not look correct, we recommend refining your search criteria or running the search again. Small adjustments often improve accuracy and relevance"
   }
 ];
 
