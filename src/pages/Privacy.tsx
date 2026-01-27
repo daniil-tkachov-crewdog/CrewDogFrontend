@@ -166,7 +166,7 @@ export default function Privacy() {
                 icon: Database,
                 color: "from-blue-500 to-cyan-500",
                 title: "1. Information We Collect",
-                content: "We collect information you provide directly to us, including when you create an account, run job searches, or contact us for support. This may include your name, email address, and the job descriptions you submit for analysis."
+                content: "We collect information you provide direct to us, including when you create an account, run job searches, or contact us for support. This may include your name, email address, and the job descriptions you submit for analysis."
               },
               {
                 icon: Eye,

@@ -47,7 +47,7 @@ const faqs = [
   {
     question: "Can I schedule a demo or consultation?",
     answer:
-      "Absolutely! Business plan subscribers can schedule dedicated consultation sessions. Contact us through this form or email us directly to arrange a convenient time.",
+      "Absolutely! Business plan subscribers can schedule dedicated consultation sessions. Contact us through this form or email us direct to arrange a convenient time.",
   },
 ];
 

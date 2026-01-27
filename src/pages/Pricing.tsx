@@ -193,7 +193,7 @@ export default function Pricing() {
       return;
     }
 
-    // For paid plans, go directly to checkout
+    // For paid plans, go direct to checkout
     if (isPaid) {
       (window as any).dataLayer.push({ event: "checkout_start", ...payload });
       try {

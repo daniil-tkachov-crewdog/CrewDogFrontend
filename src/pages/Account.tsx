@@ -90,7 +90,7 @@ export default function AccountPage() {
       // Platinum users: show downsell modal with downgrade option
       setShowDownsellModal(true);
     } else {
-      // Other pro users: call cancel API directly
+      // Other pro users: call cancel API direct
       try {
         await cancelSubscription();
         toast.success(

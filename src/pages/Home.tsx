@@ -73,7 +73,7 @@ export default function Home() {
                 variants={fadeInUp}
                 className="text-5xl md:text-7xl font-bold tracking-tight"
               >
-                Apply Directly Before 
+                Apply Direct Before 
                 <span className="block text-primary">
                   The Job Is Advertised
                 </span>
@@ -210,7 +210,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Direct Routes</h3>
                   <p className="text-muted-foreground">
-                    Discover company websites, career pages, and hiring manager contacts. Apply directly before the job is advertised.
+                    Discover company websites, career pages, and hiring manager contacts. Apply direct before the job is advertised.
                   </p>
                 </Card>
               </motion.div>
@@ -255,7 +255,7 @@ export default function Home() {
 
             <div className="max-w-2xl mx-auto space-y-4">
               {[
-                "Apply directly to hiring managers and decision makers",
+                "Apply direct to hiring managers and decision makers",
                 "Avoid having your details shared without consent",
                 "Build direct relationships with employers",
                 "Cut employer finder fees by going direct to the people hiring",
