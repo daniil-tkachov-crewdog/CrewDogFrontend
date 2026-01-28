@@ -113,6 +113,21 @@ export default function SideForm({
             </>
           )}
         </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-11 text-sm gap-2"
+          asChild
+        >
+          <a
+            href="https://www.crewdogcv.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Customise your CV
+          </a>
+        </Button>
       </form>
     </Card>
   );

@@ -190,34 +190,7 @@ export const Footer = () => {
           ))}
 
           {/* Newsletter Section */}
-          <motion.div
-            className="md:col-span-2 space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <h4 className="font-semibold text-lg bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Stay Updated
-            </h4>
-            <p className="text-xs text-muted-foreground">
-              Get the latest updates on new features and job insights.
-            </p>
-            <motion.div
-              className="relative group"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative glass-card p-1 rounded-xl">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="w-full px-4 py-2 bg-background/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                />
-              </div>
-            </motion.div>
-          </motion.div>
+
         </div>
 
         {/* Bottom Bar */}
@@ -255,7 +228,7 @@ export const Footer = () => {
                 All systems operational
               </motion.span>
               <motion.span whileHover={{ scale: 1.05 }}>
-                Made with ❤️ for job seekers
+                Made with ❤️ for Contractors
               </motion.span>
             </div>
           </div>
