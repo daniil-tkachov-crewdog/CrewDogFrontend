@@ -12,6 +12,8 @@ type Props = {
   setJobDescription: (v: string) => void;
   includeLeads: boolean;
   setIncludeLeads: (v: boolean) => void;
+  outreachMessage: boolean;
+  setOutreachMessage: (v: boolean) => void;
   isLoading: boolean;
   canSearch: boolean;
   onSubmit: (e: FormEvent) => void;
@@ -24,6 +26,8 @@ export default function CenteredForm({
   setJobDescription,
   includeLeads,
   setIncludeLeads,
+  outreachMessage,
+  setOutreachMessage,
   isLoading,
   canSearch,
   onSubmit,
@@ -113,30 +117,55 @@ export default function CenteredForm({
           </div>
         </div>
 
-        <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative p-5 rounded-2xl bg-gradient-to-br from-primary/[0.07] via-background/50 to-accent/[0.07] border-2 border-primary/10 backdrop-blur-sm hover:border-primary/20 transition-all duration-300">
-            <label className="flex items-center gap-4 cursor-pointer">
-              <div className="relative flex-shrink-0">
-                <input
-                  type="checkbox"
-                  checked={includeLeads}
-                  onChange={(e) => setIncludeLeads(e.target.checked)}
-                  className="sr-only peer"
-                  disabled={isLoading}
-                />
-                <div className="w-14 h-7 bg-muted/80 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300 shadow-inner" />
-                <div className="absolute left-1 top-1 w-5 h-5 bg-background rounded-full transition-all duration-300 peer-checked:translate-x-7 shadow-lg" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-base mb-0.5">
-                  Include Potential Leads Search
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Discover additional decision-makers and influencers
-                </p>
-              </div>
-            </label>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative p-4 rounded-2xl bg-gradient-to-br from-primary/[0.07] via-background/50 to-accent/[0.07] border-2 border-primary/10 backdrop-blur-sm hover:border-primary/20 transition-all duration-300">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <div className="relative flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={includeLeads}
+                    onChange={(e) => setIncludeLeads(e.target.checked)}
+                    className="sr-only peer"
+                    disabled={isLoading}
+                  />
+                  <div className="w-11 h-6 bg-muted/80 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300 shadow-inner" />
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-background rounded-full transition-all duration-300 peer-checked:translate-x-5 shadow-lg" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm mb-0">Leads Search</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">
+                    Decision-makers
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative p-4 rounded-2xl bg-gradient-to-br from-primary/[0.07] via-background/50 to-accent/[0.07] border-2 border-primary/10 backdrop-blur-sm hover:border-primary/20 transition-all duration-300">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <div className="relative flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={outreachMessage}
+                    onChange={(e) => setOutreachMessage(e.target.checked)}
+                    className="sr-only peer"
+                    disabled={isLoading}
+                  />
+                  <div className="w-11 h-6 bg-muted/80 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300 shadow-inner" />
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-background rounded-full transition-all duration-300 peer-checked:translate-x-5 shadow-lg" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm mb-0">Outreach</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">
+                    Messaging
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 

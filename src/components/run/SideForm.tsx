@@ -12,6 +12,8 @@ type Props = {
   setJobDescription: (v: string) => void;
   includeLeads: boolean;
   setIncludeLeads: (v: boolean) => void;
+  outreachMessage: boolean;
+  setOutreachMessage: (v: boolean) => void;
   isLoading: boolean;
   canSearch: boolean;
   onSubmit: (e: FormEvent) => void;
@@ -24,6 +26,8 @@ export default function SideForm({
   setJobDescription,
   includeLeads,
   setIncludeLeads,
+  outreachMessage,
+  setOutreachMessage,
   isLoading,
   canSearch,
   onSubmit,
@@ -74,26 +78,44 @@ export default function SideForm({
           </p>
         </div>
 
-        <div className="p-3 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
-          <label className="flex items-center gap-2 cursor-pointer group">
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={includeLeads}
-                onChange={(e) => setIncludeLeads(e.target.checked)}
-                className="sr-only peer"
-                disabled={isLoading}
-              />
-              <div className="w-9 h-5 bg-muted rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all" />
-              <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-background rounded-full transition-transform peer-checked:translate-x-4 shadow-sm" />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-xs">Include Potential Leads</p>
-              <p className="text-xs text-muted-foreground">
-                Find additional decision-makers
-              </p>
-            </div>
-          </label>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
+            <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={includeLeads}
+                    onChange={(e) => setIncludeLeads(e.target.checked)}
+                    className="sr-only peer"
+                    disabled={isLoading}
+                  />
+                  <div className="w-8 h-4 bg-muted rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all" />
+                  <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-background rounded-full transition-transform peer-checked:translate-x-4 shadow-sm" />
+                </div>
+              <div className="flex-1">
+                <p className="font-medium text-[11px] leading-tight">Leads</p>
+              </div>
+            </label>
+          </div>
+
+          <div className="p-3 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
+            <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={outreachMessage}
+                    onChange={(e) => setOutreachMessage(e.target.checked)}
+                    className="sr-only peer"
+                    disabled={isLoading}
+                  />
+                  <div className="w-8 h-4 bg-muted rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all" />
+                  <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-background rounded-full transition-transform peer-checked:translate-x-4 shadow-sm" />
+                </div>
+              <div className="flex-1">
+                <p className="font-medium text-[11px] leading-tight">Outreach</p>
+              </div>
+            </label>
+          </div>
         </div>
 
         <Button

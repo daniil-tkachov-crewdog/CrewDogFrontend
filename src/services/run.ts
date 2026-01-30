@@ -6,6 +6,7 @@ export type RunPayload = {
   JD?: string; // full job description text (optional)
   JD_link?: string; // job URL (optional)
   includeLeads?: boolean; // extra contacts toggle
+  outreachMessage?: boolean; // outreach message toggle
 };
 
 /** n8n (and other) shapes we can receive back */
@@ -56,6 +57,7 @@ export async function runSearch(payload: RunPayload): Promise<RunResponse> {
     JD: (payload.JD || "").trim(),
     JD_link: (payload.JD_link || "").trim(),
     JH_tickbox: payload.includeLeads ? "yes" : "no",
+    outreach_message: payload.outreachMessage ? "yes" : "no",
     // mirror old form’s saver flag (kept as "No")
     "Save to the doc file and the spreadsheet? (+10 sec)": "No",
   });

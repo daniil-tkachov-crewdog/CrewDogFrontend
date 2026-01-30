@@ -100,7 +100,7 @@ function extractN8nError(
 }
 
 async function runSearchWithTimeout(
-  args: { JD: string; JD_link: string; includeLeads: boolean },
+  args: { JD: string; JD_link: string; includeLeads: boolean; outreachMessage: boolean },
   ms = 60000
 ) {
   const controller = new AbortController();
@@ -121,6 +121,7 @@ export default function RunPage() {
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [includeLeads, setIncludeLeads] = useState(false);
+  const [outreachMessage, setOutreachMessage] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<NormalizedResults | null>(null);
@@ -230,7 +231,7 @@ export default function RunPage() {
     setIsLoading(true);
     try {
       const raw = await runSearchWithTimeout(
-        { JD: jobDescription || "", JD_link: jobUrl || "", includeLeads },
+        { JD: jobDescription || "", JD_link: jobUrl || "", includeLeads, outreachMessage },
         60000
       );
       if (raw == null) throw new Error("Empty response from server");
@@ -376,6 +377,8 @@ export default function RunPage() {
                     }}
                     includeLeads={includeLeads}
                     setIncludeLeads={setIncludeLeads}
+                    outreachMessage={outreachMessage}
+                    setOutreachMessage={setOutreachMessage}
                     isLoading={isLoading}
                     canSearch={canSearch}
                     onSubmit={handleSubmit}
@@ -412,6 +415,8 @@ export default function RunPage() {
                     }}
                     includeLeads={includeLeads}
                     setIncludeLeads={setIncludeLeads}
+                    outreachMessage={outreachMessage}
+                    setOutreachMessage={setOutreachMessage}
                     isLoading={isLoading}
                     canSearch={canSearch}
                     onSubmit={handleSubmit}

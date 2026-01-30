@@ -9,6 +9,7 @@ export type RunFormValues = {
   jobUrl: string;
   jobDescription: string;
   includeLeads: boolean;
+  outreachMessage: boolean;
 };
 
 export default function RunForm({
@@ -24,7 +25,7 @@ export default function RunForm({
   onSubmit: (e: React.FormEvent) => void;
   compact?: boolean;
 }) {
-  const { jobUrl, jobDescription, includeLeads } = values;
+  const { jobUrl, jobDescription, includeLeads, outreachMessage } = values;
   const jdLen = jobDescription?.length ?? 0;
 
   return (
@@ -181,6 +182,69 @@ export default function RunForm({
               </p>
               <p className="text-xs text-muted-foreground">
                 Find additional decision-makers
+              </p>
+            </div>
+            {!compact && (
+              <Sparkles className="h-6 w-6 text-primary/70 flex-shrink-0 group-hover:text-primary transition-colors" />
+            )}
+          </label>
+        </div>
+      </div>
+
+      {/* Outreach Message Toggle */}
+      <div
+        className={
+          compact
+            ? "p-3 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10"
+            : "relative group"
+        }
+      >
+        {!compact && (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        )}
+        <div
+          className={
+            compact
+              ? "flex items-center gap-2 cursor-pointer group"
+              : "relative p-5 rounded-2xl bg-gradient-to-br from-primary/[0.07] via-background/50 to-accent/[0.07] border-2 border-primary/10 backdrop-blur-sm hover:border-primary/20 transition-all duration-300"
+          }
+        >
+          <label className="flex items-center gap-4 cursor-pointer">
+            <div className="relative flex-shrink-0">
+              <input
+                type="checkbox"
+                checked={values.outreachMessage}
+                onChange={(e) =>
+                  setValues({ ...values, outreachMessage: e.target.checked })
+                }
+                className="sr-only peer"
+                disabled={isLoading}
+              />
+              <div
+                className={
+                  compact
+                    ? "w-9 h-5 bg-muted rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all"
+                    : "w-14 h-7 bg-muted/80 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-primary peer-checked:to-accent transition-all duration-300 shadow-inner"
+                }
+              />
+              <div
+                className={
+                  compact
+                    ? "absolute left-0.5 top-0.5 w-4 h-4 bg-background rounded-full transition-transform peer-checked:translate-x-4 shadow-sm"
+                    : "absolute left-1 top-1 w-5 h-5 bg-background rounded-full transition-all duration-300 peer-checked:translate-x-7 shadow-lg"
+                }
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p
+                className={`font-semibold ${
+                  compact ? "text-xs" : "text-base"
+                } mb-0.5`}
+              >
+                Outreach Message
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Enable outreach messaging
               </p>
             </div>
             {!compact && (
