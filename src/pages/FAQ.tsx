@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Search, ChevronRight, HelpCircle, Sparkles, Zap, Shield } from "lucide-react";
+import { ChevronRight, HelpCircle, Sparkles, Zap, Shield } from "lucide-react";
 import faqHeroBg from "@/assets/faq-hero-bg.png";
 
 const faqs = [
@@ -56,18 +55,12 @@ const faqs = [
 ];
 
 export default function FAQ() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const { scrollY } = useScroll();
   
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
   const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
-
-  const filteredFaqs = faqs.filter(faq =>
-    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -186,7 +179,7 @@ export default function FAQ() {
             </motion.h1>
             
             <motion.p 
-              className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed"
+              className="text-lg md:text-xl text-white max-w-2xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -195,38 +188,11 @@ export default function FAQ() {
               helpful guides, and useful tips to assist you in getting the most out of CrewDog.
             </motion.p>
 
-            {/* Premium Search Bar */}
-            <motion.div 
-              className="relative max-w-xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-cyan-400/20 rounded-2xl blur-xl" />
-              <div className="relative">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
-                <Input
-                  type="text"
-                  placeholder="Search for help..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-16 pl-14 pr-5 text-base glass-card border-2 border-primary/30 rounded-2xl focus:border-primary/60 transition-all shadow-xl"
-                />
-                <motion.div
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <Zap className="h-5 w-5 text-primary" />
-                </motion.div>
-              </div>
-            </motion.div>
-
             {/* Trust Indicators */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.4 }}
               className="flex items-center justify-center gap-8 pt-8"
             >
               <div className="flex items-center gap-2 text-sm">
@@ -328,16 +294,12 @@ export default function FAQ() {
 
             {/* FAQ List */}
             <div className="lg:col-span-8">
-              <AnimatePresence mode="wait">
-                {filteredFaqs.length > 0 ? (
-                  <motion.div
-                    key="faq-list"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-3"
-                  >
-                    {filteredFaqs.map((faq, index) => (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-3"
+              >
+                {faqs.map((faq, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
@@ -416,45 +378,7 @@ export default function FAQ() {
                         </button>
                       </motion.div>
                     ))}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="no-results"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="text-center py-16 glass-card rounded-2xl p-8 border border-primary/20"
-                  >
-                    <motion.div
-                      animate={{ 
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <Search className="h-16 w-16 text-primary mx-auto mb-4" />
-                    </motion.div>
-                    <h3 className="text-xl font-semibold mb-2">No results found</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Try different keywords or{" "}
-                      <Link to="/support" className="text-primary hover:underline font-medium">
-                        contact support
-                      </Link>
-                    </p>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <button
-                        onClick={() => setSearchQuery("")}
-                        className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors"
-                      >
-                        Clear Search
-                      </button>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              </motion.div>
             </div>
           </div>
         </div>

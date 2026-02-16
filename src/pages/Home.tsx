@@ -171,9 +171,7 @@ export default function Home() {
                 What is CrewDog?
               </h2>
               <p className="text-xl text-muted-foreground">
-                CrewDog identifies the employers and relevant LinkedIn contacts
-                behind any job description, enabling direct outreach and early
-                access to opportunities before they become publicly visible.
+                CrewDog identifies the employers and relevant LinkedIn contacts for any job description, enabling direct outreach and early access to opportunities that could help you get hired.
               </p>
             </motion.div>
 
@@ -192,8 +190,7 @@ export default function Home() {
                     Intelligent Analysis
                   </h3>
                   <p className="text-muted-foreground">
-                    Our AI analyzes any job description to uncover the real
-                    employer, even when it’s posted through a third party.
+                    Our AI analyzes any job description to surface relevant LinkedIn contacts who may help you secure roles like this.
                   </p>
                 </Card>
               </motion.div>
