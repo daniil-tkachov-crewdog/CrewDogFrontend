@@ -163,7 +163,7 @@ export function mapN8nToResults(data: any) {
     careerPage: data.careerPage || "",
     contacts: contactsFromHr || contactsFromContacts || [],
     sniff_out_clues: data.sniff_out_clues || undefined,
-    // NEW
+    outreach_message: (data.outreach_message || "").trim() || undefined,
     leads: toLeads(data),
   };
 }
