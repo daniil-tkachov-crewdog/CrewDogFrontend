@@ -83,7 +83,7 @@ export default function Home() {
                 variants={fadeInUp}
                 className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
               >
-               Turn any job description, from any source, into a list of LinkedIn influencers connected to the hiring decision.
+                Paste any real or aspirational job description in your targetCrewDog helps expats contact decision makers on LinkedIn for jobs abroad
               </motion.p>
 
               <motion.div
@@ -171,7 +171,7 @@ export default function Home() {
                 What is CrewDog?
               </h2>
               <p className="text-xl text-muted-foreground">
-                CrewDog identifies the employers and relevant LinkedIn contacts for any job description, enabling direct outreach and early access to opportunities that could help you get hired.
+                Paste any real or aspirational job description in your target country. CrewDog shows relevant HR and hiring-side profiles so you can reach out directly
               </p>
             </motion.div>
 
