@@ -112,6 +112,26 @@ export default function Home() {
           </div>
         </section>
 
+    {/* CrewDog AI Intro Block */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="max-w-3xl mx-auto text-center space-y-8"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+                Welcome to <span className="text-primary">CrewDog AI</span>
+              </h2>
+              <p className="text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Search across LinkedIn&apos;s global network of over 1 billion
+                professionals to find the people hiring in oil &amp; gas
+              </p>
+            </motion.div>
+          </div>
+        </section>
+        
         {/* Stats Section */}
         <section className="py-16 border-y border-border/40">
           <div className="container mx-auto px-4">
