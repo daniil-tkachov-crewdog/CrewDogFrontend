@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Send, Sparkles } from "lucide-react";
+import type { SearchResultsFeedbackOption } from "@/services/support";
 
 type Props = {
   jobUrl: string;
@@ -17,6 +18,12 @@ type Props = {
   isLoading: boolean;
   canSearch: boolean;
   onSubmit: (e: FormEvent) => void;
+  feedbackOption: SearchResultsFeedbackOption | "";
+  setFeedbackOption: (v: SearchResultsFeedbackOption) => void;
+  customFeedback: string;
+  setCustomFeedback: (v: string) => void;
+  feedbackSubmitting: boolean;
+  onFeedbackSubmit: () => void;
 };
 
 export default function SideForm({
@@ -31,6 +38,12 @@ export default function SideForm({
   isLoading,
   canSearch,
   onSubmit,
+  feedbackOption,
+  setFeedbackOption,
+  customFeedback,
+  setCustomFeedback,
+  feedbackSubmitting,
+  onFeedbackSubmit,
 }: Props) {
   return (
     <Card className="glass-card p-6 h-full">
@@ -150,6 +163,87 @@ export default function SideForm({
             Customise your CV
           </a>
         </Button>
+
+        <div className="pt-2 border-t border-border/60 space-y-3">
+          <h3 className="text-sm font-semibold">How do you find these results?</h3>
+
+          <div className="space-y-2.5">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="results-feedback"
+                checked={feedbackOption === "helpful"}
+                onChange={() => setFeedbackOption("helpful")}
+                className="accent-primary"
+                disabled={feedbackSubmitting}
+              />
+              <span>It was quite helpful, thanks!</span>
+            </label>
+
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="results-feedback"
+                checked={feedbackOption === "no_response"}
+                onChange={() => setFeedbackOption("no_response")}
+                className="accent-primary"
+                disabled={feedbackSubmitting}
+              />
+              <span>I didn't get any response.</span>
+            </label>
+
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="results-feedback"
+                checked={feedbackOption === "irrelevant"}
+                onChange={() => setFeedbackOption("irrelevant")}
+                className="accent-primary"
+                disabled={feedbackSubmitting}
+              />
+              <span>These results are irrelevant!</span>
+            </label>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="results-feedback"
+                  checked={feedbackOption === "custom"}
+                  onChange={() => setFeedbackOption("custom")}
+                  className="accent-primary"
+                  disabled={feedbackSubmitting}
+                />
+                <span>Your own feedback</span>
+              </label>
+              <Textarea
+                placeholder="Write your own sentence..."
+                value={customFeedback}
+                onChange={(e) => {
+                  setCustomFeedback(e.target.value);
+                  if (e.target.value && feedbackOption !== "custom") {
+                    setFeedbackOption("custom");
+                  }
+                }}
+                className="min-h-[72px] resize-none text-sm border-primary/20 bg-background/50"
+                disabled={feedbackSubmitting}
+              />
+            </div>
+
+            <Button
+              type="button"
+              className="w-full"
+              onClick={onFeedbackSubmit}
+              disabled={
+                feedbackSubmitting ||
+                !feedbackOption ||
+                (feedbackOption === "custom" && !customFeedback.trim())
+              }
+            >
+              {feedbackSubmitting ? "Sending..." : "Send the feedback"}
+            </Button>
+          </div>
+        </div>
       </form>
     </Card>
   );
