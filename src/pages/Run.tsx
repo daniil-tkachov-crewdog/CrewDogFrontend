@@ -11,6 +11,15 @@ import { useAuth } from "@/auth/AuthProvider";
 import { runSearch, mapN8nToResults } from "@/services/run";
 import type { NormalizedResults } from "@/services/run";
 
+//Added by Denny - the user survey
+
+import {
+  sendSearchResultsFeedback,
+  type SearchResultsFeedbackOption,
+} from "@/services/support";
+
+//...
+
 import { fetchAccountSummary, consumeOneCredit } from "@/services/account";
 import { logHistory } from "@/services/history";
 
@@ -135,6 +144,16 @@ export default function RunPage() {
   const [used, setUsed] = useState<number>(0);
   const [unlimited, setUnlimited] = useState<boolean>(false);
 
+//Added by Denny - the user survey
+  
+  const [feedbackOption, setFeedbackOption] = useState<
+    SearchResultsFeedbackOption | ""
+  >("");
+  const [customFeedback, setCustomFeedback] = useState("");
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  
+//...
+  
   async function syncQuotaFromServer() {
     const s = await fetchAccountSummary();
     setCap(s.cap ?? 3);
@@ -167,6 +186,8 @@ export default function RunPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
+    setFeedbackOption("");
+    setCustomFeedback("");
 
     if (!user) {
       toast({
@@ -328,6 +349,53 @@ export default function RunPage() {
     }
   }
 
+  //Added by Denny - the user survay
+
+  async function handleFeedbackSubmit() {
+    if (!feedbackOption) return;
+    if (feedbackOption === "custom" && !customFeedback.trim()) {
+      toast({
+        title: "Feedback is empty",
+        description: "Please write your feedback before sending.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setFeedbackSubmitting(true);
+    try {
+      const defaultMessageByType: Record<SearchResultsFeedbackOption, string> = {
+        helpful: "It was quite helpful, thanks!",
+        no_response: "I didn't get any response.",
+        irrelevant: "These results are irrelevant!",
+        custom: customFeedback.trim(),
+      };
+
+      await sendSearchResultsFeedback({
+        feedbackType: feedbackOption,
+        feedbackMessage: defaultMessageByType[feedbackOption],
+        userEmail: user?.email || "",
+      });
+
+      toast({
+        title: "Feedback sent",
+        description: "Thanks for helping us improve the results.",
+      });
+      setFeedbackOption("");
+      setCustomFeedback("");
+    } catch (error: any) {
+      toast({
+        title: "Could not send feedback",
+        description: error?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setFeedbackSubmitting(false);
+    }
+  }
+
+  //...
+  
   const hasSearched = !!results || isLoading || !!err;
 
   return (
@@ -420,6 +488,12 @@ export default function RunPage() {
                     isLoading={isLoading}
                     canSearch={canSearch}
                     onSubmit={handleSubmit}
+                    feedbackOption={feedbackOption}
+                    setFeedbackOption={setFeedbackOption}
+                    customFeedback={customFeedback}
+                    setCustomFeedback={setCustomFeedback}
+                    feedbackSubmitting={feedbackSubmitting}
+                    onFeedbackSubmit={handleFeedbackSubmit}
                   />
                 </motion.div>
 
