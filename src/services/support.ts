@@ -19,6 +19,29 @@ export type SupportPayload = {
   createdAt: string;
 };
 
+export type SearchResultsFeedbackOption =
+  | "helpful"
+  | "no_response"
+  | "irrelevant"
+  | "custom";
+
+export type SendSearchResultsFeedbackArgs = {
+  feedbackType: SearchResultsFeedbackOption;
+  feedbackMessage?: string;
+  userEmail?: string;
+};
+
+type SearchResultsFeedbackPayload = {
+  type: "search_results_feedback";
+  feedbackType: SearchResultsFeedbackOption;
+  feedbackMessage: string;
+  userEmail: string;
+  source: string;
+  userAgent: string;
+  pagePath: string;
+  createdAt: string;
+};
+
 function buildPayload({
   email,
   message,
@@ -55,5 +78,37 @@ export async function sendSupportMessage(args: SendSupportArgs): Promise<void> {
   if (!resp.ok) {
     const txt = await resp.text().catch(() => "");
     throw new Error(txt || `Support webhook error (${resp.status})`);
+  }
+}
+
+export async function sendSearchResultsFeedback({
+  feedbackType,
+  feedbackMessage,
+  userEmail,
+}: SendSearchResultsFeedbackArgs): Promise<void> {
+  if (!N8N_SUPPORT_WEBHOOK) {
+    throw new Error("Missing N8N_SUPPORT_WEBHOOK config.");
+  }
+
+  const payload: SearchResultsFeedbackPayload = {
+    type: "search_results_feedback",
+    feedbackType,
+    feedbackMessage: (feedbackMessage || "").trim(),
+    userEmail: (userEmail || "").trim(),
+    source: "run-results-page",
+    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+    pagePath: typeof window !== "undefined" ? window.location.pathname : "",
+    createdAt: new Date().toISOString(),
+  };
+
+  const resp = await fetch(N8N_SUPPORT_WEBHOOK, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(txt || `Search feedback webhook error (${resp.status})`);
   }
 }
