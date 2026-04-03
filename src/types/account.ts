@@ -40,18 +40,35 @@ export type NormalizedSummary = {
   planLabel?: string; // 'Platinum' | 'Silver' | 'Gold' | 'Business' | 'Retention' | 'Free' | 'Admin' | 'Pro'
 };
 
+export type ContactStatus = "none" | "requested" | "accepted" | "messaged";
+
+export type SearchContact = {
+  name?: string;
+  profileUrl?: string;
+  title?: string;
+  status?: ContactStatus;
+};
+
 export type SearchRow = {
   id: string;
   jobTitle?: string;
   companyName?: string;
   companyUrl?: string;
   jdExcerpt?: string;
+  jdRaw?: string;
   createdAt?: string;
   sourceType?: string;
   sourceUrl?: string;
   whyCompany?: string;
   location?: string;
-  hrContacts?: { name?: string; profileUrl?: string }[];
+  sourceType?: string;
+  sourceUrl?: string;
+  whyCompany?: string;
+  location?: string;
+  isImportant?: boolean;
+  contactStatuses?: Record<string, ContactStatus>;
+  hrContacts?: SearchContact[];
+  potentialLeads?: SearchContact[];
 };
 
 export type HistoryResp = {
