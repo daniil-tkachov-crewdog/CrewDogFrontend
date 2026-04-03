@@ -7,12 +7,15 @@ import { Separator } from "@/components/ui/separator";
 import {
   Briefcase,
   Calendar,
-  Download,
+//  Download,
   History as HistoryIcon,
-  Target,
-  Zap,
+//  Target,
+//  Zap,
   ChevronLeft,
   ChevronRight,
+  ExternalLink,
+  Link as LinkIcon,
+  Users,  
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fetchSearchHistory, type HistoryItem } from "@/services/history";
@@ -191,21 +194,88 @@ export default function SearchHistory() {
                             Job description (excerpt)
                           </p>
                           <p className="text-sm whitespace-pre-wrap">
-                            {it.jdExcerpt || "—"}
+                            {it.jdExcerpt || "No excerpt available."}
                           </p>
                         </div>
-                        <div className="flex gap-2 mt-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                          >
-                            View Full Report
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="mr-2 h-4 w-4" />
-                            Export
-                          </Button>
+
+                        <div className="mt-4 grid gap-3">
+                          <div className="p-4 rounded-lg bg-muted/50">
+                            <p className="text-sm text-muted-foreground mb-1">
+                              Company website
+                            </p>
+                            {it.companyUrl ? (
+                              <a
+                                href={it.companyUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-sm text-primary hover:underline break-all"
+                              >
+                                <LinkIcon className="h-3.5 w-3.5" />
+                                {it.companyUrl}
+                              </a>
+                            ) : (
+                              <p className="text-sm">—</p>
+                            )}
+                          </div>
+
+                          <div className="p-4 rounded-lg bg-muted/50">
+                            <p className="text-sm text-muted-foreground mb-1">
+                              Source job link
+                            </p>
+                            {it.sourceUrl ? (
+                              <a
+                                href={it.sourceUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-sm text-primary hover:underline break-all"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                {it.sourceUrl}
+                              </a>
+                            ) : (
+                              <p className="text-sm">—</p>
+                            )}
+                          </div>
+
+                          <div className="p-4 rounded-lg bg-muted/50">
+                            <p className="text-sm text-muted-foreground mb-1">
+                              Why this company
+                            </p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {it.whyCompany || "—"}
+                            </p>
+                          </div>
+
+                          <div className="p-4 rounded-lg bg-muted/50">
+                            <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                              <Users className="h-4 w-4" />
+                              LinkedIn contacts found
+                            </p>
+                            {it.hrContacts?.length ? (
+                              <ul className="space-y-1.5">
+                                {it.hrContacts.map((c, i) => (
+                                  <li key={`${it.id}-contact-${i}`}>
+                                    {c?.profileUrl ? (
+                                      <a
+                                        href={c.profileUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-sm text-primary hover:underline break-all"
+                                      >
+                                        {c?.name || c.profileUrl}
+                                      </a>
+                                    ) : (
+                                      <span className="text-sm">
+                                        {c?.name || "Unnamed contact"}
+                                      </span>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm">No contacts found.</p>
+                            )}
+                          </div>
                         </div>
                       </motion.div>
                     )}
