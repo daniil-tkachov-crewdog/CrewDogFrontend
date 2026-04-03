@@ -44,8 +44,13 @@ export type SearchRow = {
   id: string;
   jobTitle?: string;
   companyName?: string;
+  companyUrl?: string;
   jdExcerpt?: string;
   createdAt?: string;
+  sourceType?: string;
+  sourceUrl?: string;
+  whyCompany?: string;
+  location?: string;
   hrContacts?: { name?: string; profileUrl?: string }[];
 };
 
