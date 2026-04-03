@@ -5,6 +5,24 @@ import type { SearchRow, HistoryResp } from "@/types/account";
 
 export type HistoryItem = SearchRow; // keep existing imports stable
 
+function normalizeHistoryItem(raw: any): HistoryItem {
+  return {
+    id: String(raw?.id || ""),
+    jobTitle: raw?.jobTitle ?? raw?.job_title ?? null,
+    companyName: raw?.companyName ?? raw?.company_name ?? null,
+    companyUrl: raw?.companyUrl ?? raw?.company_url ?? null,
+    jdExcerpt: raw?.jdExcerpt ?? raw?.jd_excerpt ?? null,
+    createdAt: raw?.createdAt ?? raw?.created_at ?? null,
+    sourceType: raw?.sourceType ?? raw?.source_type ?? null,
+    sourceUrl: raw?.sourceUrl ?? raw?.source_url ?? null,
+    whyCompany: raw?.whyCompany ?? raw?.why_company ?? null,
+    location: raw?.location ?? null,
+    hrContacts: Array.isArray(raw?.hrContacts ?? raw?.hr_contacts)
+      ? (raw.hrContacts ?? raw.hr_contacts)
+      : [],
+  };
+}
+
 export async function fetchSearchHistory({
   limit = 5,
   cursor,
@@ -23,7 +41,13 @@ export async function fetchSearchHistory({
 
   const res = await fetch(url.toString(), { credentials: "include" });
   if (!res.ok) throw new Error("History fetch failed");
-  return (await res.json()) as HistoryResp;
+    const json = (await res.json()) as HistoryResp & { items?: any[] };
+  return {
+    ...json,
+    items: Array.isArray(json.items)
+      ? json.items.map(normalizeHistoryItem).filter((x) => x.id)
+      : [],
+  };
 }
 
 /** Mirror old-site semantics for saving a run item */
