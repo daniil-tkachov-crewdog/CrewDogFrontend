@@ -7,18 +7,22 @@ import { Separator } from "@/components/ui/separator";
 import {
   Briefcase,
   Calendar,
-//  Download,
   History as HistoryIcon,
-//  Target,
-//  Zap,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   Link as LinkIcon,
-  Users,  
+  Users,
+  Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { fetchSearchHistory, type HistoryItem } from "@/services/history";
+import {
+  fetchSearchHistory,
+  setContactStatuses,
+  setImportantSearch,
+  type HistoryItem,
+} from "@/services/history";
+import type { ContactStatus } from "@/types/account";
 
 export default function SearchHistory() {
   const [expanded, setExpanded] = useState<string[]>([]);
@@ -27,6 +31,10 @@ export default function SearchHistory() {
   const [cursorStack, setCursorStack] = useState<(string | null)[]>([null]); // cursor used to fetch page index
   const [nextCursors, setNextCursors] = useState<(string | null)[]>([]);
   const [loading, setLoading] = useState(false);
+  const [importantOnly, setImportantOnly] = useState(false);
+  const [savingImportant, setSavingImportant] = useState<Record<string, boolean>>({});
+  const [savingStatus, setSavingStatus] = useState<Record<string, boolean>>({});
+  const [showFullJd, setShowFullJd] = useState<Record<string, boolean>>({});
 
   const toggle = (id: string) =>
     setExpanded((p) =>
@@ -78,6 +86,67 @@ export default function SearchHistory() {
 
   const canPrev = page > 1;
   const canNext = Boolean(nextCursors[page - 1] || cursorStack[page]);
+  const visibleItems = importantOnly
+    ? items.filter((i) => i.isImportant)
+    : items;
+
+  const toggleImportant = async (it: HistoryItem) => {
+    if (!it?.id) return;
+    const next = !it.isImportant;
+    setItems((prev) =>
+      prev.map((x) => (x.id === it.id ? { ...x, isImportant: next } : x))
+    );
+    setSavingImportant((p) => ({ ...p, [it.id]: true }));
+    try {
+      await setImportantSearch(it.id, next);
+    } catch {
+      setItems((prev) =>
+        prev.map((x) => (x.id === it.id ? { ...x, isImportant: !next } : x))
+      );
+    } finally {
+      setSavingImportant((p) => ({ ...p, [it.id]: false }));
+    }
+  };
+
+  const statusColor = (s: ContactStatus) => {
+    if (s === "requested") return "text-orange-600 bg-orange-50 border-orange-200";
+    if (s === "accepted") return "text-green-600 bg-green-50 border-green-200";
+    if (s === "messaged") return "text-purple-600 bg-purple-50 border-purple-200";
+    return "text-gray-600 bg-gray-50 border-gray-200";
+  };
+
+  const setStatus = async (
+    item: HistoryItem,
+    kind: "hr" | "lead",
+    key: string,
+    status: ContactStatus
+  ) => {
+    const mapKey = `${kind}:${key}`;
+    const current = item.contactStatuses || {};
+    const next = { ...current, [mapKey]: status };
+    setItems((prev) =>
+      prev.map((x) => (x.id === item.id ? { ...x, contactStatuses: next } : x))
+    );
+    setSavingStatus((p) => ({ ...p, [item.id]: true }));
+    try {
+      await setContactStatuses(item.id, next);
+    } catch {
+      setItems((prev) =>
+        prev.map((x) =>
+          x.id === item.id ? { ...x, contactStatuses: current } : x
+        )
+      );
+    } finally {
+      setSavingStatus((p) => ({ ...p, [item.id]: false }));
+    }
+  };
+
+  const jdPreview = (it: HistoryItem) => {
+    const base = (it.jdRaw || it.jdExcerpt || "").trim();
+    if (!base) return it.sourceUrl || "No excerpt available.";
+    if (showFullJd[it.id] || base.length <= 220) return base;
+    return `${base.slice(0, 220)}...`;
+  };
 
   return (
     <section>
@@ -87,6 +156,14 @@ export default function SearchHistory() {
           <h2 className="text-2xl font-bold">Search History</h2>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant={importantOnly ? "default" : "outline"}
+            size="sm"
+            onClick={() => setImportantOnly((v) => !v)}
+          >
+            <Star className="h-4 w-4 mr-1" />
+            {importantOnly ? "Important only" : "All results"}
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -106,12 +183,14 @@ export default function SearchHistory() {
         </div>
       </div>
 
-      {items.length === 0 ? (
+      {visibleItems.length === 0 ? (
         <Card className="p-12 glass-card text-center">
           <HistoryIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
           <h3 className="text-xl font-semibold mb-2">No searches yet</h3>
           <p className="text-muted-foreground mb-6">
-            Start your first job search to see it here
+            {importantOnly
+              ? "No starred searches yet."
+              : "Start your first job search to see it here"}
           </p>
           <Link to="/run">
             <Button size="lg">
@@ -122,7 +201,7 @@ export default function SearchHistory() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {items.map((it, idx) => {
+          {visibleItems.map((it, idx) => {
             const created = it.createdAt
               ? new Date(it.createdAt).toLocaleString()
               : "";
@@ -159,6 +238,25 @@ export default function SearchHistory() {
                         variant="outline"
                         className="bg-green-500/10 text-green-500 border-green-500/20"
                       >
+                        <button
+                          type="button"
+                          disabled={savingImportant[it.id]}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            void toggleImportant(it);
+                          }}
+                          className="mr-2"
+                          aria-label="Mark important"
+                        >
+                          <Star
+                            className={`h-4 w-4 ${
+                              it.isImportant
+                                ? "fill-amber-400 text-amber-500"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        </button>
                         {status}
                       </Badge>
                     </div>
@@ -194,10 +292,24 @@ export default function SearchHistory() {
                             Job description (excerpt)
                           </p>
                           <p className="text-sm whitespace-pre-wrap">
-                            {it.jdExcerpt || "No excerpt available."}
+                            {jdPreview(it)}
                           </p>
+                          {((it.jdRaw || it.jdExcerpt || "").trim().length > 220 ||
+                            Boolean(it.sourceUrl)) && (
+                            <button
+                              className="mt-2 text-xs text-primary hover:underline"
+                              onClick={() =>
+                                setShowFullJd((p) => ({
+                                  ...p,
+                                  [it.id]: !p[it.id],
+                                }))
+                              }
+                              type="button"
+                            >
+                              {showFullJd[it.id] ? "Show less" : "Show more"}
+                            </button>
+                          )}
                         </div>
-
                         <div className="mt-4 grid gap-3">
                           <div className="p-4 rounded-lg bg-muted/50">
                             <p className="text-sm text-muted-foreground mb-1">
@@ -249,31 +361,127 @@ export default function SearchHistory() {
                           <div className="p-4 rounded-lg bg-muted/50">
                             <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
                               <Users className="h-4 w-4" />
-                              LinkedIn contacts found
+                              Key contacts
                             </p>
                             {it.hrContacts?.length ? (
-                              <ul className="space-y-1.5">
-                                {it.hrContacts.map((c, i) => (
-                                  <li key={`${it.id}-contact-${i}`}>
-                                    {c?.profileUrl ? (
-                                      <a
-                                        href={c.profileUrl}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="text-sm text-primary hover:underline break-all"
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {it.hrContacts.map((c, i) => {
+                                  const key = c.profileUrl || c.name || `hr-${i}`;
+                                  const st = (it.contactStatuses?.[`hr:${key}`] ||
+                                    "none") as ContactStatus;
+                                  return (
+                                    <div
+                                      key={`${it.id}-contact-${i}`}
+                                      className="rounded-xl border bg-background p-3 flex items-start justify-between gap-3"
+                                    >
+                                      <div className="min-w-0">
+                                        {c?.profileUrl ? (
+                                          <a
+                                            href={c.profileUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-sm font-medium text-primary hover:underline truncate block"
+                                          >
+                                            {c?.name || c.profileUrl}
+                                          </a>
+                                        ) : (
+                                          <p className="text-sm font-medium truncate">
+                                            {c?.name || "Unnamed contact"}
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground truncate">
+                                          {c?.title || it.companyName || "—"}
+                                        </p>
+                                      </div>
+                                      <select
+                                        value={st}
+                                        disabled={savingStatus[it.id]}
+                                        onChange={(e) =>
+                                          void setStatus(
+                                            it,
+                                            "hr",
+                                            key,
+                                            e.target.value as ContactStatus
+                                          )
+                                        }
+                                        className={`text-xs rounded-md border px-2 py-1 ${statusColor(
+                                          st
+                                        )}`}
                                       >
-                                        {c?.name || c.profileUrl}
-                                      </a>
-                                    ) : (
-                                      <span className="text-sm">
-                                        {c?.name || "Unnamed contact"}
-                                      </span>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
+                                        <option value="none">None</option>
+                                        <option value="requested">Requested</option>
+                                        <option value="accepted">Accepted</option>
+                                        <option value="messaged">Messaged</option>
+                                      </select>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             ) : (
                               <p className="text-sm">No contacts found.</p>
+                            )}
+                          </div>
+                          <div className="p-4 rounded-lg bg-muted/50">
+                            <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                              <Users className="h-4 w-4" />
+                              Potential leads
+                            </p>
+                            {it.potentialLeads?.length ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {it.potentialLeads.map((c, i) => {
+                                  const key = c.profileUrl || c.name || `lead-${i}`;
+                                  const st = (it.contactStatuses?.[`lead:${key}`] ||
+                                    "none") as ContactStatus;
+                                  return (
+                                    <div
+                                      key={`${it.id}-lead-${i}`}
+                                      className="rounded-xl border bg-background p-3 flex items-start justify-between gap-3"
+                                    >
+                                      <div className="min-w-0">
+                                        {c?.profileUrl ? (
+                                          <a
+                                            href={c.profileUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-sm font-medium text-primary hover:underline truncate block"
+                                          >
+                                            {c?.name || c.profileUrl}
+                                          </a>
+                                        ) : (
+                                          <p className="text-sm font-medium truncate">
+                                            {c?.name || "Unnamed lead"}
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground truncate">
+                                          {c?.title || "linkedin.com"}
+                                        </p>
+                                      </div>
+                                      <select
+                                        value={st}
+                                        disabled={savingStatus[it.id]}
+                                        onChange={(e) =>
+                                          void setStatus(
+                                            it,
+                                            "lead",
+                                            key,
+                                            e.target.value as ContactStatus
+                                          )
+                                        }
+                                        className={`text-xs rounded-md border px-2 py-1 ${statusColor(
+                                          st
+                                        )}`}
+                                      >
+                                        <option value="none">None</option>
+                                        <option value="requested">Requested</option>
+                                        <option value="accepted">Accepted</option>
+                                        <option value="messaged">Messaged</option>
+                                      </select>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <p className="text-sm">No potential leads found.</p>
                             )}
                           </div>
                         </div>
