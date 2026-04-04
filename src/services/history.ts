@@ -9,6 +9,7 @@ import type {
 } from "@/types/account";
 
 export type HistoryItem = SearchRow; // keep existing imports stable
+const LOCAL_META_KEY = "gc-history-meta-v1";
 
 const CONTACT_STATUSES: ContactStatus[] = [
   "none",
@@ -21,7 +22,12 @@ function toContact(item: any): SearchContact | null {
   if (!item || typeof item !== "object") return null;
   const name = String(item?.name || item?.title || "").trim();
   const profileUrl = String(
-    item?.profileUrl || item?.profile_url || item?.linkedIn || item?.link || ""
+    item?.profileUrl ||
+      item?.profile_url ||
+      item?.linkedIn ||
+      item?.link ||
+      item?.url ||
+      ""
   ).trim();
   const title = String(item?.role || item?.title || "").trim();
   const statusRaw = String(item?.status || "none").toLowerCase() as ContactStatus;
@@ -58,6 +64,56 @@ function normalizeHistoryItem(raw: any): HistoryItem {
         raw?.potentialLeadsFound
     ),
   };
+}
+
+function readLocalMeta(userId: string): Record<string, any> {
+  try {
+    const raw = localStorage.getItem(`${LOCAL_META_KEY}:${userId}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeLocalMeta(userId: string, value: Record<string, any>) {
+  try {
+    localStorage.setItem(`${LOCAL_META_KEY}:${userId}`, JSON.stringify(value));
+  } catch {
+    // ignore storage failures
+  }
+}
+
+function mergeLocalMeta(items: HistoryItem[], userId: string): HistoryItem[] {
+  const meta = readLocalMeta(userId);
+  return items.map((it) => {
+    const m = meta[it.id];
+    if (!m) return it;
+    return {
+      ...it,
+      isImportant:
+        typeof m.isImportant === "boolean" ? m.isImportant : it.isImportant,
+      contactStatuses: { ...(it.contactStatuses || {}), ...(m.contactStatuses || {}) },
+    };
+  });
+}
+
+async function upsertLocalMeta(
+  id: string,
+  partial: { isImportant?: boolean; contactStatuses?: Record<string, ContactStatus> }
+) {
+  const { userId } = await getIdentity();
+  if (!userId) return;
+  const meta = readLocalMeta(userId);
+  const prev = meta[id] || {};
+  meta[id] = {
+    ...prev,
+    ...partial,
+    contactStatuses: {
+      ...(prev.contactStatuses || {}),
+      ...(partial.contactStatuses || {}),
+    },
+  };
+  writeLocalMeta(userId, meta);
 }
 
 async function hydrateFromSupabase(items: HistoryItem[], userId: string) {
@@ -118,6 +174,7 @@ export async function fetchSearchHistory({
       : [],
   };
   result.items = await hydrateFromSupabase(result.items, userId);
+  result.items = mergeLocalMeta(result.items, userId);
   return result;
 }
 
@@ -164,25 +221,43 @@ export async function logHistory(args: {
         profileUrl: l.url,
         title: l.title,
       })),
+      potential_leads: (summary.leads || []).map((l) => ({
+        name: l.name || l.title,
+        profileUrl: l.url,
+        title: l.title,
+      })),
+      leads: (summary.leads || []).map((l) => ({
+        name: l.name || l.title,
+        profileUrl: l.url,
+        title: l.title,
+      })),
     }),
   });
 }
 
 export async function setImportantSearch(id: string, isImportant: boolean) {
+  await upsertLocalMeta(id, { isImportant });
   const { error } = await supabase
     .from("app_searches")
     .update({ is_important: isImportant })
     .eq("id", id);
-  if (error) throw error;
+  if (error) {
+    // keep local fallback when DB policy blocks client updates
+    console.warn("setImportantSearch failed, kept local value", error.message);
+  }
 }
 
 export async function setContactStatuses(
   id: string,
   contactStatuses: Record<string, ContactStatus>
 ) {
+  await upsertLocalMeta(id, { contactStatuses });
   const { error } = await supabase
     .from("app_searches")
     .update({ contact_statuses: contactStatuses })
     .eq("id", id);
-  if (error) throw error;
+  if (error) {
+    // keep local fallback when DB policy blocks client updates
+    console.warn("setContactStatuses failed, kept local value", error.message);
+  }
 }
