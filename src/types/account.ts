@@ -61,10 +61,6 @@ export type SearchRow = {
   sourceUrl?: string;
   whyCompany?: string;
   location?: string;
-  sourceType?: string;
-  sourceUrl?: string;
-  whyCompany?: string;
-  location?: string;
   isImportant?: boolean;
   contactStatuses?: Record<string, ContactStatus>;
   hrContacts?: SearchContact[];
