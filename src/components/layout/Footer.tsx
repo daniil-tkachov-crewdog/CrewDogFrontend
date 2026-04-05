@@ -130,6 +130,7 @@ export const Footer = () => {
               links: [
                 { to: "/run", label: "Run Search" },
                 { to: "/pricing", label: "Pricing" },
+                { href: "https://crewdogcv.ai/", label: "CrewdogCV" },
                 // { to: "/faq", label: "FAQ" },
               ],
             },
@@ -163,7 +164,7 @@ export const Footer = () => {
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <motion.li
-                    key={link.to}
+                    key={link.to || link.href}
                     initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -172,17 +173,35 @@ export const Footer = () => {
                       delay: sectionIndex * 0.1 + linkIndex * 0.05,
                     }}
                   >
-                    <Link
-                      to={link.to}
-                      onClick={() => handleFooterNavClick(link.label, link.to)}
-                      className="group text-sm text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center gap-2"
-                    >
-                      <span className="relative">
-                        {link.label}
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
-                      </span>
-                      <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-y-1 group-hover:translate-y-0" />
-                    </Link>
+{link.to ? (
+                      <Link
+                        to={link.to}
+                        onClick={() => handleFooterNavClick(link.label, link.to)}
+                        className="group text-sm text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center gap-2"
+                      >
+                        <span className="relative">
+                          {link.label}
+                          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
+                        </span>
+                        <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-y-1 group-hover:translate-y-0" />
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                          handleFooterNavClick(link.label, link.href || "")
+                        }
+                        className="group text-sm text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center gap-2"
+                      >
+                        <span className="relative">
+                          {link.label}
+                          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
+                        </span>
+                        <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-y-1 group-hover:translate-y-0" />
+                      </a>
+                    )}
                   </motion.li>
                 ))}
               </ul>
