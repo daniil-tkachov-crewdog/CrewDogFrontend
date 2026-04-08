@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
-import { Target, Search, TrendingUp, CheckCircle2, Users, Zap } from "lucide-react";
+import { Target, Search, TrendingUp, CheckCircle2, Users, Zap, FileText, UserPlus, MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const fadeInUp = {
@@ -112,7 +112,7 @@ export default function Home() {
           </div>
         </section>
 
-    {/* CrewDog AI Intro Block */}
+        {/* CrewDog AI Intro Block */}
         <section className="py-20">
           <div className="container mx-auto px-4">
             <motion.div
@@ -131,7 +131,7 @@ export default function Home() {
             </motion.div>
           </div>
         </section>
-        
+
         {/* Stats Section */}
         <section className="py-16 border-y border-border/40">
           <div className="container mx-auto px-4">
@@ -178,6 +178,90 @@ export default function Home() {
           </div>
         </section>
 
+        {/* How it works */}
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="max-w-3xl mx-auto text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold">How it works</h2>
+            </motion.div>
+
+            <div className="max-w-xl mx-auto">
+              {[
+                {
+                  icon: <FileText className="h-6 w-6 text-primary" />,
+                  title: "Find a job description you like",
+                  description: "Browse LinkedIn, job boards, or any career site and copy the job description for a role you're targeting.",
+                  link: null,
+                },
+                {
+                  icon: <Search className="h-6 w-6 text-primary" />,
+                  title: "Paste it into CrewDog and run the search",
+                  description: "Drop the job description into CrewDog to get a list of relevant LinkedIn contacts — hiring managers, HR professionals, and decision-makers.",
+                  link: "/run",
+                  linkLabel: "Try it now →",
+                },
+                {
+                  icon: <UserPlus className="h-6 w-6 text-primary" />,
+                  title: "Request a connection on LinkedIn",
+                  description: "Send connection requests to the contacts CrewDog surfaces. A short, personalised note goes a long way.",
+                  link: null,
+                },
+                {
+                  icon: <MessageSquare className="h-6 w-6 text-primary" />,
+                  title: "Message them",
+                  description: "Once connected, reach out directly. Going straight to the source beats any recruiter middleman.",
+                  link: null,
+                },
+              ].map((step, index) => (
+                <div key={index} className="relative flex gap-6">
+                  {index < 3 && (
+                    <div className="absolute left-[23px] top-[52px] w-px h-[calc(100%-8px)] bg-primary/20" />
+                  )}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex-shrink-0 flex flex-col items-center"
+                  >
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center relative z-10">
+                      {step.icon}
+                    </div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 + 0.05 }}
+                    className="pb-10"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold text-primary uppercase tracking-widest">
+                        Step {index + 1}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                    <p className="text-muted-foreground">{step.description}</p>
+                    {step.link && (
+                      <Link
+                        to={step.link}
+                        className="inline-block mt-3 text-sm font-medium text-primary hover:underline"
+                      >
+                        {step.linkLabel}
+                      </Link>
+                    )}
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* What is CrewDog */}
         <section className="py-20">
           <div className="container mx-auto px-4">
@@ -206,9 +290,7 @@ export default function Home() {
                   <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <Search className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">
-                    Intelligent Analysis
-                  </h3>
+                  <h3 className="text-xl font-semibold mb-3">Intelligent Analysis</h3>
                   <p className="text-muted-foreground">
                     Our AI analyses any job description to identify relevant LinkedIn contacts who may assist you in securing similar roles.
                   </p>
@@ -244,7 +326,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Reach out on LinkedIn</h3>
                   <p className="text-muted-foreground">
-                   Going direct results in higher response rates than going through third-party recruiters.
+                    Going direct results in higher response rates than going through third-party recruiters.
                   </p>
                 </Card>
               </motion.div>
@@ -303,7 +385,6 @@ export default function Home() {
               className="max-w-3xl mx-auto text-center space-y-6 mb-16"
             >
               <h2 className="text-4xl md:text-5xl font-bold">What You Get</h2>
-              
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -328,7 +409,6 @@ export default function Home() {
                   <li>• Hiring manager profiles</li>
                   <li>• HR contact information</li>
                   <li>• Team lead connections</li>
-                
                 </ul>
               </Card>
             </div>
@@ -346,10 +426,7 @@ export default function Home() {
                 Start your first search free. No credit card required.
               </p>
               <Link to="/run">
-                <Button
-                  size="lg"
-                  className="text-lg px-12 py-6 magnetic-button"
-                >
+                <Button size="lg" className="text-lg px-12 py-6 magnetic-button">
                   Start Your Search Now
                 </Button>
               </Link>
