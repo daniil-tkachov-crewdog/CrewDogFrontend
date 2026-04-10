@@ -17,6 +17,7 @@ type Props = {
   isLoading: boolean;
   canSearch: boolean;
   onSubmit: (e: FormEvent) => void;
+  onCustomise: () => void;
 };
 
 export default function CenteredForm({
@@ -31,6 +32,7 @@ export default function CenteredForm({
   isLoading,
   canSearch,
   onSubmit,
+  onCustomise,
 }: Props) {
   const jdLen = jobDescription?.length ?? 0;
 
@@ -189,6 +191,16 @@ export default function CenteredForm({
               <Send className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
             </>
           )}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-12 text-base font-semibold border-2 border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-200 rounded-xl"
+          onClick={onCustomise}
+          disabled={isLoading}
+        >
+          Customise your CV
         </Button>
 
 
