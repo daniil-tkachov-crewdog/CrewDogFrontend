@@ -78,14 +78,18 @@ export default function CustomiseCVPanel() {
     setNoFileAlert(false);
     setIsCustomising(true);
 
-    try {
+   try {
       const cvText = await extractTextFromPdf(cvFile);
-      await fetch(CV_CUSTOMISE_URL, {
+      const resp = await fetch(CV_CUSTOMISE_URL, {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=UTF-8" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ CV_text: cvText }),
       });
+
+      if (!resp.ok) {
+        const txt = await resp.text().catch(() => "");
+        throw new Error(txt || `CV customise webhook error (${resp.status})`);
+      }
     } catch (err) {
       console.error("CV customise error:", err);
     } finally {
