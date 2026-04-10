@@ -43,6 +43,10 @@ async function getPdfJsModule(): Promise<PdfJsModule> {
   return pdfJsModule;
 }
 
+function isPdfFile(file: File): boolean {
+  return file.type === "application/pdf" || file.name.toLowerCase().endswith(".pdf");
+}
+
 async function extractTextFromPdf(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
   const pdfJsModule = await getPdfJsModule();
@@ -56,7 +60,7 @@ async function extractTextFromPdf(file: File): Promise<string> {
     fullText += `${pageText}\n`;
   }
 
-  return fullText.trim();
+  return fullText;
 }
 
 export default function CustomiseCVPanel() {
@@ -109,9 +113,14 @@ export default function CustomiseCVPanel() {
         accept=".pdf"
         className="hidden"
         onChange={(e) => {
-          const file = e.target.files?.[0] ?? null;
-          setCvFile(file);
-          if (file) setNoFileAlert(false);
+          const selectedFile = e.target.files?.[0] ?? null;
+
+          if (selectedFile && isPdfFile(selectedFile)) {
+            setCvFile(selectedFile);
+            setNoFileAlert(false);
+          } else {
+            setCvFile(null);
+          }
           e.target.value = "";
         }}
       />
