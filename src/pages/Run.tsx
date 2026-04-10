@@ -29,6 +29,7 @@ import CenteredForm from "@/components/run/CenteredForm";
 import SideForm from "@/components/run/SideForm";
 import LoadingCard from "@/components/run/LoadingCard";
 import ResultsCard from "@/components/run/ResultsCard";
+import CustomiseCVPanel from "@/components/run/CustomiseCVPanel";
 
 /* ---------------- helpers ---------------- */
 
@@ -140,6 +141,8 @@ export default function RunPage() {
     requestId?: string;
   } | null>(null);
 
+  const [showCustomise, setShowCustomise] = useState(false);
+  
   const [cap, setCap] = useState<number>(3);
   const [used, setUsed] = useState<number>(0);
   const [unlimited, setUnlimited] = useState<boolean>(false);
@@ -188,6 +191,7 @@ export default function RunPage() {
     setErr(null);
     setFeedbackOption("");
     setCustomFeedback("");
+    setShowCustomise(false);
 
     if (!user) {
       toast({
@@ -397,6 +401,7 @@ export default function RunPage() {
   //...
   
   const hasSearched = !!results || isLoading || !!err;
+  const showSplitLayout = hasSearched || showCustomise;
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
@@ -419,7 +424,7 @@ export default function RunPage() {
           </Link>
 
           <AnimatePresence mode="wait">
-            {!hasSearched ? (
+            {!showSplitLayout ? (
               <motion.div
                 key="centered"
                 initial={{ opacity: 0, y: 20 }}
@@ -450,6 +455,7 @@ export default function RunPage() {
                     isLoading={isLoading}
                     canSearch={canSearch}
                     onSubmit={handleSubmit}
+                    onCustomise={() => setShowCustomise(true)}
                   />
                 </div>
               </motion.div>
@@ -488,6 +494,7 @@ export default function RunPage() {
                     isLoading={isLoading}
                     canSearch={canSearch}
                     onSubmit={handleSubmit}
+                    onCustomise={() => setShowCustomise(true)}
                     feedbackOption={feedbackOption}
                     setFeedbackOption={setFeedbackOption}
                     customFeedback={customFeedback}
@@ -497,25 +504,25 @@ export default function RunPage() {
                   />
                 </motion.div>
 
-                {/* Right: results / loader / error */}
+                {/* Right: customise / results / loader / error */}
                 <motion.div
                   className="lg:col-span-2"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                 >
                   <AnimatePresence mode="wait">
-                    {isLoading && (
+                    {showCustomise && (
                       <motion.div
-                        key="loading"
+                        key="customise"
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                       >
-                        <LoadingCard />
+                        <CustomiseCVPanel />
                       </motion.div>
                     )}
-
-                    {!isLoading && err && (
+ 
+                    {!showCustomise && isLoading && (
                       <motion.div
                         key="error"
                         initial={{ opacity: 0, scale: 0.95 }}
