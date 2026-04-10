@@ -31,10 +31,25 @@ export type SendSearchResultsFeedbackArgs = {
   userEmail?: string;
 };
 
+export type SendCvCustomiseArgs = {
+  cvText: string;
+  userEmail?: string;
+};
+
 type SearchResultsFeedbackPayload = {
   type: "search_results_feedback";
   feedbackType: SearchResultsFeedbackOption;
   feedbackMessage: string;
+  userEmail: string;
+  source: string;
+  userAgent: string;
+  pagePath: string;
+  createdAt: string;
+};
+
+type CvCustomisePayload = {
+  type: "cv_customise";
+  CV_text: string;
   userEmail: string;
   source: string;
   userAgent: string;
@@ -110,5 +125,35 @@ export async function sendSearchResultsFeedback({
   if (!resp.ok) {
     const txt = await resp.text().catch(() => "");
     throw new Error(txt || `Search feedback webhook error (${resp.status})`);
+  }
+}
+
+export async function sendCvCustomise({
+  cvText,
+  userEmail,
+}: SendCvCustomiseArgs): Promise<void> {
+  if (!N8N_SUPPORT_WEBHOOK) {
+    throw new Error("Missing N8N_SUPPORT_WEBHOOK config.");
+  }
+
+  const payload: CvCustomisePayload = {
+    type: "cv_customise",
+    CV_text: (cvText || "").trim(),
+    userEmail: (userEmail || "").trim(),
+    source: "run-customise-cv",
+    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+    pagePath: typeof window !== "undefined" ? window.location.pathname : "",
+    createdAt: new Date().toISOString(),
+  };
+
+  const resp = await fetch(N8N_SUPPORT_WEBHOOK, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(txt || `CV customise webhook error (${resp.status})`);
   }
 }
