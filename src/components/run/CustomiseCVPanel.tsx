@@ -82,7 +82,8 @@ export default function CustomiseCVPanel() {
       const cvText = await extractTextFromPdf(cvFile);
       await fetch(CV_CUSTOMISE_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
         body: JSON.stringify({ CV_text: cvText }),
       });
     } catch (err) {
