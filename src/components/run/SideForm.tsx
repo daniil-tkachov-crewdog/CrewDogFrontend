@@ -18,6 +18,7 @@ type Props = {
   isLoading: boolean;
   canSearch: boolean;
   onSubmit: (e: FormEvent) => void;
+  onCustomise: () => void;
   feedbackOption: SearchResultsFeedbackOption | "";
   setFeedbackOption: (v: SearchResultsFeedbackOption) => void;
   customFeedback: string;
@@ -38,6 +39,7 @@ export default function SideForm({
   isLoading,
   canSearch,
   onSubmit,
+  onCustomise,
   feedbackOption,
   setFeedbackOption,
   customFeedback,
@@ -149,6 +151,16 @@ export default function SideForm({
           )}
         </Button>
 
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-10 text-sm font-semibold border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-200"
+          onClick={onCustomise}
+          disabled={isLoading}
+        >
+          Customise your CV
+        </Button>
+        
         <div className="pt-2 border-t border-border/60 space-y-3">
           <h3 className="text-sm font-semibold">How do you find these results?</h3>
 
