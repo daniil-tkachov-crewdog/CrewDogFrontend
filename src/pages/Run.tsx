@@ -522,7 +522,7 @@ export default function RunPage() {
                       </motion.div>
                     )}
  
-                    {!showCustomise && isLoading && (
+                    {!showCustomise && !isLoading && err && (
                       <motion.div
                         key="error"
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -591,7 +591,7 @@ export default function RunPage() {
                       </motion.div>
                     )}
 
-                    {!isLoading && results && !err && (
+                    {!showCustomise && !isLoading && results && !err && (
                       <motion.div
                         key="results"
                         initial={{ opacity: 0, scale: 0.95 }}
