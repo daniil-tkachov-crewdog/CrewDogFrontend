@@ -2,15 +2,12 @@ import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Loader2, Upload } from "lucide-react";
-
-const CV_CUSTOMISE_URL =
-  "https://crewdog.app.n8n.cloud/webhook/eb31b6d7-7bac-4ed0-a177-6676898d3ec8";
+import { sendCvCustomise } from "@/services/support";
 
 const PDFJS_CDN_URL =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
 const PDFJS_WORKER_CDN_URL =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
-
 type PdfTextItem = {
   str?: string;
 };
@@ -80,12 +77,7 @@ export default function CustomiseCVPanel() {
 
    try {
       const cvText = await extractTextFromPdf(cvFile);
-      const resp = await fetch(CV_CUSTOMISE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ CV_text: cvText }),
-      });
-
+      await sendCvCustomise({ cvText });
       if (!resp.ok) {
         const txt = await resp.text().catch(() => "");
         throw new Error(txt || `CV customise webhook error (${resp.status})`);
