@@ -41,7 +41,7 @@ async function getPdfJsModule(): Promise<PdfJsModule> {
 }
 
 function isPdfFile(file: File): boolean {
-  return file.type === "application/pdf" || file.name.toLowerCase().endswith(".pdf");
+  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
 }
 
 async function extractTextFromPdf(file: File): Promise<string> {
