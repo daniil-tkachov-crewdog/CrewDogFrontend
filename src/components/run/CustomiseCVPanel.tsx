@@ -75,13 +75,9 @@ export default function CustomiseCVPanel() {
     setNoFileAlert(false);
     setIsCustomising(true);
 
-   try {
+    try {
       const cvText = await extractTextFromPdf(cvFile);
       await sendCvCustomise({ cvText });
-      if (!resp.ok) {
-        const txt = await resp.text().catch(() => "");
-        throw new Error(txt || `CV customise webhook error (${resp.status})`);
-      }
     } catch (err) {
       console.error("CV customise error:", err);
     } finally {

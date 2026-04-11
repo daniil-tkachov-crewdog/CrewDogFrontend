@@ -74,11 +74,16 @@ export const API_BASE = ensureHttpsInProd(normalizeBase(resolvedApiBase));
 // Stripe
 export const STRIPE_PUBLISHABLE_KEY = env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-// ---- NEW: N8N support webhook (JSON endpoint) ----
+// ---- N8N webhooks (JSON endpoints) ----
 const rawSupport =
   env.VITE_N8N_SUPPORT_WEBHOOK?.trim?.() ||
   "https://crewdog.app.n8n.cloud/webhook/support";
 export const N8N_SUPPORT_WEBHOOK = ensureHttpsInProd(normalizeBase(rawSupport));
+
+const rawCvWebhook =
+  env.VITE_N8N_CV_WEBHOOK?.trim?.() ||
+  "https://crewdog.app.n8n.cloud/webhook/eb31b6d7-7bac-4ed0-a177-6676898d3ec8";
+export const N8N_CV_WEBHOOK = ensureHttpsInProd(normalizeBase(rawCvWebhook));
 
 // Prod guardrails: flag obvious misconfig early (console only)
 const IS_PROD_LIKE = isBrowser && !isLocalHost;

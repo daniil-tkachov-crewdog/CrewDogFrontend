@@ -1,5 +1,5 @@
 // src/services/support.ts
-import { N8N_SUPPORT_WEBHOOK } from "@/lib/config";
+import { N8N_CV_WEBHOOK, N8N_SUPPORT_WEBHOOK } from "@/lib/config";
 
 export type SupportTopic = "technical" | "billing" | "feature" | "other";
 
@@ -33,7 +33,6 @@ export type SendSearchResultsFeedbackArgs = {
 
 export type SendCvCustomiseArgs = {
   cvText: string;
-  userEmail?: string;
 };
 
 type SearchResultsFeedbackPayload = {
@@ -50,7 +49,6 @@ type SearchResultsFeedbackPayload = {
 type CvCustomisePayload = {
   type: "cv_customise";
   CV_text: string;
-  userEmail: string;
   source: string;
   userAgent: string;
   pagePath: string;
@@ -130,23 +128,21 @@ export async function sendSearchResultsFeedback({
 
 export async function sendCvCustomise({
   cvText,
-  userEmail,
 }: SendCvCustomiseArgs): Promise<void> {
-  if (!N8N_SUPPORT_WEBHOOK) {
-    throw new Error("Missing N8N_SUPPORT_WEBHOOK config.");
+  if (!N8N_CV_WEBHOOK) {
+    throw new Error("Missing N8N_CV_WEBHOOK config.");
   }
 
   const payload: CvCustomisePayload = {
     type: "cv_customise",
     CV_text: (cvText || "").trim(),
-    userEmail: (userEmail || "").trim(),
     source: "run-customise-cv",
     userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
     pagePath: typeof window !== "undefined" ? window.location.pathname : "",
     createdAt: new Date().toISOString(),
   };
 
-  const resp = await fetch(N8N_SUPPORT_WEBHOOK, {
+  const resp = await fetch(N8N_CV_WEBHOOK, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
