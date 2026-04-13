@@ -196,43 +196,81 @@ export async function logHistory(args: {
   const { userId, summary, jobUrl, jobDescription, includeLeads } = args;
   if (!userId) return;
 
-  await fetch(`${API_BASE.replace(/\/$/, "")}/searches/log`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId,
-      sourceType: jobDescription ? "paste" : "url",
-      sourceUrl: jobUrl || null,
-      includeLeads,
-      jdRaw: jobDescription || "",
-      jobTitle: null,
-      companyName: summary.company || null,
-      companyUrl: summary.website || null,
-      location: null,
-      whyCompany: summary.sniff_out_clues || null,
-      hrContacts: (summary.contacts || []).map((c) => ({
-        name: c.name,
-        title: c.role,
-        profileUrl: c.linkedIn,
-      })),
-      potentialLeads: (summary.leads || []).map((l) => ({
-        name: l.name || l.title,
-        profileUrl: l.url,
-        title: l.title,
-      })),
-      potential_leads: (summary.leads || []).map((l) => ({
-        name: l.name || l.title,
-        profileUrl: l.url,
-        title: l.title,
-      })),
-      leads: (summary.leads || []).map((l) => ({
-        name: l.name || l.title,
-        profileUrl: l.url,
-        title: l.title,
-      })),
-    }),
-  });
+  const leadsPayload = (summary.leads || []).map((l) => ({
+    name: l.name || l.title,
+    profileUrl: l.url,
+    title: l.title,
+  }));
+
+  // Call backend to create the search record
+  let backendOk = false;
+  let searchId: string | null = null;
+  try {
+    const res = await fetch(`${API_BASE.replace(/\/$/, "")}/searches/log`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        sourceType: jobDescription ? "paste" : "url",
+        sourceUrl: jobUrl || null,
+        includeLeads,
+        jdRaw: jobDescription || "",
+        jobTitle: null,
+        companyName: summary.company || null,
+        companyUrl: summary.website || null,
+        location: null,
+        whyCompany: summary.sniff_out_clues || null,
+        hrContacts: (summary.contacts || []).map((c) => ({
+          name: c.name,
+          title: c.role,
+          profileUrl: c.linkedIn,
+        })),
+        potentialLeads: leadsPayload,
+        potential_leads: leadsPayload,
+        leads: leadsPayload,
+      }),
+    });
+    backendOk = res.ok;
+    // Try to read the created record's ID from the response
+    if (res.ok) {
+      try {
+        const json = await res.json();
+        searchId = json?.id ?? json?.data?.id ?? json?.searchId ?? null;
+      } catch {
+        // response body not JSON or empty — that's fine
+      }
+    }
+  } catch {
+    // network error — nothing to update
+  }
+
+  // The backend does not currently persist potential_leads into Supabase.
+  // Work around this by writing it directly from the client after the backend call.
+  if (backendOk && leadsPayload.length > 0) {
+    try {
+      // If the backend didn't return an ID, find the most recently created record
+      if (!searchId) {
+        const { data: latest } = await supabase
+          .from("app_searches")
+          .select("id")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+        searchId = latest?.id ?? null;
+      }
+      if (searchId) {
+        await supabase
+          .from("app_searches")
+          .update({ potential_leads: leadsPayload })
+          .eq("id", searchId)
+          .eq("user_id", userId);
+      }
+    } catch {
+      // best-effort only — leads will be missing from history but search still succeeded
+    }
+  }
 }
 
 export async function setImportantSearch(id: string, isImportant: boolean) {
