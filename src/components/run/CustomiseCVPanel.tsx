@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { FileText, Loader2, Upload } from "lucide-react";
 import { sendCvCustomise } from "@/services/support";
 
@@ -63,21 +65,21 @@ async function extractTextFromPdf(file: File): Promise<string> {
 export default function CustomiseCVPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [jobUrl, setJobUrl] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   const [isCustomising, setIsCustomising] = useState(false);
-  const [noFileAlert, setNoFileAlert] = useState(false);
+
+  const hasJd = jobUrl.trim().length > 0 || jobDescription.trim().length > 0;
+  const canCustomise = cvFile !== null && hasJd;
 
   async function handleCustomise() {
-    if (!cvFile) {
-      setNoFileAlert(true);
-      return;
-    }
+    if (!canCustomise) return;
 
-    setNoFileAlert(false);
     setIsCustomising(true);
 
     try {
-      const cvText = await extractTextFromPdf(cvFile);
-      await sendCvCustomise({ cvText });
+      const cvText = await extractTextFromPdf(cvFile!);
+      await sendCvCustomise({ cvText, jobUrl: jobUrl.trim(), jobDescription: jobDescription.trim() });
     } catch (err) {
       console.error("CV customise error:", err);
     } finally {
@@ -94,12 +96,6 @@ export default function CustomiseCVPanel() {
         </p>
       </div>
 
-      {noFileAlert && (
-        <div className="px-4 py-3 rounded-lg bg-yellow-500/10 border border-yellow-500/40 text-yellow-600 dark:text-yellow-400 text-sm font-medium">
-          There's no CV uploaded.
-        </div>
-      )}
-
       <input
         ref={fileInputRef}
         type="file"
@@ -110,7 +106,6 @@ export default function CustomiseCVPanel() {
 
           if (selectedFile && isPdfFile(selectedFile)) {
             setCvFile(selectedFile);
-            setNoFileAlert(false);
           } else {
             setCvFile(null);
           }
@@ -142,11 +137,57 @@ export default function CustomiseCVPanel() {
         )}
       </button>
 
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2 text-foreground/80">
+            Job Posting URL
+          </label>
+          <Input
+            type="url"
+            placeholder="https://linkedin.com/jobs/..."
+            value={jobUrl}
+            onChange={(e) => {
+              setJobUrl(e.target.value);
+              if (e.target.value) setJobDescription("");
+            }}
+            className="h-11 bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl"
+            disabled={isCustomising}
+          />
+        </div>
+
+        <div className="relative py-2">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border/50" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-card px-4 py-1 text-xs font-semibold text-muted-foreground/60 tracking-wider uppercase rounded-full border border-border/50">
+              Or paste description
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2 text-foreground/80">
+            Job Description
+          </label>
+          <Textarea
+            placeholder="Paste the job description here…"
+            value={jobDescription}
+            onChange={(e) => {
+              setJobDescription(e.target.value);
+              if (e.target.value) setJobUrl("");
+            }}
+            className="min-h-[120px] resize-none bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl"
+            disabled={isCustomising}
+          />
+        </div>
+      </div>
+
       <Button
         type="button"
         className="w-full h-16 text-lg font-bold relative overflow-hidden group bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:shadow-primary/25 transition-all duration-300 rounded-xl mt-auto"
         onClick={handleCustomise}
-        disabled={isCustomising}
+        disabled={!canCustomise || isCustomising}
         size="lg"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

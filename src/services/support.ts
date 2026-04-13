@@ -33,6 +33,8 @@ export type SendSearchResultsFeedbackArgs = {
 
 export type SendCvCustomiseArgs = {
   cvText: string;
+  jobUrl: string;
+  jobDescription: string;
 };
 
 type SearchResultsFeedbackPayload = {
@@ -49,6 +51,8 @@ type SearchResultsFeedbackPayload = {
 type CvCustomisePayload = {
   type: "cv_customise";
   CV_text: string;
+  JD: string;
+  JD_link: string;
   source: string;
   userAgent: string;
   pagePath: string;
@@ -128,6 +132,8 @@ export async function sendSearchResultsFeedback({
 
 export async function sendCvCustomise({
   cvText,
+  jobUrl,
+  jobDescription,
 }: SendCvCustomiseArgs): Promise<void> {
   if (!N8N_CV_WEBHOOK) {
     throw new Error("Missing N8N_CV_WEBHOOK config.");
@@ -136,6 +142,8 @@ export async function sendCvCustomise({
   const payload: CvCustomisePayload = {
     type: "cv_customise",
     CV_text: (cvText || "").trim(),
+    JD: (jobDescription || "").trim(),
+    JD_link: (jobUrl || "").trim(),
     source: "run-customise-cv",
     userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
     pagePath: typeof window !== "undefined" ? window.location.pathname : "",
