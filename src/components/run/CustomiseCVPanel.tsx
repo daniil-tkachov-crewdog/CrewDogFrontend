@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Loader2, Upload } from "lucide-react";
-import { sendCvCustomise } from "@/services/support";
+import { CheckCircle2, FileText, Loader2, Upload } from "lucide-react";
+import { sendCvCustomise, type CvCustomiseResult } from "@/services/support";
 
 const PDFJS_CDN_URL =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
@@ -68,6 +68,7 @@ export default function CustomiseCVPanel() {
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [isCustomising, setIsCustomising] = useState(false);
+  const [customisedCv, setCustomisedCv] = useState<CvCustomiseResult | null>(null);
 
   const hasJd = jobUrl.trim().length > 0 || jobDescription.trim().length > 0;
   const canCustomise = cvFile !== null && hasJd;
@@ -79,7 +80,8 @@ export default function CustomiseCVPanel() {
 
     try {
       const cvText = await extractTextFromPdf(cvFile!);
-      await sendCvCustomise({ cvText, jobUrl: jobUrl.trim(), jobDescription: jobDescription.trim() });
+      const result = await sendCvCustomise({ cvText, jobUrl: jobUrl.trim(), jobDescription: jobDescription.trim() });
+      setCustomisedCv(result);
     } catch (err) {
       console.error("CV customise error:", err);
     } finally {
@@ -182,6 +184,13 @@ export default function CustomiseCVPanel() {
           />
         </div>
       </div>
+
+      {customisedCv && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400">
+          <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
+          <span className="text-sm font-medium">Your CV has been customised and is ready to download.</span>
+        </div>
+      )}
 
       <Button
         type="button"

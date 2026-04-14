@@ -37,6 +37,25 @@ export type SendCvCustomiseArgs = {
   jobDescription: string;
 };
 
+export type CvJob = {
+  [key: string]: string;
+};
+
+export type CustomisedCv = {
+  Name: string;
+  Phone_number: string;
+  Email: string;
+  LinkedIn: string;
+  Expirience_custom: Record<string, CvJob>;
+  Skills_custom: string;
+  Education: string;
+  Certificates: string;
+};
+
+export type CvCustomiseResult = {
+  CV_text_customised: CustomisedCv;
+};
+
 type SearchResultsFeedbackPayload = {
   type: "search_results_feedback";
   feedbackType: SearchResultsFeedbackOption;
@@ -134,7 +153,7 @@ export async function sendCvCustomise({
   cvText,
   jobUrl,
   jobDescription,
-}: SendCvCustomiseArgs): Promise<void> {
+}: SendCvCustomiseArgs): Promise<CvCustomiseResult> {
   if (!N8N_CV_WEBHOOK) {
     throw new Error("Missing N8N_CV_WEBHOOK config.");
   }
@@ -160,4 +179,6 @@ export async function sendCvCustomise({
     const txt = await resp.text().catch(() => "");
     throw new Error(txt || `CV customise webhook error (${resp.status})`);
   }
+
+  return resp.json() as Promise<CvCustomiseResult>;
 }
