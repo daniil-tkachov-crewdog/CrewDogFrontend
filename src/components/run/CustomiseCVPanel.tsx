@@ -3,31 +3,20 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, FileText, Loader2, Upload } from "lucide-react";
+import { AlertCircle, CheckCircle2, FileText, Loader2, Upload } from "lucide-react";
 import { sendCvCustomise, type CvCustomiseResult } from "@/services/support";
 
 const PDFJS_CDN_URL =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
 const PDFJS_WORKER_CDN_URL =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
-type PdfTextItem = {
-  str?: string;
-};
 
-type PdfPage = {
-  getTextContent: () => Promise<{ items: PdfTextItem[] }>;
-};
-
-type PdfDocument = {
-  numPages: number;
-  getPage: (pageNumber: number) => Promise<PdfPage>;
-};
-
+type PdfTextItem = { str?: string };
+type PdfPage = { getTextContent: () => Promise<{ items: PdfTextItem[] }> };
+type PdfDocument = { numPages: number; getPage: (n: number) => Promise<PdfPage> };
 type PdfJsModule = {
-  getDocument: (options: { data: ArrayBuffer }) => { promise: Promise<PdfDocument> };
-  GlobalWorkerOptions: {
-    workerSrc: string;
-  };
+  getDocument: (opts: { data: ArrayBuffer }) => { promise: Promise<PdfDocument> };
+  GlobalWorkerOptions: { workerSrc: string };
 };
 
 let pdfJsModulePromise: Promise<PdfJsModule> | null = null;
@@ -36,7 +25,6 @@ async function getPdfJsModule(): Promise<PdfJsModule> {
   if (!pdfJsModulePromise) {
     pdfJsModulePromise = import(/* @vite-ignore */ PDFJS_CDN_URL) as Promise<PdfJsModule>;
   }
-
   const pdfJsModule = await pdfJsModulePromise;
   pdfJsModule.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_CDN_URL;
   return pdfJsModule;
@@ -46,10 +34,9 @@ function isPdfFile(file: File): boolean {
   return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
 }
 
-async function extractTextFromPdf(file: File): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer();
+async function extractTextFromBuffer(buffer: ArrayBuffer): Promise<string> {
   const pdfJsModule = await getPdfJsModule();
-  const pdf = await pdfJsModule.getDocument({ data: arrayBuffer }).promise;
+  const pdf = await pdfJsModule.getDocument({ data: buffer }).promise;
 
   let fullText = "";
   for (let i = 1; i <= pdf.numPages; i++) {
@@ -58,29 +45,57 @@ async function extractTextFromPdf(file: File): Promise<string> {
     const pageText = textContent.items.map((item) => item.str ?? "").join(" ");
     fullText += `${pageText}\n`;
   }
-
   return fullText;
 }
 
 export default function CustomiseCVPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvFileName, setCvFileName] = useState<string | null>(null);
+  const [cvBuffer, setCvBuffer] = useState<ArrayBuffer | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [isCustomising, setIsCustomising] = useState(false);
   const [customisedCv, setCustomisedCv] = useState<CvCustomiseResult | null>(null);
 
   const hasJd = jobUrl.trim().length > 0 || jobDescription.trim().length > 0;
-  const canCustomise = cvFile !== null && hasJd;
+  const canCustomise = cvBuffer !== null && hasJd;
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selectedFile = e.target.files?.[0] ?? null;
+    e.target.value = "";
+    setFileError(null);
+    setCvBuffer(null);
+    setCvFileName(null);
+
+    if (!selectedFile) return;
+    if (!isPdfFile(selectedFile)) {
+      setFileError("Please upload a PDF file.");
+      return;
+    }
+
+    try {
+      const buffer = await selectedFile.arrayBuffer();
+      setCvBuffer(buffer);
+      setCvFileName(selectedFile.name);
+    } catch {
+      setFileError("Could not read the file. Please try again or use a different PDF.");
+    }
+  }
 
   async function handleCustomise() {
     if (!canCustomise) return;
 
     setIsCustomising(true);
+    setCustomisedCv(null);
 
     try {
-      const cvText = await extractTextFromPdf(cvFile!);
-      const result = await sendCvCustomise({ cvText, jobUrl: jobUrl.trim(), jobDescription: jobDescription.trim() });
+      const cvText = await extractTextFromBuffer(cvBuffer!);
+      const result = await sendCvCustomise({
+        cvText,
+        jobUrl: jobUrl.trim(),
+        jobDescription: jobDescription.trim(),
+      });
       setCustomisedCv(result);
     } catch (err) {
       console.error("CV customise error:", err);
@@ -103,16 +118,7 @@ export default function CustomiseCVPanel() {
         type="file"
         accept=".pdf"
         className="hidden"
-        onChange={(e) => {
-          const selectedFile = e.target.files?.[0] ?? null;
-
-          if (selectedFile && isPdfFile(selectedFile)) {
-            setCvFile(selectedFile);
-          } else {
-            setCvFile(null);
-          }
-          e.target.value = "";
-        }}
+        onChange={handleFileChange}
       />
 
       <button
@@ -120,11 +126,11 @@ export default function CustomiseCVPanel() {
         onClick={() => fileInputRef.current?.click()}
         className="flex flex-col items-center justify-center gap-3 w-full rounded-xl border-2 border-dashed border-primary/30 hover:border-primary/60 bg-primary/5 hover:bg-primary/10 transition-all duration-200 py-12 px-4 cursor-pointer group"
       >
-        {cvFile ? (
+        {cvFileName ? (
           <>
             <FileText className="h-10 w-10 text-primary" />
             <span className="text-sm font-medium text-foreground truncate max-w-full px-4">
-              {cvFile.name}
+              {cvFileName}
             </span>
             <span className="text-xs text-muted-foreground">Click to change</span>
           </>
@@ -138,6 +144,13 @@ export default function CustomiseCVPanel() {
           </>
         )}
       </button>
+
+      {fileError && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          <span className="text-sm font-medium">{fileError}</span>
+        </div>
+      )}
 
       <div className="space-y-4">
         <div>
