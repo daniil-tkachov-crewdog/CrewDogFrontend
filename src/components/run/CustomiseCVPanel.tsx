@@ -90,7 +90,9 @@ export default function CustomiseCVPanel() {
     setCustomisedCv(null);
 
     try {
-      const cvText = await extractTextFromBuffer(cvBuffer!);
+      // slice(0) copies the buffer — PDF.js transfers (detaches) whatever it receives,
+      // so we must never hand it the original stored in state.
+      const cvText = await extractTextFromBuffer(cvBuffer!.slice(0));
       const result = await sendCvCustomise({
         cvText,
         jobUrl: jobUrl.trim(),

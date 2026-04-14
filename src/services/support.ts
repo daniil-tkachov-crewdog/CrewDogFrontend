@@ -180,5 +180,13 @@ export async function sendCvCustomise({
     throw new Error(txt || `CV customise webhook error (${resp.status})`);
   }
 
-  return resp.json() as Promise<CvCustomiseResult>;
+  const text = await resp.text();
+  if (!text) {
+    throw new Error("CV customise: n8n returned an empty response. Check that the Respond to Webhook node is configured to return JSON.");
+  }
+  try {
+    return JSON.parse(text) as CvCustomiseResult;
+  } catch {
+    throw new Error(`CV customise: unexpected response from n8n: ${text.slice(0, 200)}`);
+  }
 }
