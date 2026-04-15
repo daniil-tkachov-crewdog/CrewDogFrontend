@@ -18,9 +18,9 @@ export function generateCvPdf(data: CvCustomiseResult): void {
   const cv = data.CV_text_customised;
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const PW = doc.internal.pageSize.getWidth();  // 210mm
-  const PH = doc.internal.pageSize.getHeight(); // 297mm
-  const CW = PW - MARGIN * 2;                   // 170mm content width
+  const PW = 210;        // A4 width  in mm — hardcoded to avoid jsPDF unit quirks
+  const PH = 297;        // A4 height in mm
+  const CW = PW - MARGIN * 2; // 170mm content width
 
   let y = MARGIN;
 
@@ -112,7 +112,11 @@ export function generateCvPdf(data: CvCustomiseResult): void {
           doc.setFontSize(10.5);
           doc.setFont("helvetica", "bold");
           doc.setTextColor(20, 20, 20);
-          doc.text(titleVal.trim(), MARGIN, y);
+          const titleMaxW = isNonEmpty(timeVal)
+            ? CW - doc.getTextWidth(timeVal.trim()) - 6
+            : CW;
+          const titleLines = doc.splitTextToSize(titleVal.trim(), titleMaxW);
+          doc.text(titleLines, MARGIN, y);
 
           if (isNonEmpty(timeVal)) {
             doc.setFontSize(9);
