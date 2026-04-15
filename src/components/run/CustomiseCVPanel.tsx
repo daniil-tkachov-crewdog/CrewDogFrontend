@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, CheckCircle2, FileText, Loader2, Upload } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, FileText, Loader2, Upload } from "lucide-react";
 import { sendCvCustomise, type CvCustomiseResult } from "@/services/support";
+import { generateCvPdf } from "@/lib/generateCvPdf";
 
 const PDFJS_CDN_URL =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
@@ -207,23 +208,38 @@ export default function CustomiseCVPanel() {
         </div>
       )}
 
-      <Button
-        type="button"
-        className="w-full h-16 text-lg font-bold relative overflow-hidden group bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:shadow-primary/25 transition-all duration-300 rounded-xl mt-auto"
-        onClick={handleCustomise}
-        disabled={!canCustomise || isCustomising}
-        size="lg"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        {isCustomising ? (
-          <>
-            <Loader2 className="h-6 w-6 animate-spin relative z-10 mr-2" />
-            <span className="relative z-10">Customising…</span>
-          </>
-        ) : (
-          <span className="relative z-10">Customise</span>
+      <div className={`mt-auto flex flex-col gap-3 ${customisedCv ? "" : "flex-1 justify-end"}`}>
+        {customisedCv && (
+          <Button
+            type="button"
+            className="w-full h-14 text-base font-bold relative overflow-hidden group bg-gradient-to-r from-green-500 to-emerald-500 hover:shadow-2xl hover:shadow-green-500/25 transition-all duration-300 rounded-xl"
+            onClick={() => generateCvPdf(customisedCv)}
+            size="lg"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Download className="h-5 w-5 relative z-10 mr-2" />
+            <span className="relative z-10">Download your CV</span>
+          </Button>
         )}
-      </Button>
+
+        <Button
+          type="button"
+          className="w-full h-14 text-base font-bold relative overflow-hidden group bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:shadow-primary/25 transition-all duration-300 rounded-xl"
+          onClick={handleCustomise}
+          disabled={!canCustomise || isCustomising}
+          size="lg"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {isCustomising ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin relative z-10 mr-2" />
+              <span className="relative z-10">Customising…</span>
+            </>
+          ) : (
+            <span className="relative z-10">{customisedCv ? "Re-customise" : "Customise"}</span>
+          )}
+        </Button>
+      </div>
     </Card>
   );
 }
