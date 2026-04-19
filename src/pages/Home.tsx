@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
-import { Target, Search, TrendingUp, CheckCircle2, Users, Zap, FileText, UserPlus, MessageSquare } from "lucide-react";
-import { useEffect, useState } from "react";
+import { FileText, Search, UserPlus, MessageSquare } from "lucide-react";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -21,79 +19,84 @@ const staggerContainer = {
   }
 };
 
+const HERO_IMAGE = "https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?q=80&w=2000";
+
+const HOW_IT_WORKS_STEPS = [
+  {
+    icon: <FileText className="h-5 w-5 text-white" />,
+    title: "Find a job description you like",
+    description: "Browse LinkedIn, job boards, or any career site and copy the job description for a role you're targeting.",
+  },
+  {
+    icon: <Search className="h-5 w-5 text-white" />,
+    title: "Paste it into CrewDog and run the search",
+    description: "Drop the job description into CrewDog to get a list of relevant LinkedIn contacts — hiring managers, HR professionals, and decision-makers.",
+    link: "/run",
+    linkLabel: "Try it now →",
+  },
+  {
+    icon: <UserPlus className="h-5 w-5 text-white" />,
+    title: "Request a connection on LinkedIn",
+    description: "Send connection requests to the contacts CrewDog surfaces. A short, personalised note goes a long way.",
+  },
+  {
+    icon: <MessageSquare className="h-5 w-5 text-white" />,
+    title: "Message them",
+    description: "Once connected, reach out directly. Going straight to the source beats any recruiter middleman.",
+  },
+];
+
 export default function Home() {
-  const [counts, setCounts] = useState({ searches: 0, jobs: 0, success: 0 });
-
-  useEffect(() => {
-    const targets = { searches: 12847, jobs: 45023, success: 94 };
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      setCounts({
-        searches: Math.floor(targets.searches * progress),
-        jobs: Math.floor(targets.jobs * progress),
-        success: Math.floor(targets.success * progress)
-      });
-      if (step >= steps) clearInterval(timer);
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col">
       <Topbar />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDU5LDEzMCwyNDYsMC4xKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
 
-          <div className="container mx-auto px-4 py-20 md:py-32 relative">
+        {/* ── Hero ── */}
+        <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <img
+              src={HERO_IMAGE}
+              alt="Offshore oil rig"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-br from-primary/70 to-primary/40" />
+
+          <div className="container mx-auto px-6 py-20 relative z-20">
             <motion.div
               initial="initial"
               animate="animate"
               variants={staggerContainer}
-              className="max-w-4xl mx-auto text-center space-y-8"
+              className="max-w-3xl space-y-8"
             >
-              <motion.div variants={fadeInUp} className="inline-block">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium mb-6">
-                  <Zap className="h-4 w-4 text-primary" />
+              <motion.div variants={fadeInUp}>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur border border-white/30 text-white text-sm font-semibold">
+                  <span>🚀</span>
                   <span>Skip the middleman. Apply smarter.</span>
                 </div>
               </motion.div>
 
               <motion.h1
                 variants={fadeInUp}
-                className="text-5xl md:text-7xl font-bold tracking-tight"
+                className="text-5xl md:text-7xl font-extrabold leading-[1.1] text-white drop-shadow-lg"
               >
-                Apply Direct Before 
-                <span className="block text-primary">
-                  The Job Is Advertised
-                </span>
+                Apply Direct Before<br />The Job Is Advertised
               </motion.h1>
 
               <motion.p
                 variants={fadeInUp}
-                className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
+                className="text-xl md:text-2xl text-white/95 max-w-2xl drop-shadow"
               >
-                Paste any real or aspirational job description for your target role. CrewDog enables expats to connect directly with decision-makers on LinkedIn for international opportunities.
+                CrewDog enables expats to connect directly with decision-makers on LinkedIn for international Oil &amp; Gas opportunities.
               </motion.p>
 
-              <motion.div
-                variants={fadeInUp}
-                className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
-              >
+              <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
                 <Link to="/run">
                   <Button
                     size="lg"
-                    className="text-lg px-8 py-6 magnetic-button glow-effect"
+                    className="text-lg px-8 py-6 bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))] hover:-translate-y-0.5 transition-all"
                   >
                     Start Free Search
                   </Button>
@@ -102,135 +105,170 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="text-lg px-8 py-6"
+                    className="text-lg px-8 py-6 bg-transparent border-2 border-white/60 text-white hover:bg-white/10 hover:-translate-y-0.5 transition-all"
                   >
                     Learn More
                   </Button>
                 </Link>
               </motion.div>
+
+              {/* Stats */}
+              <motion.div variants={fadeInUp} className="flex flex-wrap gap-10 pt-4">
+                {[
+                  { value: "500+", label: "CVs Created" },
+                  { value: "89%", label: "Interview Rate" },
+                  { value: "4.8", label: "User Rating" },
+                ].map((stat) => (
+                  <div key={stat.label} className="flex flex-col">
+                    <span className="text-4xl font-extrabold text-orange drop-shadow-sm">{stat.value}</span>
+                    <span className="text-sm text-white/90">{stat.label}</span>
+                  </div>
+                ))}
+              </motion.div>
+
+              {/* Trust bar */}
+              <motion.div
+                variants={fadeInUp}
+                className="flex flex-wrap items-center gap-8 pt-6 border-t border-white/20 opacity-75"
+              >
+                <span className="text-xs font-semibold text-white uppercase tracking-widest">
+                  Trusted by professionals at leading Oil &amp; Gas companies
+                </span>
+                {["TOTAL", "Shell", "BP"].map((name) => (
+                  <span key={name} className="text-white font-semibold text-sm">{name}</span>
+                ))}
+              </motion.div>
             </motion.div>
           </div>
         </section>
 
-        {/* CrewDog AI Intro Block */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
+        {/* ── Three Ways to Win ── */}
+        <section className="py-24 bg-background">
+          <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="max-w-3xl mx-auto text-center space-y-8"
+              className="text-center mb-16 space-y-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-                Welcome to <span className="text-primary">CrewDog AI</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border text-primary text-sm font-semibold">
+                <span>✨</span>
+                <span>Three Ways to Win</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+                Your Complete Job Search Arsenal
               </h2>
-              <p className="text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Search across LinkedIn&apos;s global network of over 1 billion
-                professionals to find the people hiring in oil &amp; gas
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                AI-powered tools designed for international Oil &amp; Gas professionals
               </p>
             </motion.div>
-          </div>
-        </section>
 
-        {/* Stats Section */}
-        <section className="py-16 border-y border-border/40">
-          <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center space-y-2"
-              >
-                <div className="text-4xl md:text-5xl font-bold text-primary">
-                  {counts.searches.toLocaleString()}+
-                </div>
-                <div className="text-muted-foreground">Searches Completed</div>
-              </motion.div>
+              {/* Card 1 — AI Search */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-                className="text-center space-y-2"
+                className="relative group rounded-2xl border border-border bg-card p-8 overflow-hidden hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary">
-                  {counts.jobs.toLocaleString()}+
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/60 group-hover:h-2 transition-all duration-300" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-3xl mb-6 shadow-[0_8px_20px_hsl(var(--shadow-ambient))]">
+                  🔍
                 </div>
-                <div className="text-muted-foreground">Jobs Analyzed</div>
+                <h3 className="text-2xl font-bold mb-3">AI Search Assistant</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  Paste any job description and discover the hiring company, decision-makers, and HR contacts on LinkedIn.
+                </p>
+                <Link to="/run">
+                  <Button className="w-full">Try It Free</Button>
+                </Link>
               </motion.div>
+
+              {/* Card 2 — CV Co-Pilot */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="text-center space-y-2"
+                className="relative group rounded-2xl border border-border bg-card p-8 overflow-hidden hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary">
-                  {counts.success}%
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange to-orange-dark group-hover:h-2 transition-all duration-300" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange to-orange-dark flex items-center justify-center text-3xl mb-6 shadow-[0_8px_20px_hsl(var(--orange-glow))]">
+                  📄
                 </div>
-                <div className="text-muted-foreground">Success Rate</div>
+                <h3 className="text-2xl font-bold mb-3">CV Co-Pilot (Taylor)</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  AI-powered CV optimization for Oil &amp; Gas roles. Taylor analyzes your experience and tailors it for each position.
+                </p>
+                <a href="https://crewdogcv.ai" target="_blank" rel="noopener noreferrer">
+                  <Button
+                    className="w-full bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))]"
+                  >
+                    Build Your CV
+                  </Button>
+                </a>
+              </motion.div>
+
+              {/* Card 3 — Flying Squad */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="relative group rounded-2xl border border-border bg-card p-8 overflow-hidden hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange to-orange-dark group-hover:h-2 transition-all duration-300" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange to-orange-dark flex items-center justify-center text-3xl mb-6 shadow-[0_8px_20px_hsl(var(--orange-glow))]">
+                  🚁
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Flying Squad</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  Pack your bags. Deploy to high-paying Oil &amp; Gas contracts in the UK and worldwide. Join the crew today.
+                </p>
+                <a href="https://crewdogcv.ai/" target="_blank" rel="noopener noreferrer">
+                  <Button
+                    className="w-full bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))]"
+                  >
+                    Join the Crew
+                  </Button>
+                </a>
               </motion.div>
             </div>
-            <p className="text-center text-sm text-muted-foreground mt-8">
-              * Demo statistics for illustration purposes
-            </p>
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4">
+        {/* ── How It Works ── */}
+        <section className="py-24 bg-muted/30">
+          <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="max-w-3xl mx-auto text-center mb-16"
+              className="text-center mb-16 space-y-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold">How it works</h2>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-primary text-sm font-semibold">
+                <span>📋</span>
+                <span>Simple Process</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">How It Works</h2>
             </motion.div>
 
             <div className="max-w-xl mx-auto">
-              {[
-                {
-                  icon: <FileText className="h-6 w-6 text-primary" />,
-                  title: "Find a job description you like",
-                  description: "Browse LinkedIn, job boards, or any career site and copy the job description for a role you're targeting.",
-                  link: null,
-                },
-                {
-                  icon: <Search className="h-6 w-6 text-primary" />,
-                  title: "Paste it into CrewDog and run the search",
-                  description: "Drop the job description into CrewDog to get a list of relevant LinkedIn contacts — hiring managers, HR professionals, and decision-makers.",
-                  link: "/run",
-                  linkLabel: "Try it now →",
-                },
-                {
-                  icon: <UserPlus className="h-6 w-6 text-primary" />,
-                  title: "Request a connection on LinkedIn",
-                  description: "Send connection requests to the contacts CrewDog surfaces. A short, personalised note goes a long way.",
-                  link: null,
-                },
-                {
-                  icon: <MessageSquare className="h-6 w-6 text-primary" />,
-                  title: "Message them",
-                  description: "Once connected, reach out directly. Going straight to the source beats any recruiter middleman.",
-                  link: null,
-                },
-              ].map((step, index) => (
+              {HOW_IT_WORKS_STEPS.map((step, index) => (
                 <div key={index} className="relative flex gap-6">
-                  {index < 3 && (
-                    <div className="absolute left-[23px] top-[52px] w-px h-[calc(100%-8px)] bg-primary/20" />
+                  {index < HOW_IT_WORKS_STEPS.length - 1 && (
+                    <div className="absolute left-[23px] top-[52px] w-px h-[calc(100%-8px)] bg-gradient-to-b from-primary/40 to-transparent" />
                   )}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex-shrink-0 flex flex-col items-center"
+                    className="flex-shrink-0"
                   >
-                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center relative z-10">
-                      {step.icon}
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center relative z-10 shadow-[0_4px_12px_hsl(var(--shadow-ambient))]">
+                      <span className="text-white font-bold text-sm">{index + 1}</span>
                     </div>
                   </motion.div>
                   <motion.div
@@ -240,12 +278,10 @@ export default function Home() {
                     transition={{ delay: index * 0.1 + 0.05 }}
                     className="pb-10"
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-primary uppercase tracking-widest">
-                        Step {index + 1}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                    <span className="text-xs font-bold text-primary uppercase tracking-widest">
+                      Step {index + 1}
+                    </span>
+                    <h3 className="text-xl font-semibold mt-1 mb-2">{step.title}</h3>
                     <p className="text-muted-foreground">{step.description}</p>
                     {step.link && (
                       <Link
@@ -262,177 +298,39 @@ export default function Home() {
           </div>
         </section>
 
-        {/* What is CrewDog */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
+        {/* ── Final CTA ── */}
+        <section className="relative py-24 text-center overflow-hidden bg-gradient-to-r from-primary to-[hsl(217,91%,50%)]">
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0L0 0 0 40' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='1'/%3E%3C/svg%3E")`
+            }}
+          />
+          <div className="container mx-auto px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="max-w-3xl mx-auto text-center space-y-6 mb-16"
+              className="space-y-6"
             >
-              <h2 className="text-4xl md:text-5xl font-bold">
-                What is CrewDog?
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Paste any real or aspirational job description for your target country. CrewDog identifies relevant HR and hiring professionals, enabling you to contact them directly.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-              >
-                <Card className="p-6 h-full glass-card hover:shadow-xl transition-shadow">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <Search className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">Intelligent Analysis</h3>
-                  <p className="text-muted-foreground">
-                    Our AI analyses any job description to identify relevant LinkedIn contacts who may assist you in securing similar roles.
-                  </p>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="p-6 h-full glass-card hover:shadow-xl transition-shadow">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <Target className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">Direct Routes</h3>
-                  <p className="text-muted-foreground">
-                    Discover company websites, careers pages, and hiring manager contacts. Apply directly before roles are advertised.
-                  </p>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-              >
-                <Card className="p-6 h-full glass-card hover:shadow-xl transition-shadow">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <TrendingUp className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">Reach out on LinkedIn</h3>
-                  <p className="text-muted-foreground">
-                    Going direct results in higher response rates than going through third-party recruiters.
-                  </p>
-                </Card>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Why Use CrewDog */}
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="max-w-3xl mx-auto text-center space-y-6 mb-16"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold">
-                Why Job Hunters Use CrewDog
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Stop missing opportunities to recruiter filters and middleman
-                fees by going straight to the people who make hiring decisions
-              </p>
-            </motion.div>
-
-            <div className="max-w-2xl mx-auto space-y-4">
-              {[
-                "Apply direct to hiring managers and decision makers",
-                "Avoid having your details shared without consent",
-                "Build direct relationships with employers",
-                "Cut employer finder fees by going direct to the people hiring",
-              ].map((benefit, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3 p-4 rounded-xl glass-card"
-                >
-                  <CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-lg">{benefit}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* What You Get */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="max-w-3xl mx-auto text-center space-y-6 mb-16"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold">What You Get</h2>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <Card className="p-6 glass-card">
-                <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                  <Target className="h-5 w-5 text-primary" />
-                  Company Intelligence
-                </h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Actual hiring company name</li>
-                  <li>• Company website and career page</li>
-                  <li>• Industry and size information</li>
-                </ul>
-              </Card>
-
-              <Card className="p-6 glass-card">
-                <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  Direct Contacts
-                </h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Hiring manager profiles</li>
-                  <li>• HR contact information</li>
-                  <li>• Team lead connections</li>
-                </ul>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <Card className="max-w-3xl mx-auto p-12 text-center glass-card glow-effect">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white">
                 Find roles before they are publicly advertised.
               </h2>
-              <p className="text-xl text-muted-foreground mb-8">
+              <p className="text-xl text-white/95">
                 Start your first search free. No credit card required.
               </p>
               <Link to="/run">
-                <Button size="lg" className="text-lg px-12 py-6 magnetic-button">
+                <Button
+                  size="lg"
+                  className="text-lg px-10 py-6 bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))] hover:-translate-y-0.5 transition-all"
+                >
                   Start Your Search Now
                 </Button>
               </Link>
-            </Card>
+            </motion.div>
           </div>
         </section>
+
       </main>
 
       <Footer />
