@@ -4,6 +4,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { FileText, Search, UserPlus, MessageSquare } from "lucide-react";
+import landingPageImage from "@/assets/Landing_page_image.png";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -19,7 +20,7 @@ const staggerContainer = {
   }
 };
 
-const HERO_IMAGE = "https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?q=80&w=2000";
+const HERO_IMAGE = landingPageImage;
 
 const HOW_IT_WORKS_STEPS = [
   {
