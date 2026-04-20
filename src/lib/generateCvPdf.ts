@@ -31,15 +31,15 @@ export async function generateCvPdf(data: CvCustomiseResult): Promise<void> {
   const CW = PW - MARGIN * 2; // 170mm content width
 
   // ─── Logo — top-right corner, page 1 only ─────────────────────────────────
-  const logoH = 10;
-  const logoW = 10;
-  const logoGap = 1.5;
-  doc.setFontSize(8);
+  const logoH = 20;
+  const logoW = 20;
+  const logoGap = 3;
+  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
   const brandW = doc.getTextWidth("CrewDog");
   const logoX = PW - MARGIN - logoW - logoGap - brandW;
   doc.addImage(logoImg, "PNG", logoX, MARGIN, logoW, logoH);
-  doc.setTextColor(59, 130, 246);
+  doc.setTextColor(20, 20, 20);
   doc.text("CrewDog", logoX + logoW + logoGap, MARGIN + logoH * 0.62);
 
   let y = MARGIN;
