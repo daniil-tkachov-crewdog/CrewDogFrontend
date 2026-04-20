@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import type { CvCustomiseResult } from "@/services/support";
+import crewDogLogo from "@/assets/CrewDog-App-Logo.png";
 
 // A4 dimensions in mm: 210 × 297
 const MARGIN = 20;
@@ -14,13 +15,32 @@ function lineH(fontSize: number): number {
   return fontSize * 0.352778 * 1.2;
 }
 
-export function generateCvPdf(data: CvCustomiseResult): void {
+export async function generateCvPdf(data: CvCustomiseResult): Promise<void> {
   const cv = data.CV_text_customised;
+
+  const logoImg = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = crewDogLogo;
+  });
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const PW = 210;        // A4 width  in mm — hardcoded to avoid jsPDF unit quirks
   const PH = 297;        // A4 height in mm
   const CW = PW - MARGIN * 2; // 170mm content width
+
+  // ─── Logo — top-right corner, page 1 only ─────────────────────────────────
+  const logoH = 10;
+  const logoW = 10;
+  const logoGap = 1.5;
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  const brandW = doc.getTextWidth("CrewDog");
+  const logoX = PW - MARGIN - logoW - logoGap - brandW;
+  doc.addImage(logoImg, "PNG", logoX, MARGIN, logoW, logoH);
+  doc.setTextColor(59, 130, 246);
+  doc.text("CrewDog", logoX + logoW + logoGap, MARGIN + logoH * 0.62);
 
   let y = MARGIN;
 
