@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import blueFluidBg from "@/assets/blue-fluid-bg.jpg";
+import loginPageImage from "@/assets/Login_page_image.png";
 import { useAuth } from "@/auth/AuthProvider";
 
 export default function Login() {
