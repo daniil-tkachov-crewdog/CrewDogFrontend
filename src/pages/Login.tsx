@@ -423,8 +423,8 @@ export default function Login() {
             transition={{ duration: 1.5 }}
           >
             <img
-              src={blueFluidBg}
-              alt="Blue Fluid Background"
+              src={loginPageImage}
+              alt="Login page visual"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a8a]/30 via-transparent to-[#172554]/30" />
