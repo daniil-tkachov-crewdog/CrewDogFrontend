@@ -1,15 +1,20 @@
-import { FormEvent } from "react";
+import { FormEvent, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, Send, Sparkles } from "lucide-react";
+import { AlertCircle, FileText, Loader2, Send, Sparkles, Upload, X } from "lucide-react";
+import { isPdfFile } from "@/lib/extractPdfText";
 
 type Props = {
   jobUrl: string;
   setJobUrl: (v: string) => void;
   jobDescription: string;
   setJobDescription: (v: string) => void;
+  cvFile: File | null;
+  setCvFile: (f: File | null) => void;
+  cvFileError: string | null;
+  setCvFileError: (msg: string | null) => void;
   includeLeads: boolean;
   setIncludeLeads: (v: boolean) => void;
   outreachMessage: boolean;
@@ -25,6 +30,10 @@ export default function CenteredForm({
   setJobUrl,
   jobDescription,
   setJobDescription,
+  cvFile,
+  setCvFile,
+  cvFileError,
+  setCvFileError,
   includeLeads,
   setIncludeLeads,
   outreachMessage,
@@ -35,6 +44,25 @@ export default function CenteredForm({
   onCustomise,
 }: Props) {
   const jdLen = jobDescription?.length ?? 0;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const urlDisabled = isLoading || !!jobDescription || !!cvFile;
+  const jdDisabled = isLoading || !!jobUrl || !!cvFile;
+  const cvDisabled = isLoading || !!jobUrl || !!jobDescription;
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = e.target.files?.[0] ?? null;
+    e.target.value = "";
+    setCvFileError(null);
+    if (!selected) return;
+    if (!isPdfFile(selected)) {
+      setCvFileError("Please upload a PDF file.");
+      return;
+    }
+    setJobUrl("");
+    setJobDescription("");
+    setCvFile(selected);
+  }
 
   return (
     <Card className="glass-card p-12 border-primary/10 shadow-2xl backdrop-blur-xl">
@@ -62,11 +90,16 @@ export default function CenteredForm({
                 placeholder="https://linkedin.com/jobs/..."
                 value={jobUrl}
                 onChange={(e) => {
-                  setJobUrl(e.target.value);
-                  if (e.target.value) setJobDescription("");
+                  const v = e.target.value;
+                  setJobUrl(v);
+                  if (v) {
+                    setJobDescription("");
+                    setCvFile(null);
+                    setCvFileError(null);
+                  }
                 }}
                 className="h-14 text-base pl-4 pr-4 bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl shadow-sm hover:shadow-md focus:shadow-lg"
-                disabled={isLoading}
+                disabled={urlDisabled}
               />
             </div>
           </div>
@@ -90,11 +123,16 @@ export default function CenteredForm({
               placeholder="Paste the complete job description here (include location)…"
               value={jobDescription}
               onChange={(e) => {
-                setJobDescription(e.target.value);
-                if (e.target.value) setJobUrl("");
+                const v = e.target.value;
+                setJobDescription(v);
+                if (v) {
+                  setJobUrl("");
+                  setCvFile(null);
+                  setCvFileError(null);
+                }
               }}
               className="min-h-[160px] resize-none text-base p-4 bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl shadow-sm hover:shadow-md focus:shadow-lg"
-              disabled={isLoading}
+              disabled={jdDisabled}
             />
             {jobDescription && (
               <div className="mt-3 space-y-2">
@@ -116,6 +154,74 @@ export default function CenteredForm({
             <p className="mt-2 text-xs text-muted-foreground/70">
               ⚠️ Location is mandatory for best results.
             </p>
+          </div>
+
+          <div className="relative py-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gradient-to-r from-transparent via-border to-transparent" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-card px-6 py-1.5 text-xs font-semibold text-muted-foreground/60 tracking-wider uppercase rounded-full border border-border/50">
+                Or upload your CV
+              </span>
+            </div>
+          </div>
+
+          <div className="group">
+            <label className="block text-sm font-medium mb-2 text-foreground/80">
+              CV (PDF)
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf,.pdf"
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={cvDisabled}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={cvDisabled}
+              className="flex flex-col items-center justify-center gap-3 w-full rounded-xl border-2 border-dashed border-primary/30 hover:border-primary/60 bg-primary/5 hover:bg-primary/10 transition-all duration-200 py-8 px-4 cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {cvFile ? (
+                <>
+                  <FileText className="h-8 w-8 text-primary" />
+                  <span className="text-sm font-medium text-foreground truncate max-w-full px-4">
+                    {cvFile.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">Click to change</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                    Click to upload your CV
+                  </span>
+                  <span className="text-xs text-muted-foreground">PDF only</span>
+                </>
+              )}
+            </button>
+            {cvFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCvFile(null);
+                  setCvFileError(null);
+                }}
+                disabled={isLoading}
+                className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-3 w-3" /> Remove
+              </button>
+            )}
+            {cvFileError && (
+              <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs font-medium">{cvFileError}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -174,7 +280,7 @@ export default function CenteredForm({
         <Button
           type="submit"
           className="w-full h-16 text-lg gap-3 font-bold relative overflow-hidden group bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:shadow-primary/25 transition-all duration-300 rounded-xl"
-          disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
+          disabled={isLoading || (!jobUrl && !jobDescription && !cvFile) || !canSearch}
           size="lg"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

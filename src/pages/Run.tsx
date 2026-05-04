@@ -10,6 +10,7 @@ import { useAuth } from "@/auth/AuthProvider";
 
 import { runSearch, mapN8nToResults } from "@/services/run";
 import type { NormalizedResults } from "@/services/run";
+import { extractTextFromBuffer } from "@/lib/extractPdfText";
 
 //Added by Denny - the user survey
 
@@ -110,7 +111,13 @@ function extractN8nError(
 }
 
 async function runSearchWithTimeout(
-  args: { JD: string; JD_link: string; includeLeads: boolean; outreachMessage: boolean },
+  args: {
+    JD: string;
+    JD_link: string;
+    full_CV_text: string;
+    includeLeads: boolean;
+    outreachMessage: boolean;
+  },
   ms = 60000
 ) {
   const controller = new AbortController();
@@ -130,6 +137,8 @@ export default function RunPage() {
 
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvFileError, setCvFileError] = useState<string | null>(null);
   const [includeLeads, setIncludeLeads] = useState(false);
   const [outreachMessage, setOutreachMessage] = useState(false);
 
@@ -202,18 +211,23 @@ export default function RunPage() {
       return;
     }
 
-    if (jobUrl.trim() && jobDescription.trim()) {
+    const filledCount =
+      (jobUrl.trim() ? 1 : 0) +
+      (jobDescription.trim() ? 1 : 0) +
+      (cvFile ? 1 : 0);
+
+    if (filledCount > 1) {
       toast({
         title: "Choose one input",
-        description: "Provide either a Job URL or a Job Description, not both.",
+        description: "Provide a Job URL, a Job Description, or a CV — not more than one.",
         variant: "destructive",
       });
       return;
     }
-    if (!jobUrl.trim() && !jobDescription.trim()) {
+    if (filledCount === 0) {
       toast({
         title: "Input required",
-        description: "Provide a Job URL or paste the description.",
+        description: "Provide a Job URL, paste the description, or upload your CV.",
         variant: "destructive",
       });
       return;
@@ -255,8 +269,28 @@ export default function RunPage() {
 
     setIsLoading(true);
     try {
+      let fullCvText = "";
+      if (cvFile) {
+        try {
+          const buffer = await cvFile.arrayBuffer();
+          fullCvText = await extractTextFromBuffer(buffer);
+        } catch (extractErr: any) {
+          setErr({
+            message:
+              "Could not read the uploaded PDF. Please try a different file.",
+          });
+          throw extractErr;
+        }
+      }
+
       const raw = await runSearchWithTimeout(
-        { JD: jobDescription || "", JD_link: jobUrl || "", includeLeads, outreachMessage },
+        {
+          JD: jobDescription || "",
+          JD_link: jobUrl || "",
+          full_CV_text: fullCvText,
+          includeLeads,
+          outreachMessage,
+        },
         60000
       );
       if (raw == null) throw new Error("Empty response from server");
@@ -439,15 +473,35 @@ export default function RunPage() {
                       setErr(null);
                       setResults(null);
                       setJobUrl(v);
-                      if (v) setJobDescription("");
+                      if (v) {
+                        setJobDescription("");
+                        setCvFile(null);
+                        setCvFileError(null);
+                      }
                     }}
                     jobDescription={jobDescription}
                     setJobDescription={(v) => {
                       setErr(null);
                       setResults(null);
                       setJobDescription(v);
-                      if (v) setJobUrl("");
+                      if (v) {
+                        setJobUrl("");
+                        setCvFile(null);
+                        setCvFileError(null);
+                      }
                     }}
+                    cvFile={cvFile}
+                    setCvFile={(f) => {
+                      setErr(null);
+                      setResults(null);
+                      setCvFile(f);
+                      if (f) {
+                        setJobUrl("");
+                        setJobDescription("");
+                      }
+                    }}
+                    cvFileError={cvFileError}
+                    setCvFileError={setCvFileError}
                     includeLeads={includeLeads}
                     setIncludeLeads={setIncludeLeads}
                     outreachMessage={outreachMessage}
@@ -478,15 +532,35 @@ export default function RunPage() {
                       setErr(null);
                       setResults(null);
                       setJobUrl(v);
-                      if (v) setJobDescription("");
+                      if (v) {
+                        setJobDescription("");
+                        setCvFile(null);
+                        setCvFileError(null);
+                      }
                     }}
                     jobDescription={jobDescription}
                     setJobDescription={(v) => {
                       setErr(null);
                       setResults(null);
                       setJobDescription(v);
-                      if (v) setJobUrl("");
+                      if (v) {
+                        setJobUrl("");
+                        setCvFile(null);
+                        setCvFileError(null);
+                      }
                     }}
+                    cvFile={cvFile}
+                    setCvFile={(f) => {
+                      setErr(null);
+                      setResults(null);
+                      setCvFile(f);
+                      if (f) {
+                        setJobUrl("");
+                        setJobDescription("");
+                      }
+                    }}
+                    cvFileError={cvFileError}
+                    setCvFileError={setCvFileError}
                     includeLeads={includeLeads}
                     setIncludeLeads={setIncludeLeads}
                     outreachMessage={outreachMessage}

@@ -1,16 +1,21 @@
-import { FormEvent } from "react";
+import { FormEvent, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, Send, Sparkles } from "lucide-react";
+import { AlertCircle, FileText, Loader2, Send, Sparkles, Upload, X } from "lucide-react";
 import type { SearchResultsFeedbackOption } from "@/services/support";
+import { isPdfFile } from "@/lib/extractPdfText";
 
 type Props = {
   jobUrl: string;
   setJobUrl: (v: string) => void;
   jobDescription: string;
   setJobDescription: (v: string) => void;
+  cvFile: File | null;
+  setCvFile: (f: File | null) => void;
+  cvFileError: string | null;
+  setCvFileError: (msg: string | null) => void;
   includeLeads: boolean;
   setIncludeLeads: (v: boolean) => void;
   outreachMessage: boolean;
@@ -32,6 +37,10 @@ export default function SideForm({
   setJobUrl,
   jobDescription,
   setJobDescription,
+  cvFile,
+  setCvFile,
+  cvFileError,
+  setCvFileError,
   includeLeads,
   setIncludeLeads,
   outreachMessage,
@@ -47,6 +56,25 @@ export default function SideForm({
   feedbackSubmitting,
   onFeedbackSubmit,
 }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const urlDisabled = isLoading || !!jobDescription || !!cvFile;
+  const jdDisabled = isLoading || !!jobUrl || !!cvFile;
+  const cvDisabled = isLoading || !!jobUrl || !!jobDescription;
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = e.target.files?.[0] ?? null;
+    e.target.value = "";
+    setCvFileError(null);
+    if (!selected) return;
+    if (!isPdfFile(selected)) {
+      setCvFileError("Please upload a PDF file.");
+      return;
+    }
+    setJobUrl("");
+    setJobDescription("");
+    setCvFile(selected);
+  }
+
   return (
     <Card className="glass-card p-6 h-full">
       <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
@@ -61,11 +89,16 @@ export default function SideForm({
             placeholder="🔗 Job URL"
             value={jobUrl}
             onChange={(e) => {
-              setJobUrl(e.target.value);
-              if (e.target.value) setJobDescription("");
+              const v = e.target.value;
+              setJobUrl(v);
+              if (v) {
+                setJobDescription("");
+                setCvFile(null);
+                setCvFileError(null);
+              }
             }}
             className="h-11 text-sm border-primary/20 bg-background/50"
-            disabled={isLoading}
+            disabled={urlDisabled}
           />
 
           <div className="relative">
@@ -81,16 +114,80 @@ export default function SideForm({
             placeholder="📝 Job description (include location)…"
             value={jobDescription}
             onChange={(e) => {
-              setJobDescription(e.target.value);
-              if (e.target.value) setJobUrl("");
+              const v = e.target.value;
+              setJobDescription(v);
+              if (v) {
+                setJobUrl("");
+                setCvFile(null);
+                setCvFileError(null);
+              }
             }}
             className="min-h-[100px] resize-none text-sm border-primary/20 bg-background/50"
-            disabled={isLoading}
+            disabled={jdDisabled}
           />
 
           <p className="text-xs text-muted-foreground/70">
             ⚠️ Location is mandatory for best results.
           </p>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-card px-2 text-muted-foreground">or upload CV</span>
+            </div>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={cvDisabled}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={cvDisabled}
+            className="flex flex-col items-center justify-center gap-2 w-full rounded-lg border-2 border-dashed border-primary/30 hover:border-primary/60 bg-primary/5 hover:bg-primary/10 transition-all duration-200 py-4 px-3 cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {cvFile ? (
+              <>
+                <FileText className="h-6 w-6 text-primary" />
+                <span className="text-xs font-medium text-foreground truncate max-w-full px-2">
+                  {cvFile.name}
+                </span>
+              </>
+            ) : (
+              <>
+                <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                <span className="text-xs font-medium text-muted-foreground">
+                  Upload CV (PDF)
+                </span>
+              </>
+            )}
+          </button>
+          {cvFile && (
+            <button
+              type="button"
+              onClick={() => {
+                setCvFile(null);
+                setCvFileError(null);
+              }}
+              disabled={isLoading}
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-3 w-3" /> Remove
+            </button>
+          )}
+          {cvFileError && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <span className="text-xs font-medium">{cvFileError}</span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -136,7 +233,7 @@ export default function SideForm({
         <Button
           type="submit"
           className="w-full h-11 text-sm gap-2 magnetic-button glow-effect"
-          disabled={isLoading || (!jobUrl && !jobDescription) || !canSearch}
+          disabled={isLoading || (!jobUrl && !jobDescription && !cvFile) || !canSearch}
         >
           {isLoading ? (
             <>

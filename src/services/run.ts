@@ -5,6 +5,7 @@ import { API_BASE } from "@/lib/config";
 export type RunPayload = {
   JD?: string; // full job description text (optional)
   JD_link?: string; // job URL (optional)
+  full_CV_text?: string; // extracted CV text (optional)
   includeLeads?: boolean; // extra contacts toggle
   outreachMessage?: boolean; // outreach message toggle
 };
@@ -56,6 +57,7 @@ export async function runSearch(payload: RunPayload): Promise<RunResponse> {
   const body = JSON.stringify({
     JD: (payload.JD || "").trim(),
     JD_link: (payload.JD_link || "").trim(),
+    full_CV_text: (payload.full_CV_text || "").trim(),
     JH_tickbox: payload.includeLeads ? "yes" : "no",
     outreach_message: payload.outreachMessage ? "yes" : "no",
     // mirror old form’s saver flag (kept as "No")
