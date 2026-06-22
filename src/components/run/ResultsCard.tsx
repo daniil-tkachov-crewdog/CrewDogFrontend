@@ -1,21 +1,7 @@
 // src/components/run/ResultsCard.tsx
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Building2,
-  Globe,
-  Briefcase,
-  Users2,
-  Info,
-  UserSearch,
-  ExternalLink,
-  MessageSquareText,
-  Copy,
-  Check,
-  Sparkles,
-} from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -44,150 +30,58 @@ function getHost(url?: string) {
 }
 
 function getInitials(name: string) {
-  return name
-    .split(/[\s-]+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-/* ------------------------------------------------------------------ */
-/*  Sub-components                                                     */
-/* ------------------------------------------------------------------ */
-
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
-};
-
-function SectionHeader({
-  icon: Icon,
-  title,
-  count,
-}: {
-  icon: React.ElementType;
-  title: string;
-  count?: number;
-}) {
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="p-1.5 rounded-lg bg-primary/10">
-        <Icon className="h-4 w-4 text-primary" />
-      </div>
-      <h4 className="font-semibold text-sm tracking-tight">{title}</h4>
-      {count != null && count > 0 && (
-        <Badge
-          variant="secondary"
-          className="ml-auto text-[10px] px-2 py-0.5 font-medium"
-        >
-          {count}
-        </Badge>
-      )}
-    </div>
+    name
+      .split(/[\s-]+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "•"
   );
 }
 
-function PersonCard({
+const cardEnter = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.35, ease: "easeOut" },
+};
+
+const labelCls =
+  "font-['IBM_Plex_Mono',monospace] text-[11px] uppercase tracking-[0.16em] text-[#6F6C78]";
+
+/* A single contact / lead row, prototype `.contact` style. */
+function ContactRow({
   name,
-  subline,
+  sub,
   href,
-  icon: Icon,
-  cta = "View profile",
-  index = 0,
+  cta,
 }: {
   name: string;
-  subline?: string;
+  sub?: string;
   href?: string;
-  icon: React.ElementType;
-  cta?: string;
-  index?: number;
+  cta: string;
 }) {
-  const initials = getInitials(name);
-
-  const inner = (
-    <div className="flex items-center gap-3.5">
-      {/* Avatar */}
-      <div className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center group-hover:from-primary/30 group-hover:to-primary/10 transition-colors duration-300">
-        <span className="text-xs font-bold text-primary/80 group-hover:text-primary transition-colors">
-          {initials || <Icon className="h-4 w-4" />}
-        </span>
+  return (
+    <div className="flex items-center gap-4 border-t border-[#E4E1D9] py-4 first:border-t-0">
+      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-[#E4E1D9] bg-[#F4F2EE] font-['IBM_Plex_Mono',monospace] text-[14px] font-semibold text-[#FF5A1F]">
+        {getInitials(name)}
       </div>
-
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p className="font-medium text-sm truncate leading-tight">{name}</p>
-        {subline && (
-          <p className="text-xs text-muted-foreground mt-0.5 truncate">
-            {subline}
-          </p>
-        )}
-      </div>
-
-      {/* CTA icon */}
-      {href && (
-        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <ExternalLink className="h-3.5 w-3.5 text-primary" />
+      <div className="min-w-0">
+        <div className="truncate text-[15px] font-semibold tracking-[-0.01em]">
+          {name}
         </div>
+        {sub && <div className="truncate text-[13px] text-[#55525E]">{sub}</div>}
+      </div>
+      {href && (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto whitespace-nowrap rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[7px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08]"
+        >
+          {cta} ↗
+        </a>
       )}
     </div>
-  );
-
-  return (
-    <motion.div variants={fadeUp}>
-      <div className="group rounded-xl border border-border/40 bg-gradient-to-br from-muted/40 to-transparent p-3.5 hover:border-primary/25 hover:bg-muted/60 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 cursor-pointer">
-        {href ? (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-lg"
-            aria-label={`${cta}: ${name}`}
-          >
-            {inner}
-          </a>
-        ) : (
-          inner
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-function ResourceLink({
-  href,
-  icon: Icon,
-  label,
-  sublabel,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  sublabel: string;
-}) {
-  return (
-    <motion.a
-      variants={fadeUp}
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex items-center gap-3 p-3.5 rounded-xl bg-muted/30 hover:bg-muted/60 border border-transparent hover:border-primary/20 transition-all duration-300"
-    >
-      <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
-        <Icon className="h-4 w-4 text-primary" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium leading-tight">{label}</p>
-        <p className="text-xs text-muted-foreground mt-0.5 truncate">
-          {sublabel}
-        </p>
-      </div>
-      <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-    </motion.a>
   );
 }
 
@@ -208,205 +102,159 @@ export default function ResultsCard({ results }: { results: Results }) {
   const hasContacts =
     Array.isArray(results.contacts) && results.contacts.length > 0;
   const hasLeads = Array.isArray(results.leads) && results.leads.length > 0;
-  const hasResources = !!(results.website || results.careerPage);
+  const hasSources = !!(results.website || results.careerPage);
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="show"
-      variants={stagger}
-    >
-      <Card className="relative overflow-hidden border border-border/50 bg-gradient-to-br from-card via-card/95 to-card/80 backdrop-blur-xl shadow-xl">
-        {/* Decorative gradient orb */}
-        <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-primary/8 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 h-36 w-36 rounded-full bg-accent/6 blur-3xl" />
+    <div className="grid gap-[18px]">
+      {/* ── Likely end client ── */}
+      <motion.div
+        {...cardEnter}
+        className="overflow-hidden rounded-md border border-[#E4E1D9] bg-white"
+      >
+        <div className="flex items-center gap-[18px] border-b border-[#E4E1D9] px-7 py-[26px]">
+          <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-[#FF5A1F] font-['IBM_Plex_Mono',monospace] text-[20px] font-bold text-[#0B0B0F]">
+            {(results.company?.[0] ?? "?").toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <span className={labelCls + " text-[#FF5A1F]"}>Likely end client</span>
+            <h2 className="mt-1 truncate text-[26px] tracking-[-0.02em]">
+              {results.company}
+            </h2>
+          </div>
+        </div>
 
-        <div className="relative z-10 p-6 sm:p-8 space-y-7">
-          {/* ── Company Header ────────────────────────────── */}
-          <motion.div variants={fadeUp} className="space-y-4">
-            <div className="flex items-start gap-4">
-              <motion.div
-                className="h-14 w-14 shrink-0 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20"
-                whileHover={{ scale: 1.05, rotate: 3 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <Building2 className="h-7 w-7 text-primary-foreground" />
-              </motion.div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                  Company Identified
+        {(results.sniff_out_clues || hasSources) && (
+          <div className="px-7 py-6">
+            {results.sniff_out_clues && (
+              <>
+                <div className={labelCls + " mb-[14px]"}>Why this company</div>
+                <p className="max-w-[54ch] text-[15px] leading-[1.6] text-[#55525E]">
+                  {results.sniff_out_clues}
                 </p>
-                <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent leading-tight truncate">
-                  {results.company}
-                </h3>
+              </>
+            )}
+
+            {hasSources && (
+              <div className="mt-5 flex flex-wrap gap-2">
                 {results.website && (
                   <a
                     href={results.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+                    className="rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[7px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08]"
                   >
-                    <Globe className="h-3 w-3" />
-                    {getHost(results.website)}
-                    <ExternalLink className="h-2.5 w-2.5" />
+                    {getHost(results.website) || "Website"} ↗
+                  </a>
+                )}
+                {results.careerPage && (
+                  <a
+                    href={results.careerPage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[7px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08]"
+                  >
+                    Careers ↗
                   </a>
                 )}
               </div>
+            )}
+          </div>
+        )}
+      </motion.div>
+
+      {/* ── Outreach message (kept feature) ── */}
+      {results.outreach_message && (
+        <motion.div
+          {...cardEnter}
+          className="overflow-hidden rounded-md border border-[#E4E1D9] bg-white"
+        >
+          <div className="flex items-center justify-between gap-4 border-b border-[#E4E1D9] px-7 py-[18px]">
+            <span className={labelCls + " text-[#FF5A1F]"}>Outreach message</span>
+            <button
+              type="button"
+              onClick={handleCopyOutreach}
+              className="inline-flex items-center gap-1.5 rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[6px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08]"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-3.5 w-3.5" /> Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" /> Copy
+                </>
+              )}
+            </button>
+          </div>
+          <div className="px-7 py-6">
+            <p className="whitespace-pre-wrap text-[15px] leading-[1.6] text-[#55525E]">
+              {results.outreach_message}
+            </p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ── Likely contacts ── */}
+      {hasContacts && (
+        <motion.div
+          {...cardEnter}
+          className="overflow-hidden rounded-md border border-[#E4E1D9] bg-white"
+        >
+          <div className="flex items-center gap-[18px] border-b border-[#E4E1D9] px-7 py-[26px]">
+            <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-[#FF5A1F] font-['IBM_Plex_Mono',monospace] text-[20px] font-bold text-[#0B0B0F]">
+              →
             </div>
-          </motion.div>
-
-          {/* ── Insights ──────────────────────────────────── */}
-          {results.sniff_out_clues && (
-            <motion.div variants={fadeUp}>
-              <div className="rounded-xl border border-border/30 bg-muted/20 p-4 space-y-2.5">
-                <SectionHeader icon={Info} title="Why this company" />
-                <p className="text-sm text-muted-foreground leading-relaxed pl-9">
-                  {results.sniff_out_clues}
-                </p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── Outreach Message ──────────────────────────── */}
-          {results.outreach_message && (
-            <motion.div variants={fadeUp}>
-              <div className="rounded-xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <SectionHeader
-                    icon={MessageSquareText}
-                    title="Outreach Message"
-                  />
-                  <motion.button
-                    type="button"
-                    onClick={handleCopyOutreach}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg
-                               bg-primary/10 text-primary hover:bg-primary/20
-                               transition-colors duration-200"
-                    aria-label="Copy outreach message"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="h-3.5 w-3.5" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        Copy
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-                <div className="rounded-lg bg-background/60 border border-border/30 p-4">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {results.outreach_message}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── Resources ─────────────────────────────────── */}
-          {hasResources && (
-            <motion.div variants={fadeUp} className="space-y-3">
-              <SectionHeader icon={Globe} title="Resources" />
-              <motion.div
-                variants={stagger}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-              >
-                {results.website && (
-                  <ResourceLink
-                    href={results.website}
-                    icon={Globe}
-                    label="Company Website"
-                    sublabel={getHost(results.website) || "Visit site"}
-                  />
-                )}
-                {results.careerPage && (
-                  <ResourceLink
-                    href={results.careerPage}
-                    icon={Briefcase}
-                    label="Careers Page"
-                    sublabel={
-                      getHost(results.careerPage) || "View open positions"
-                    }
-                  />
-                )}
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* ── Key Contacts (HR) ─────────────────────────── */}
-          {hasContacts && (
-            <motion.div variants={fadeUp} className="space-y-3">
-              <SectionHeader
-                icon={Users2}
-                title="Key Contacts"
-                count={results.contacts!.length}
+            <div>
+              <span className={labelCls + " text-[#FF5A1F]"}>Worth approaching</span>
+              <h2 className="mt-1 text-[20px] tracking-[-0.02em]">Likely contacts</h2>
+            </div>
+          </div>
+          <div className="px-7 py-2">
+            {results.contacts!.map((c, i) => (
+              <ContactRow
+                key={`${c.linkedIn || c.name}-${i}`}
+                name={c.name}
+                sub={c.role}
+                href={c.linkedIn}
+                cta="LinkedIn"
               />
-              <motion.div
-                variants={stagger}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
-              >
-                {results.contacts!.map((c, i) => (
-                  <PersonCard
-                    key={`${c.linkedIn || c.name}-${i}`}
-                    name={c.name}
-                    subline={c.role}
-                    href={c.linkedIn}
-                    icon={Users2}
-                    cta="View LinkedIn"
-                    index={i}
-                  />
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
+            ))}
+          </div>
+          <div className="flex items-center gap-[10px] border-t border-[#E4E1D9] px-7 py-4 font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#6F6C78]">
+            <span className="h-[6px] w-[6px] rounded-full bg-[#FF5A1F]" />
+            Radar Contact · Direct tier
+          </div>
+        </motion.div>
+      )}
 
-          {/* ── Potential Leads ────────────────────────────── */}
-          {hasLeads && (
-            <motion.div variants={fadeUp} className="space-y-3">
-              <SectionHeader
-                icon={UserSearch}
-                title="Potential Leads"
-                count={results.leads!.length}
+      {/* ── Extra leads ── */}
+      {hasLeads && (
+        <motion.div
+          {...cardEnter}
+          className="overflow-hidden rounded-md border border-[#E4E1D9] bg-white"
+        >
+          <div className="flex items-center gap-[18px] border-b border-[#E4E1D9] px-7 py-[26px]">
+            <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-[#FF5A1F] font-['IBM_Plex_Mono',monospace] text-[16px] font-bold text-[#0B0B0F]">
+              +
+            </div>
+            <div>
+              <span className={labelCls + " text-[#FF5A1F]"}>Wider net</span>
+              <h2 className="mt-1 text-[20px] tracking-[-0.02em]">Extra leads</h2>
+            </div>
+          </div>
+          <div className="px-7 py-2">
+            {results.leads!.map((p, i) => (
+              <ContactRow
+                key={`${p.url}-${i}`}
+                name={p.name}
+                sub={getHost(p.url)}
+                href={p.url}
+                cta="Open"
               />
-              <motion.div
-                variants={stagger}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
-              >
-                {results.leads!.map((p, i) => (
-                  <PersonCard
-                    key={`${p.url}-${i}`}
-                    name={p.name}
-                    subline={getHost(p.url)}
-                    href={p.url}
-                    icon={UserSearch}
-                    cta="Open profile"
-                    index={i}
-                  />
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* ── Footer accent ─────────────────────────────── */}
-          <motion.div
-            variants={fadeUp}
-            className="flex items-center justify-center gap-2 pt-2 text-[11px] text-muted-foreground/50"
-          >
-            <Sparkles className="h-3 w-3" />
-            <span>Powered by AI analysis</span>
-          </motion.div>
-        </div>
-      </Card>
-    </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 }

@@ -127,8 +127,33 @@ All colors MUST be HSL.
   .animation-delay-200 {
     animation-delay: 200ms;
   }
-  
+
   .animation-delay-400 {
     animation-delay: 400ms;
+  }
+
+  /* Radar run-page scanline (loading state) */
+  .radar-scanline {
+    position: relative;
+    height: 1px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .radar-scanline::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -40%;
+    height: 100%;
+    width: 40%;
+    background: #ff5a1f;
+    animation: radar-scan 1.4s ease-in-out infinite;
+  }
+  @keyframes radar-scan {
+    0% { left: -40%; }
+    100% { left: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .radar-scanline::after { animation: none; width: 100%; left: 0; }
   }
 }
