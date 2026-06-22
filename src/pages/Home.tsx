@@ -1,337 +1,246 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
-import { FileText, Search, UserPlus, MessageSquare } from "lucide-react";
-import landingPageImage from "@/assets/Landing_page_image.png";
 
-const fadeInUp = {
+/**
+ * Landing page — "CrewDog Radar" prototype.
+ * Faithful implementation of the Claude Design "Landing Page Prototype.html"
+ * handoff. The shared Topbar and Footer (with the existing footer links) are
+ * kept; only the landing content adopts the new editorial / radar aesthetic.
+ *
+ * Palette (scoped to this page via arbitrary values):
+ *   ember     #FF5A1F   ink      #0B0B0F   ink-soft  #15151C
+ *   paper     #F4F2EE   paperDim #E4E1D9   mute      #6F6C78
+ */
+
+const fadeUp = {
   initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 }
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5 },
 };
 
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const HERO_IMAGE = landingPageImage;
-
-const HOW_IT_WORKS_STEPS = [
+const PROCESS_STEPS = [
   {
-    icon: <FileText className="h-5 w-5 text-white" />,
-    title: "Find a job description you like",
-    description: "Browse LinkedIn, job boards, or any career site and copy the job description for a role you're targeting.",
+    num: "01",
+    tone: "light" as const,
+    title: "Spot the demand",
+    body: "Surface the live competitor adverts that signal a company is actively hiring — the demand that's real this week, not last quarter.",
   },
   {
-    icon: <Search className="h-5 w-5 text-white" />,
-    title: "Paste it into CrewDog and run the search",
-    description: "Drop the job description into CrewDog to get a list of relevant LinkedIn contacts — hiring managers, HR professionals, and decision-makers.",
-    link: "/run",
-    linkLabel: "Try it now →",
+    num: "02",
+    tone: "light" as const,
+    title: "Read the signals",
+    body: "Radar reads the signals in the post and points you to the companies most likely to be hiring behind it.",
   },
   {
-    icon: <UserPlus className="h-5 w-5 text-white" />,
-    title: "Request a connection on LinkedIn",
-    description: "Send connection requests to the contacts CrewDog surfaces. A short, personalised note goes a long way.",
+    num: "03",
+    tone: "dark" as const,
+    title: "Identify the likely client",
+    body: "Turn the competitor advert into a named company worth approaching — the likely end client behind the post, with the confidence to act on it.",
   },
   {
-    icon: <MessageSquare className="h-5 w-5 text-white" />,
-    title: "Message them",
-    description: "Once connected, reach out directly. Going straight to the source beats any recruiter middleman.",
+    num: "04",
+    tone: "dark" as const,
+    title: "Reveal the likely contact",
+    body: "Radar surfaces the likely LinkedIn contact at that company — the person worth connecting with — so you start the conversation direct.",
+    tag: "Radar Contact · Direct tier",
   },
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#F4F2EE] text-[#0B0B0F] font-['Space_Grotesk',system-ui,sans-serif]">
       <Topbar />
 
       <main className="flex-1">
-
         {/* ── Hero ── */}
-        <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <img
-              src={HERO_IMAGE}
-              alt="Offshore oil rig"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="absolute inset-0 z-10 bg-gradient-to-br from-primary/70 to-primary/40" />
-
-          <div className="container mx-auto px-6 py-20 relative z-20">
-            <motion.div
-              initial="initial"
-              animate="animate"
-              variants={staggerContainer}
-              className="max-w-3xl space-y-8"
-            >
-              <motion.div variants={fadeInUp}>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur border border-white/30 text-white text-sm font-semibold">
-                  <span>🚀</span>
-                  <span>Skip the middleman. Apply smarter.</span>
-                </div>
-              </motion.div>
-
-              <motion.h1
-                variants={fadeInUp}
-                className="text-5xl md:text-7xl font-extrabold leading-[1.1] text-white drop-shadow-lg"
-              >
-                Apply Direct Before<br />The Job Is Advertised
-              </motion.h1>
-
-              <motion.p
-                variants={fadeInUp}
-                className="text-xl md:text-2xl text-white/95 max-w-2xl drop-shadow"
-              >
-                CrewDog enables expats to connect directly with decision-makers on LinkedIn for international Oil &amp; Gas opportunities.
-              </motion.p>
-
-              <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-                <Link to="/run">
-                  <Button
-                    size="lg"
-                    className="text-lg px-8 py-6 bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))] hover:-translate-y-0.5 transition-all"
-                  >
-                    Start Free Search
-                  </Button>
-                </Link>
-                <Link to="/faq">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="text-lg px-8 py-6 bg-transparent border-2 border-white/60 text-white hover:bg-white/10 hover:-translate-y-0.5 transition-all"
-                  >
-                    Learn More
-                  </Button>
-                </Link>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div variants={fadeInUp} className="flex flex-wrap gap-10 pt-4">
-                {[
-                  { value: "500+", label: "CVs Created" },
-                  { value: "89%", label: "Interview Rate" },
-                  { value: "4.8", label: "User Rating" },
-                ].map((stat) => (
-                  <div key={stat.label} className="flex flex-col">
-                    <span className="text-4xl font-extrabold text-orange drop-shadow-sm">{stat.value}</span>
-                    <span className="text-sm text-white/90">{stat.label}</span>
-                  </div>
-                ))}
-              </motion.div>
-
-              {/* Trust bar */}
-              <motion.div
-                variants={fadeInUp}
-                className="flex flex-wrap items-center gap-8 pt-6 border-t border-white/20 opacity-75"
-              >
-                <span className="text-xs font-semibold text-white uppercase tracking-widest">
-                  Trusted by professionals at leading Oil &amp; Gas companies
-                </span>
-                {["TOTAL", "Shell", "BP"].map((name) => (
-                  <span key={name} className="text-white font-semibold text-sm">{name}</span>
-                ))}
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Three Ways to Win ── */}
-        <section className="py-24 bg-background">
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16 space-y-4"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border text-primary text-sm font-semibold">
-                <span>✨</span>
-                <span>Three Ways to Win</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                Your Complete Job Search Arsenal
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                AI-powered tools designed for international Oil &amp; Gas professionals
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Card 1 — AI Search */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="relative group rounded-2xl border border-border bg-card p-8 overflow-hidden hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/60 group-hover:h-2 transition-all duration-300" />
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-3xl mb-6 shadow-[0_8px_20px_hsl(var(--shadow-ambient))]">
-                  🔍
-                </div>
-                <h3 className="text-2xl font-bold mb-3">AI Search Assistant</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  Paste any job description and discover the hiring company, decision-makers, and HR contacts on LinkedIn.
-                </p>
-                <Link to="/run">
-                  <Button className="w-full">Try It Free</Button>
-                </Link>
-              </motion.div>
-
-              {/* Card 2 — CV Co-Pilot */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="relative group rounded-2xl border border-border bg-card p-8 overflow-hidden hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange to-orange-dark group-hover:h-2 transition-all duration-300" />
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange to-orange-dark flex items-center justify-center text-3xl mb-6 shadow-[0_8px_20px_hsl(var(--orange-glow))]">
-                  📄
-                </div>
-                <h3 className="text-2xl font-bold mb-3">CV Co-Pilot (Taylor)</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  AI-powered CV optimization for Oil &amp; Gas roles. Taylor analyzes your experience and tailors it for each position.
-                </p>
-                <a href="https://crewdogcv.ai" target="_blank" rel="noopener noreferrer">
-                  <Button
-                    className="w-full bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))]"
-                  >
-                    Build Your CV
-                  </Button>
-                </a>
-              </motion.div>
-
-              {/* Card 3 — Flying Squad */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="relative group rounded-2xl border border-border bg-card p-8 overflow-hidden hover:-translate-y-2 hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange to-orange-dark group-hover:h-2 transition-all duration-300" />
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange to-orange-dark flex items-center justify-center text-3xl mb-6 shadow-[0_8px_20px_hsl(var(--orange-glow))]">
-                  🚁
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Flying Squad</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  Pack your bags. Deploy to high-paying Oil &amp; Gas contracts in the UK and worldwide. Join the crew today.
-                </p>
-                <a href="https://crewdogcv.ai/" target="_blank" rel="noopener noreferrer">
-                  <Button
-                    className="w-full bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))]"
-                  >
-                    Join the Crew
-                  </Button>
-                </a>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── How It Works ── */}
-        <section className="py-24 bg-muted/30">
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16 space-y-4"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-primary text-sm font-semibold">
-                <span>📋</span>
-                <span>Simple Process</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">How It Works</h2>
-            </motion.div>
-
-            <div className="max-w-xl mx-auto">
-              {HOW_IT_WORKS_STEPS.map((step, index) => (
-                <div key={index} className="relative flex gap-6">
-                  {index < HOW_IT_WORKS_STEPS.length - 1 && (
-                    <div className="absolute left-[23px] top-[52px] w-px h-[calc(100%-8px)] bg-gradient-to-b from-primary/40 to-transparent" />
-                  )}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex-shrink-0"
-                  >
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center relative z-10 shadow-[0_4px_12px_hsl(var(--shadow-ambient))]">
-                      <span className="text-white font-bold text-sm">{index + 1}</span>
-                    </div>
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 + 0.05 }}
-                    className="pb-10"
-                  >
-                    <span className="text-xs font-bold text-primary uppercase tracking-widest">
-                      Step {index + 1}
-                    </span>
-                    <h3 className="text-xl font-semibold mt-1 mb-2">{step.title}</h3>
-                    <p className="text-muted-foreground">{step.description}</p>
-                    {step.link && (
-                      <Link
-                        to={step.link}
-                        className="inline-block mt-3 text-sm font-medium text-primary hover:underline"
-                      >
-                        {step.linkLabel}
-                      </Link>
-                    )}
-                  </motion.div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Final CTA ── */}
-        <section className="relative py-24 text-center overflow-hidden bg-gradient-to-r from-primary to-[hsl(217,91%,50%)]">
+        <header className="relative overflow-hidden bg-[#0B0B0F] text-white">
+          {/* Radar sweep decoration */}
           <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0L0 0 0 40' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='1'/%3E%3C/svg%3E")`
-            }}
-          />
-          <div className="container mx-auto px-6 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white">
-                Find roles before they are publicly advertised.
-              </h2>
-              <p className="text-xl text-white/95">
-                Start your first search free. No credit card required.
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-40 -top-20 h-[520px] w-[520px] rounded-full border border-[#FF5A1F]/20 max-[720px]:right-[-220px] max-[720px]:opacity-50"
+          >
+            <div className="absolute inset-20 rounded-full border border-[#FF5A1F]/[0.14]" />
+            <div className="absolute inset-[170px] rounded-full border border-[#FF5A1F]/10" />
+          </div>
+
+          <div className="mx-auto w-full max-w-[1040px] px-6 py-[72px] pb-[88px]">
+            <motion.div {...fadeUp}>
+              <span className="mb-7 block font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.22em] text-[#FF5A1F]">
+                Competitor advert intelligence · Energy &amp; Data Centres
+              </span>
+              <h1 className="max-w-[13ch] text-[clamp(44px,9vw,92px)] font-bold leading-[0.96] tracking-[-0.03em]">
+                Read the advert. <em className="not-italic text-[#FF5A1F]">Find the lead.</em>
+              </h1>
+              <p className="mt-[30px] max-w-[54ch] text-[clamp(17px,2.4vw,20px)] leading-[1.6] text-[#C9C6CF]">
+                For recruiters in energy and data centres. Every competitor job post carries
+                signals about the end client. Paste the advert and Radar reads those signals —
+                then names the company likely behind it, and the people likely doing the hiring.
               </p>
-              <Link to="/run">
-                <Button
-                  size="lg"
-                  className="text-lg px-10 py-6 bg-orange hover:bg-orange-dark text-white shadow-[0_4px_20px_hsl(var(--orange-glow))] hover:-translate-y-0.5 transition-all"
+              <div className="mt-10 flex flex-wrap gap-[14px]">
+                <Link
+                  to="/run"
+                  className="rounded-[2px] bg-[#FF5A1F] px-[26px] py-[15px] text-[15px] font-semibold text-[#0B0B0F] transition-transform duration-150 hover:-translate-y-0.5"
                 >
-                  Start Your Search Now
-                </Button>
+                  Paste an advert
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </header>
+
+        {/* ── Contrast strip — the positioning line ── */}
+        <section className="bg-[#FF5A1F] text-[#0B0B0F]">
+          <div className="mx-auto flex w-full max-w-[1040px] flex-wrap items-baseline gap-[14px] px-6 py-[22px]">
+            <span className="font-['IBM_Plex_Mono',monospace] text-[12px] font-semibold uppercase tracking-[0.18em]">
+              The difference
+            </span>
+            <p className="text-[clamp(16px,2.4vw,19px)] font-medium tracking-[-0.01em]">
+              Radar shows you who to connect with. Others just say an advert{" "}
+              <em className="not-italic font-semibold">might</em> point to a client.
+            </p>
+          </div>
+        </section>
+
+        {/* ── Process ── */}
+        <section id="how" className="pb-6 pt-20">
+          <div className="mx-auto w-full max-w-[1040px] px-6">
+            <motion.div {...fadeUp} className="mb-12">
+              <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.2em] text-[#FF5A1F]">
+                // the four moves
+              </span>
+              <h2 className="mt-[14px] max-w-[18ch] text-[clamp(30px,5vw,46px)] leading-[1.02] tracking-[-0.02em]">
+                From a competitor advert to a conversation
+              </h2>
+              <p className="mt-[18px] max-w-[56ch] text-[17px] leading-[1.6] text-[#55525E]">
+                Every competitor post carries signals about who's hiring. Radar reads them and
+                points you to the connections worth approaching — in seconds, on every advert
+                you feed it.
+              </p>
+            </motion.div>
+
+            <div className="grid gap-[18px]">
+              {PROCESS_STEPS.map((step) => {
+                const dark = step.tone === "dark";
+                return (
+                  <motion.article
+                    key={step.num}
+                    {...fadeUp}
+                    className={
+                      "grid grid-cols-[auto_1fr] items-start gap-[26px] rounded-md px-[30px] py-[34px] max-[720px]:grid-cols-1 max-[720px]:gap-3 " +
+                      (dark
+                        ? "bg-[#0B0B0F] text-white"
+                        : "border border-[#E4E1D9] bg-white")
+                    }
+                  >
+                    <div className="font-['IBM_Plex_Mono',monospace] text-[34px] font-semibold leading-none text-[#FF5A1F]">
+                      {step.num}
+                    </div>
+                    <div>
+                      <h3
+                        className={
+                          "mb-[10px] text-[24px] tracking-[-0.01em] " +
+                          (dark ? "text-white" : "")
+                        }
+                      >
+                        {step.title}
+                      </h3>
+                      <p
+                        className={
+                          "max-w-[52ch] text-[16px] leading-[1.6] " +
+                          (dark ? "text-[#B9B6C0]" : "text-[#55525E]")
+                        }
+                      >
+                        {step.body}
+                      </p>
+                      {step.tag && (
+                        <span className="mt-4 inline-block rounded-[2px] border border-[#FF5A1F]/[0.35] px-[10px] py-[5px] font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.06em] text-[#FF5A1F]">
+                          {step.tag}
+                        </span>
+                      )}
+                    </div>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Signals callout ── */}
+        <section className="pb-20 pt-16">
+          <div className="mx-auto w-full max-w-[1040px] px-6">
+            <motion.div
+              {...fadeUp}
+              className="rounded-md bg-[#15151C] px-9 py-11 text-white"
+            >
+              <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.18em] text-[#FF5A1F]">
+                What Radar gives you
+              </span>
+              <h2 className="my-[14px] mb-7 max-w-[20ch] text-[clamp(26px,4vw,38px)] tracking-[-0.02em]">
+                Signals in. Connections worth approaching out.
+              </h2>
+              <p className="mt-1 max-w-[54ch] text-[17px] leading-[1.6] text-[#C9C6CF]">
+                Radar reads the signals across live competitor adverts and suggests the companies
+                that hire people like this — so you spend your time on real demand, not guesswork.
+                Feed it a post, get a shortlist of connections worth approaching.
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── CV handoff ── */}
+        <section className="pb-[72px]">
+          <div className="mx-auto w-full max-w-[1040px] px-6">
+            <motion.div
+              {...fadeUp}
+              className="flex flex-wrap items-center justify-between gap-7 rounded-md border border-[#E4E1D9] border-l-4 border-l-[#FF5A1F] bg-white px-[34px] py-[38px]"
+            >
+              <div>
+                <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.18em] text-[#FF5A1F]">
+                  Next step · CrewDog CV
+                </span>
+                <h2 className="my-3 max-w-[22ch] text-[clamp(22px,3.4vw,30px)] tracking-[-0.02em]">
+                  Found the connection? Now make the approach land.
+                </h2>
+                <p className="max-w-[54ch] text-[16px] leading-[1.6] text-[#55525E]">
+                  Format your best CV to send to these connections, and start the conversation
+                  with your MPC — your most placeable candidate, ready to go.
+                </p>
+              </div>
+              <a
+                href="https://crewdogcv.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 whitespace-nowrap rounded-[2px] bg-[#FF5A1F] px-[26px] py-[15px] text-[15px] font-semibold text-[#0B0B0F] transition-transform duration-150 hover:-translate-y-0.5"
+              >
+                Open CrewDog CV →
+              </a>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Close CTA ── */}
+        <section id="start" className="bg-[#0B0B0F] py-[84px] text-center text-white">
+          <div className="mx-auto w-full max-w-[1040px] px-6">
+            <motion.div {...fadeUp}>
+              <h2 className="mx-auto max-w-[16ch] text-[clamp(32px,6vw,60px)] leading-none tracking-[-0.03em]">
+                Paste the advert. <em className="not-italic text-[#FF5A1F]">Get the lead.</em>
+              </h2>
+              <p className="mx-auto mb-9 mt-[22px] max-w-[46ch] text-[18px] text-[#C9C6CF]">
+                Start free. See the likely client behind your first competitor post in under a
+                minute.
+              </p>
+              <Link
+                to="/run"
+                className="inline-block rounded-[2px] bg-[#FF5A1F] px-[26px] py-[15px] text-[15px] font-semibold text-[#0B0B0F] transition-transform duration-150 hover:-translate-y-0.5"
+              >
+                Run your first search
               </Link>
             </motion.div>
           </div>
         </section>
-
       </main>
 
       <Footer />
