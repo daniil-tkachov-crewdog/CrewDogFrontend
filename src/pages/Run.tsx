@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, ArrowLeft, Copy } from "lucide-react";
+import { Copy } from "lucide-react";
 
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
@@ -26,7 +26,6 @@ import { logHistory } from "@/services/history";
 
 import QuotaBadge from "@/components/run/QuotaBadge";
 
-import CenteredForm from "@/components/run/CenteredForm";
 import SideForm from "@/components/run/SideForm";
 import LoadingCard from "@/components/run/LoadingCard";
 import ResultsCard from "@/components/run/ResultsCard";
@@ -434,252 +433,224 @@ export default function RunPage() {
 
   //...
   
-  const hasSearched = !!results || isLoading || !!err;
-  const showSplitLayout = hasSearched || showCustomise;
+  // Shared input setters — clearing stale state + enforcing single-input rule.
+  const onJobUrl = (v: string) => {
+    setErr(null);
+    setResults(null);
+    setJobUrl(v);
+    if (v) {
+      setJobDescription("");
+      setCvFile(null);
+      setCvFileError(null);
+    }
+  };
+  const onJobDescription = (v: string) => {
+    setErr(null);
+    setResults(null);
+    setJobDescription(v);
+    if (v) {
+      setJobUrl("");
+      setCvFile(null);
+      setCvFileError(null);
+    }
+  };
+  const onCvFile = (f: File | null) => {
+    setErr(null);
+    setResults(null);
+    setCvFile(f);
+    if (f) {
+      setJobUrl("");
+      setJobDescription("");
+    }
+  };
+
+  const showResults = !showCustomise && !isLoading && !!results && !err;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
-      {/* Premium Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-      <div className="absolute top-20 right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen flex flex-col bg-[#F4F2EE] text-[#0B0B0F] font-['Space_Grotesk',system-ui,sans-serif]">
       <Topbar />
       <QuotaBadge />
 
-      <main className="flex-1 flex flex-col relative">
-        <div className="container mx-auto px-4 flex-1 flex flex-col py-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors w-fit"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Link>
-
-          <AnimatePresence mode="wait">
-            {!showSplitLayout ? (
-              <motion.div
-                key="centered"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex-1 flex items-center justify-center"
+      <main className="flex-1 py-14">
+        <div className="mx-auto w-full max-w-[1040px] px-6">
+          {/* Run heading */}
+          <div className="mb-10">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.2em] text-[#FF5A1F]">
+                // run a search
+              </span>
+              <Link
+                to="/"
+                className="font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.06em] text-[#6F6C78] transition-colors hover:text-[#0B0B0F]"
               >
-                <div className="w-full max-w-2xl">
-                  <CenteredForm
-                    jobUrl={jobUrl}
-                    setJobUrl={(v) => {
-                      setErr(null);
-                      setResults(null);
-                      setJobUrl(v);
-                      if (v) {
-                        setJobDescription("");
-                        setCvFile(null);
-                        setCvFileError(null);
-                      }
-                    }}
-                    jobDescription={jobDescription}
-                    setJobDescription={(v) => {
-                      setErr(null);
-                      setResults(null);
-                      setJobDescription(v);
-                      if (v) {
-                        setJobUrl("");
-                        setCvFile(null);
-                        setCvFileError(null);
-                      }
-                    }}
-                    cvFile={cvFile}
-                    setCvFile={(f) => {
-                      setErr(null);
-                      setResults(null);
-                      setCvFile(f);
-                      if (f) {
-                        setJobUrl("");
-                        setJobDescription("");
-                      }
-                    }}
-                    cvFileError={cvFileError}
-                    setCvFileError={setCvFileError}
-                    includeLeads={includeLeads}
-                    setIncludeLeads={setIncludeLeads}
-                    outreachMessage={outreachMessage}
-                    setOutreachMessage={setOutreachMessage}
-                    isLoading={isLoading}
-                    canSearch={canSearch}
-                    onSubmit={handleSubmit}
-                    onCustomise={() => setShowCustomise(true)}
-                  />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="split"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full"
-              >
-                {/* Left: compact form */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                >
-                  <SideForm
-                    jobUrl={jobUrl}
-                    setJobUrl={(v) => {
-                      setErr(null);
-                      setResults(null);
-                      setJobUrl(v);
-                      if (v) {
-                        setJobDescription("");
-                        setCvFile(null);
-                        setCvFileError(null);
-                      }
-                    }}
-                    jobDescription={jobDescription}
-                    setJobDescription={(v) => {
-                      setErr(null);
-                      setResults(null);
-                      setJobDescription(v);
-                      if (v) {
-                        setJobUrl("");
-                        setCvFile(null);
-                        setCvFileError(null);
-                      }
-                    }}
-                    cvFile={cvFile}
-                    setCvFile={(f) => {
-                      setErr(null);
-                      setResults(null);
-                      setCvFile(f);
-                      if (f) {
-                        setJobUrl("");
-                        setJobDescription("");
-                      }
-                    }}
-                    cvFileError={cvFileError}
-                    setCvFileError={setCvFileError}
-                    includeLeads={includeLeads}
-                    setIncludeLeads={setIncludeLeads}
-                    outreachMessage={outreachMessage}
-                    setOutreachMessage={setOutreachMessage}
-                    isLoading={isLoading}
-                    canSearch={canSearch}
-                    onSubmit={handleSubmit}
-                    onCustomise={() => setShowCustomise(true)}
-                    feedbackOption={feedbackOption}
-                    setFeedbackOption={setFeedbackOption}
-                    customFeedback={customFeedback}
-                    setCustomFeedback={setCustomFeedback}
-                    feedbackSubmitting={feedbackSubmitting}
-                    onFeedbackSubmit={handleFeedbackSubmit}
-                  />
-                </motion.div>
+                ← Back
+              </Link>
+            </div>
+            <h1 className="max-w-[18ch] text-[clamp(30px,5vw,46px)] leading-[1.02] tracking-[-0.02em]">
+              Paste a competitor advert
+            </h1>
+            <p className="mt-4 max-w-[56ch] text-[17px] leading-[1.6] text-[#55525E]">
+              Drop in the job post — URL or full text. Radar reads the signals and
+              names the likely end client behind it, plus the contact worth
+              approaching.
+            </p>
+          </div>
 
-                {/* Right: customise / results / loader / error */}
-                <motion.div
-                  className="lg:col-span-2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                >
-                  <AnimatePresence mode="wait">
-                    {showCustomise && (
-                      <motion.div
-                        key="customise"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                      >
-                        <CustomiseCVPanel />
-                      </motion.div>
-                    )}
- 
-                    {!showCustomise && !isLoading && err && (
-                      <motion.div
-                        key="error"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="glass-card p-6 border-red-500/20 bg-red-500/5 rounded-xl"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="mt-0.5">
-                            <AlertTriangle className="h-5 w-5 text-red-500" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold">
-                              We couldn’t complete the search
-                            </h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {err.message}
-                            </p>
-                            {(err.code || err.requestId) && (
-                              <div className="mt-3 text-xs text-muted-foreground/90 flex items-center gap-3">
-                                {err.code && (
-                                  <span>
-                                    Code: <code>{err.code}</code>
-                                  </span>
-                                )}
-                                {err.requestId && (
-                                  <span className="inline-flex items-center gap-1">
-                                    Req: <code>{err.requestId}</code>
-                                    <button
-                                      type="button"
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 border rounded-md hover:bg-accent/30"
-                                      onClick={() =>
-                                        navigator.clipboard.writeText(
-                                          err.requestId!
-                                        )
-                                      }
-                                      aria-label="Copy request id"
-                                    >
-                                      <Copy className="h-3.5 w-3.5" /> Copy
-                                    </button>
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                            <div className="mt-4 flex flex-wrap gap-2">
-                              <button
-                                type="button"
-                                className="btn btn-sm border px-3 py-1.5 rounded-md"
-                                onClick={(ev) => handleSubmit(ev as any)}
-                              >
-                                Try Again
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-sm border px-3 py-1.5 rounded-md"
-                                onClick={() => {
-                                  setErr(null);
-                                  setResults(null);
-                                }}
-                              >
-                                Reset
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
+          {/* Split layout — consistent across every stage */}
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
+            {/* Left: form (always present) */}
+            <SideForm
+              jobUrl={jobUrl}
+              setJobUrl={onJobUrl}
+              jobDescription={jobDescription}
+              setJobDescription={onJobDescription}
+              cvFile={cvFile}
+              setCvFile={onCvFile}
+              cvFileError={cvFileError}
+              setCvFileError={setCvFileError}
+              includeLeads={includeLeads}
+              setIncludeLeads={setIncludeLeads}
+              outreachMessage={outreachMessage}
+              setOutreachMessage={setOutreachMessage}
+              isLoading={isLoading}
+              canSearch={canSearch}
+              onSubmit={handleSubmit}
+              onCustomise={() => setShowCustomise(true)}
+              showFeedback={showResults}
+              feedbackOption={feedbackOption}
+              setFeedbackOption={setFeedbackOption}
+              customFeedback={customFeedback}
+              setCustomFeedback={setCustomFeedback}
+              feedbackSubmitting={feedbackSubmitting}
+              onFeedbackSubmit={handleFeedbackSubmit}
+            />
 
-                    {!showCustomise && !isLoading && results && !err && (
-                      <motion.div
-                        key="results"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
+            {/* Right: state-dependent panel */}
+            <div className="min-h-[340px]">
+              <AnimatePresence mode="wait">
+                {showCustomise ? (
+                  <motion.div
+                    key="customise"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div className="mb-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowCustomise(false)}
+                        className="font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.06em] text-[#6F6C78] transition-colors hover:text-[#0B0B0F]"
                       >
-                        <ResultsCard results={results as any} />
-                      </motion.div>
+                        ← Back to results
+                      </button>
+                    </div>
+                    <CustomiseCVPanel />
+                  </motion.div>
+                ) : isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="h-full"
+                  >
+                    <LoadingCard />
+                  </motion.div>
+                ) : err ? (
+                  <motion.div
+                    key="error"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="rounded-md border border-[#E4E1D9] border-l-4 border-l-[#FF5A1F] bg-white px-7 py-7"
+                  >
+                    <span className="font-['IBM_Plex_Mono',monospace] text-[11px] uppercase tracking-[0.16em] text-[#FF5A1F]">
+                      No signal
+                    </span>
+                    <h3 className="mt-2 text-[20px] tracking-[-0.01em]">
+                      We couldn’t complete the search
+                    </h3>
+                    <p className="mt-2 max-w-[54ch] text-[15px] leading-[1.6] text-[#55525E]">
+                      {err.message}
+                    </p>
+                    {(err.code || err.requestId) && (
+                      <div className="mt-3 flex items-center gap-3 font-['IBM_Plex_Mono',monospace] text-[11px] text-[#6F6C78]">
+                        {err.code && (
+                          <span>
+                            Code: <code>{err.code}</code>
+                          </span>
+                        )}
+                        {err.requestId && (
+                          <span className="inline-flex items-center gap-1">
+                            Req: <code>{err.requestId}</code>
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 rounded-[2px] border border-[#E4E1D9] px-2 py-0.5 hover:border-[#FF5A1F]"
+                              onClick={() =>
+                                navigator.clipboard.writeText(err.requestId!)
+                              }
+                              aria-label="Copy request id"
+                            >
+                              <Copy className="h-3 w-3" /> Copy
+                            </button>
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </AnimatePresence>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={(ev) => handleSubmit(ev as any)}
+                        className="rounded-[2px] bg-[#FF5A1F] px-5 py-[11px] text-[14px] font-semibold text-[#0B0B0F] transition-transform hover:-translate-y-0.5"
+                      >
+                        Try again
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setErr(null);
+                          setResults(null);
+                        }}
+                        className="rounded-[2px] border border-[#E4E1D9] px-5 py-[11px] text-[14px] font-medium transition-colors hover:border-[#FF5A1F]"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : results ? (
+                  <motion.div
+                    key="results"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <ResultsCard results={results as any} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex h-full min-h-[340px] flex-col items-center justify-center rounded-md border border-dashed border-[#E4E1D9] px-9 py-12 text-center"
+                  >
+                    <div className="relative mb-[26px] h-[120px] w-[120px] rounded-full border border-[#FF5A1F]/30">
+                      <span className="absolute inset-6 rounded-full border border-[#FF5A1F]/[0.22]" />
+                      <span className="absolute inset-12 rounded-full border border-[#FF5A1F]/[0.16]" />
+                      <span className="absolute left-1/2 top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FF5A1F]" />
+                    </div>
+                    <h3 className="mb-2 text-[18px] tracking-[-0.01em]">
+                      Awaiting signal
+                    </h3>
+                    <p className="max-w-[36ch] text-[14px] leading-[1.55] text-[#55525E]">
+                      Paste an advert and run the search. Your likely client and
+                      contact will surface here.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </main>
 

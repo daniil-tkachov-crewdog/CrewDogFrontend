@@ -1,9 +1,5 @@
 import { useRef, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, CheckCircle2, Download, FileText, Loader2, Upload } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { sendCvCustomise, type CvCustomiseResult } from "@/services/support";
 import { generateCvPdf } from "@/lib/generateCvPdf";
 import { extractTextFromBuffer, isPdfFile } from "@/lib/extractPdfText";
@@ -66,14 +62,20 @@ export default function CustomiseCVPanel() {
     }
   }
 
+  const labelCls =
+    "block font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.08em] text-[#6F6C78] mb-[10px]";
+  const inputCls =
+    "w-full font-['Space_Grotesk',sans-serif] text-[15px] text-[#0B0B0F] bg-[#F4F2EE] border border-[#E4E1D9] rounded-[3px] px-[14px] py-[14px] transition-colors focus:outline-none focus:border-[#FF5A1F] disabled:opacity-50";
+
   return (
-    <Card className="glass-card p-8 h-full flex flex-col gap-6">
-      <div>
-        <h2 className="text-xl font-semibold">Customise Your CV</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Upload your CV and we'll tailor it to the job description.
-        </p>
-      </div>
+    <div className="rounded-md border border-[#E4E1D9] bg-white px-7 py-[30px]">
+      <span className="font-['IBM_Plex_Mono',monospace] text-[11px] uppercase tracking-[0.16em] text-[#FF5A1F]">
+        Next step · CrewDog CV
+      </span>
+      <h2 className="mt-[10px] text-[24px] tracking-[-0.02em]">Customise your CV</h2>
+      <p className="mt-2 text-[15px] leading-[1.6] text-[#55525E]">
+        Upload your CV and we'll tailor it to the advert before you reach out.
+      </p>
 
       <input
         ref={fileInputRef}
@@ -86,40 +88,28 @@ export default function CustomiseCVPanel() {
       <button
         type="button"
         onClick={() => fileInputRef.current?.click()}
-        className="flex flex-col items-center justify-center gap-3 w-full rounded-xl border-2 border-dashed border-primary/30 hover:border-primary/60 bg-primary/5 hover:bg-primary/10 transition-all duration-200 py-12 px-4 cursor-pointer group"
+        className="mt-6 flex w-full flex-col items-center justify-center gap-2 rounded-[4px] border border-dashed border-[#E4E1D9] bg-[#F4F2EE] px-4 py-10 transition-colors hover:border-[#FF5A1F]"
       >
-        {cvFileName ? (
-          <>
-            <FileText className="h-10 w-10 text-primary" />
-            <span className="text-sm font-medium text-foreground truncate max-w-full px-4">
-              {cvFileName}
-            </span>
-            <span className="text-xs text-muted-foreground">Click to change</span>
-          </>
-        ) : (
-          <>
-            <Upload className="h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors" />
-            <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-              Click to upload your CV
-            </span>
-            <span className="text-xs text-muted-foreground">PDF only</span>
-          </>
+        <span className="font-['IBM_Plex_Mono',monospace] text-[13px] tracking-[0.04em] text-[#0B0B0F]">
+          {cvFileName ?? "Click to upload your CV (PDF)"}
+        </span>
+        {!cvFileName && (
+          <span className="font-['IBM_Plex_Mono',monospace] text-[11px] text-[#6F6C78]">
+            PDF only
+          </span>
         )}
       </button>
 
       {fileError && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
-          <AlertCircle className="h-5 w-5 flex-shrink-0" />
-          <span className="text-sm font-medium">{fileError}</span>
-        </div>
+        <p className="mt-3 font-['IBM_Plex_Mono',monospace] text-[12px] text-red-600">
+          {fileError}
+        </p>
       )}
 
-      <div className="space-y-4">
+      <div className="mt-6 space-y-5">
         <div>
-          <label className="block text-sm font-medium mb-2 text-foreground/80">
-            Job Posting URL
-          </label>
-          <Input
+          <label className={labelCls}>Advert URL</label>
+          <input
             type="url"
             placeholder="https://linkedin.com/jobs/..."
             value={jobUrl}
@@ -127,78 +117,68 @@ export default function CustomiseCVPanel() {
               setJobUrl(e.target.value);
               if (e.target.value) setJobDescription("");
             }}
-            className="h-11 bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl"
+            className={inputCls}
             disabled={isCustomising}
           />
         </div>
 
-        <div className="relative py-2">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border/50" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-card px-4 py-1 text-xs font-semibold text-muted-foreground/60 tracking-wider uppercase rounded-full border border-border/50">
-              Or paste description
-            </span>
-          </div>
+        <div className="flex items-center gap-[14px]">
+          <span className="h-px flex-1 bg-[#E4E1D9]" />
+          <span className="font-['IBM_Plex_Mono',monospace] text-[11px] uppercase tracking-[0.16em] text-[#6F6C78]">
+            or paste the text
+          </span>
+          <span className="h-px flex-1 bg-[#E4E1D9]" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-foreground/80">
-            Job Description
-          </label>
-          <Textarea
-            placeholder="Paste the job description here…"
+          <label className={labelCls}>Advert text</label>
+          <textarea
+            placeholder="Paste the advert here…"
             value={jobDescription}
             onChange={(e) => {
               setJobDescription(e.target.value);
               if (e.target.value) setJobUrl("");
             }}
-            className="min-h-[120px] resize-none bg-background/60 backdrop-blur-sm border-2 border-primary/10 hover:border-primary/20 focus:border-primary/40 transition-all duration-300 rounded-xl"
+            className={inputCls + " min-h-[120px] resize-y leading-[1.55]"}
             disabled={isCustomising}
           />
         </div>
       </div>
 
       {customisedCv && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400">
-          <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
-          <span className="text-sm font-medium">Your CV has been customised and is ready to download.</span>
-        </div>
+        <p className="mt-5 font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.04em] text-[#FF5A1F]">
+          ✓ Your CV has been customised and is ready to download.
+        </p>
       )}
 
-      <div className={`mt-auto flex flex-col gap-3 ${customisedCv ? "" : "flex-1 justify-end"}`}>
+      <div className="mt-6 flex flex-col gap-3">
         {customisedCv && (
-          <Button
+          <button
             type="button"
-            className="w-full h-14 text-base font-bold relative overflow-hidden group bg-gradient-to-r from-green-500 to-emerald-500 hover:shadow-2xl hover:shadow-green-500/25 transition-all duration-300 rounded-xl"
             onClick={() => generateCvPdf(customisedCv)}
-            size="lg"
+            className="flex w-full items-center justify-center gap-2 rounded-[2px] bg-[#0B0B0F] px-[26px] py-[15px] font-['Space_Grotesk',sans-serif] text-[15px] font-semibold text-white transition-transform hover:-translate-y-0.5"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <Download className="h-5 w-5 relative z-10 mr-2" />
-            <span className="relative z-10">Download your CV</span>
-          </Button>
+            <Download className="h-4 w-4" /> Download your CV
+          </button>
         )}
 
-        <Button
+        <button
           type="button"
-          className="w-full h-14 text-base font-bold relative overflow-hidden group bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:shadow-primary/25 transition-all duration-300 rounded-xl"
           onClick={handleCustomise}
           disabled={!canCustomise || isCustomising}
-          size="lg"
+          className="flex w-full items-center justify-center gap-2 rounded-[2px] bg-[#FF5A1F] px-[26px] py-[15px] font-['Space_Grotesk',sans-serif] text-[15px] font-semibold text-[#0B0B0F] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           {isCustomising ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin relative z-10 mr-2" />
-              <span className="relative z-10">Customising…</span>
+              <Loader2 className="h-4 w-4 animate-spin" /> Customising…
             </>
+          ) : customisedCv ? (
+            "Re-customise"
           ) : (
-            <span className="relative z-10">{customisedCv ? "Re-customise" : "Customise"}</span>
+            "Customise"
           )}
-        </Button>
+        </button>
       </div>
-    </Card>
+    </div>
   );
 }
