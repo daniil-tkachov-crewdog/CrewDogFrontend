@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { CheckCircle2, Eye, EyeOff, Lock, Shield } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+
+const MONO_LABEL =
+  "block font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.08em] text-[#6F6C78] mb-[10px]";
+const INPUT =
+  "w-full font-['Space_Grotesk',sans-serif] text-[15px] text-[#0B0B0F] bg-[#F4F2EE] border border-[#E4E1D9] rounded-[3px] px-[14px] py-[12px] transition-colors focus:outline-none focus:border-[#FF5A1F]";
 
 export default function SecuritySection() {
   const [show, setShow] = useState(false);
@@ -63,52 +64,53 @@ export default function SecuritySection() {
 
   return (
     <section>
-      <div className="flex items-center gap-2 mb-6">
-        <Shield className="h-5 w-5 text-primary" />
-        <h2 className="text-2xl font-bold">Security</h2>
-      </div>
+      <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.2em] text-[#FF5A1F]">
+        // security
+      </span>
 
-      <Card className="p-6 glass-card">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Lock className="h-5 w-5" />
-          Change Password
-        </h3>
+      <div className="mt-5 rounded-md border border-[#E4E1D9] bg-white p-6 sm:p-7">
+        <h3 className="mb-5 text-[18px] tracking-[-0.01em]">Change password</h3>
         <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+          <div>
+            <label htmlFor="currentPassword" className={MONO_LABEL}>
+              Current password
+            </label>
             <div className="relative">
-              <Input
+              <input
                 id="currentPassword"
                 type={show ? "text" : "password"}
-                className="pr-10"
+                className={INPUT + " pr-10"}
               />
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6F6C78] hover:text-[#0B0B0F]"
               >
-                {show ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
-            <Input id="newPassword" type="password" />
+          <div>
+            <label htmlFor="newPassword" className={MONO_LABEL}>
+              New password
+            </label>
+            <input id="newPassword" type="password" className={INPUT} />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
-            <Input id="confirmPassword" type="password" />
+          <div>
+            <label htmlFor="confirmPassword" className={MONO_LABEL}>
+              Confirm new password
+            </label>
+            <input id="confirmPassword" type="password" className={INPUT} />
           </div>
-          <Button type="submit" className="w-full" disabled={busy}>
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-            {busy ? "Updating…" : "Update Password"}
-          </Button>
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full rounded-[2px] bg-[#FF5A1F] px-[22px] py-[13px] font-['Space_Grotesk',sans-serif] text-[15px] font-semibold text-[#0B0B0F] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {busy ? "Updating…" : "Update password"}
+          </button>
         </form>
-      </Card>
+      </div>
     </section>
   );
 }

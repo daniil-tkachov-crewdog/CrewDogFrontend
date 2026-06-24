@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
-  Briefcase,
-  Calendar,
-  History as HistoryIcon,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   Link as LinkIcon,
-  Users,
   Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -24,11 +16,17 @@ import {
 } from "@/services/history";
 import type { ContactStatus } from "@/types/account";
 
+const MONO =
+  "font-['IBM_Plex_Mono',monospace] tracking-[0.06em]";
+const PANEL = "rounded-[4px] border border-[#E4E1D9] bg-[#F4F2EE] p-4";
+const SUBLABEL =
+  "font-['IBM_Plex_Mono',monospace] text-[11px] uppercase tracking-[0.1em] text-[#6F6C78] mb-2";
+
 export default function SearchHistory() {
   const [expanded, setExpanded] = useState<string[]>([]);
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [page, setPage] = useState(1);
-  const [cursorStack, setCursorStack] = useState<(string | null)[]>([null]); // cursor used to fetch page index
+  const [cursorStack, setCursorStack] = useState<(string | null)[]>([null]);
   const [nextCursors, setNextCursors] = useState<(string | null)[]>([]);
   const [loading, setLoading] = useState(false);
   const [importantOnly, setImportantOnly] = useState(false);
@@ -37,9 +35,7 @@ export default function SearchHistory() {
   const [showFullJd, setShowFullJd] = useState<Record<string, boolean>>({});
 
   const toggle = (id: string) =>
-    setExpanded((p) =>
-      p.includes(id) ? p.filter((x) => x !== id) : [...p, id]
-    );
+    setExpanded((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
 
   const loadPage = async (target: number) => {
     if (loading) return;
@@ -64,12 +60,10 @@ export default function SearchHistory() {
 
   useEffect(() => {
     loadPage(1);
-    // refresh when tab becomes visible
     const vis = () => {
       if (document.visibilityState === "visible") loadPage(1);
     };
     document.addEventListener("visibilitychange", vis);
-    // listen for quota/search usage broadcast
     let bc: BroadcastChannel | null = null;
     try {
       bc = new BroadcastChannel("gc-activity");
@@ -108,13 +102,6 @@ export default function SearchHistory() {
     }
   };
 
-  const statusColor = (s: ContactStatus) => {
-    if (s === "requested") return "text-orange-600 bg-orange-50 border-orange-200";
-    if (s === "accepted") return "text-green-600 bg-green-50 border-green-200";
-    if (s === "messaged") return "text-purple-600 bg-purple-50 border-purple-200";
-    return "text-gray-600 bg-gray-50 border-gray-200";
-  };
-
   const setStatus = async (
     item: HistoryItem,
     kind: "hr" | "lead",
@@ -148,348 +135,297 @@ export default function SearchHistory() {
     return `${base.slice(0, 220)}...`;
   };
 
+  const pagerBtn =
+    "inline-flex items-center gap-1 rounded-[2px] border border-[#E4E1D9] px-3 py-[7px] " +
+    MONO +
+    " text-[11px] uppercase text-[#6F6C78] transition-colors hover:border-[#FF5A1F] disabled:cursor-not-allowed disabled:opacity-40";
+
+  const statusSelect =
+    "rounded-[2px] border border-[#E4E1D9] bg-white px-2 py-1 " +
+    MONO +
+    " text-[11px] text-[#0B0B0F] focus:outline-none focus:border-[#FF5A1F]";
+
+  function ContactList({
+    item,
+    kind,
+    rows,
+    emptyLabel,
+  }: {
+    item: HistoryItem;
+    kind: "hr" | "lead";
+    rows: { name?: string; title?: string; profileUrl?: string }[] | undefined;
+    emptyLabel: string;
+  }) {
+    if (!rows?.length) return <p className="text-[14px] text-[#55525E]">{emptyLabel}</p>;
+    return (
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {rows.map((c, i) => {
+          const key = c.profileUrl || c.name || `${kind}-${i}`;
+          const st = (item.contactStatuses?.[`${kind}:${key}`] ||
+            "none") as ContactStatus;
+          return (
+            <div
+              key={`${item.id}-${kind}-${i}`}
+              className="flex items-start justify-between gap-3 rounded-[4px] border border-[#E4E1D9] bg-white p-3"
+            >
+              <div className="min-w-0">
+                {c?.profileUrl ? (
+                  <a
+                    href={c.profileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block truncate text-[14px] font-medium text-[#FF5A1F] hover:underline"
+                  >
+                    {c?.name || c.profileUrl}
+                  </a>
+                ) : (
+                  <p className="truncate text-[14px] font-medium">
+                    {c?.name || (kind === "hr" ? "Unnamed contact" : "Unnamed lead")}
+                  </p>
+                )}
+                <p className="truncate text-[12px] text-[#6F6C78]">
+                  {c?.title || (kind === "hr" ? item.companyName || "—" : "linkedin.com")}
+                </p>
+              </div>
+              <select
+                value={st}
+                disabled={savingStatus[item.id]}
+                onChange={(e) =>
+                  void setStatus(item, kind, key, e.target.value as ContactStatus)
+                }
+                className={statusSelect}
+              >
+                <option value="none">None</option>
+                <option value="requested">Requested</option>
+                <option value="accepted">Accepted</option>
+                <option value="messaged">Messaged</option>
+              </select>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <section>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.2em] text-[#FF5A1F]">
+          // search history
+        </span>
         <div className="flex items-center gap-2">
-          <HistoryIcon className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-bold">Search History</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={importantOnly ? "default" : "outline"}
-            size="sm"
+          <button
             onClick={() => setImportantOnly((v) => !v)}
+            className={
+              "inline-flex items-center gap-1 rounded-[2px] border px-3 py-[7px] " +
+              MONO +
+              " text-[11px] uppercase transition-colors " +
+              (importantOnly
+                ? "border-[#FF5A1F] bg-[#FF5A1F] text-[#0B0B0F]"
+                : "border-[#E4E1D9] text-[#6F6C78] hover:border-[#FF5A1F]")
+            }
           >
-            <Star className="h-4 w-4 mr-1" />
+            <Star className="h-3.5 w-3.5" />
             {importantOnly ? "Important only" : "All results"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+          </button>
+          <button
             onClick={() => canPrev && loadPage(page - 1)}
             disabled={!canPrev || loading}
+            className={pagerBtn}
           >
-            <ChevronLeft className="h-4 w-4" /> Prev
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+            <ChevronLeft className="h-3.5 w-3.5" /> Prev
+          </button>
+          <button
             onClick={() => canNext && loadPage(page + 1)}
             disabled={!canNext || loading}
+            className={pagerBtn}
           >
-            Next <ChevronRight className="h-4 w-4" />
-          </Button>
+            Next <ChevronRight className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
 
       {visibleItems.length === 0 ? (
-        <Card className="p-12 glass-card text-center">
-          <HistoryIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-semibold mb-2">No searches yet</h3>
-          <p className="text-muted-foreground mb-6">
+        <div className="rounded-md border border-dashed border-[#E4E1D9] bg-white px-9 py-12 text-center">
+          <h3 className="mb-2 text-[18px] tracking-[-0.01em]">No searches yet</h3>
+          <p className="mb-6 text-[14px] text-[#55525E]">
             {importantOnly
               ? "No starred searches yet."
-              : "Start your first job search to see it here"}
+              : "Start your first search to see it here."}
           </p>
-          <Link to="/run">
-            <Button size="lg">
-              <Briefcase className="mr-2 h-4 w-4" />
-              Run Your First Search
-            </Button>
+          <Link
+            to="/run"
+            className="inline-block rounded-[2px] bg-[#FF5A1F] px-[22px] py-[12px] text-[14px] font-semibold text-[#0B0B0F] transition-transform hover:-translate-y-0.5"
+          >
+            Run your first search
           </Link>
-        </Card>
+        </div>
       ) : (
         <div className="space-y-3">
-          {visibleItems.map((it, idx) => {
+          {visibleItems.map((it) => {
             const created = it.createdAt
               ? new Date(it.createdAt).toLocaleString()
               : "";
-            const status = "Completed";
+            const isOpen = expanded.includes(it.id);
             return (
-              <motion.div
+              <div
                 key={it.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                className="overflow-hidden rounded-md border border-[#E4E1D9] bg-white"
               >
-                <Card className="glass-card overflow-hidden">
-                  <button
-                    onClick={() => toggle(it.id)}
-                    className="w-full p-6 flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                        <Briefcase className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="text-left flex-1">
-                        <p className="font-semibold text-lg mb-1">
-                          {it.jobTitle || "Untitled role"}
-                          {it.companyName ? ` — ${it.companyName}` : ""}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {created}
-                          </span>
-                        </div>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="bg-green-500/10 text-green-500 border-green-500/20"
-                      >
-                        <button
-                          type="button"
-                          disabled={savingImportant[it.id]}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            void toggleImportant(it);
-                          }}
-                          className="mr-2"
-                          aria-label="Mark important"
-                        >
-                          <Star
-                            className={`h-4 w-4 ${
-                              it.isImportant
-                                ? "fill-amber-400 text-amber-500"
-                                : "text-muted-foreground"
-                            }`}
-                          />
-                        </button>
-                        {status}
-                      </Badge>
+                <button
+                  onClick={() => toggle(it.id)}
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                >
+                  <div className="flex flex-1 items-center gap-4">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[4px] bg-[#FF5A1F] font-['IBM_Plex_Mono',monospace] text-[16px] font-bold text-[#0B0B0F]">
+                      {(it.companyName?.[0] || it.jobTitle?.[0] || "?").toUpperCase()}
                     </div>
-                    <motion.div
-                      animate={{ rotate: expanded.includes(it.id) ? 180 : 0 }}
-                      transition={{ duration: 0.25 }}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[16px] font-semibold">
+                        {it.jobTitle || "Untitled role"}
+                        {it.companyName ? ` — ${it.companyName}` : ""}
+                      </p>
+                      <span className={MONO + " text-[11px] text-[#6F6C78]"}>
+                        {created}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Mark important"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!savingImportant[it.id]) void toggleImportant(it);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (!savingImportant[it.id]) void toggleImportant(it);
+                        }
+                      }}
                     >
-                      <svg
-                        className="h-5 w-5 text-muted-foreground"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M6 9l6 6 6-6"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        />
+                      <Star
+                        className={`h-4 w-4 ${
+                          it.isImportant
+                            ? "fill-[#FF5A1F] text-[#FF5A1F]"
+                            : "text-[#6F6C78]"
+                        }`}
+                      />
+                    </span>
+                    <span className={MONO + " text-[11px] uppercase text-[#FF5A1F]"}>
+                      Completed
+                    </span>
+                    <motion.span
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="text-[#6F6C78]"
+                    >
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" />
                       </svg>
-                    </motion.div>
-                  </button>
+                    </motion.span>
+                  </div>
+                </button>
 
-                  <AnimatePresence>
-                    {expanded.includes(it.id) && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="px-6 pb-6"
-                      >
-                        <Separator className="mb-4" />
-                        <div className="p-4 rounded-lg bg-muted/50">
-                          <p className="text-sm text-muted-foreground mb-1">
-                            Job description (excerpt)
-                          </p>
-                          <p className="text-sm whitespace-pre-wrap">
-                            {jdPreview(it)}
-                          </p>
-                          {((it.jdRaw || it.jdExcerpt || "").trim().length > 220 ||
-                            Boolean(it.sourceUrl)) && (
-                            <button
-                              className="mt-2 text-xs text-primary hover:underline"
-                              onClick={() =>
-                                setShowFullJd((p) => ({
-                                  ...p,
-                                  [it.id]: !p[it.id],
-                                }))
-                              }
-                              type="button"
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="px-6 pb-6"
+                    >
+                      <div className="mb-4 h-px bg-[#E4E1D9]" />
+
+                      <div className={PANEL}>
+                        <p className={SUBLABEL}>Advert (excerpt)</p>
+                        <p className="whitespace-pre-wrap text-[14px] text-[#0B0B0F]">
+                          {jdPreview(it)}
+                        </p>
+                        {((it.jdRaw || it.jdExcerpt || "").trim().length > 220 ||
+                          Boolean(it.sourceUrl)) && (
+                          <button
+                            className="mt-2 font-['IBM_Plex_Mono',monospace] text-[11px] text-[#FF5A1F] hover:underline"
+                            onClick={() =>
+                              setShowFullJd((p) => ({ ...p, [it.id]: !p[it.id] }))
+                            }
+                            type="button"
+                          >
+                            {showFullJd[it.id] ? "Show less" : "Show more"}
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="mt-3 grid gap-3">
+                        <div className={PANEL}>
+                          <p className={SUBLABEL}>Company website</p>
+                          {it.companyUrl ? (
+                            <a
+                              href={it.companyUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 break-all text-[14px] text-[#FF5A1F] hover:underline"
                             >
-                              {showFullJd[it.id] ? "Show less" : "Show more"}
-                            </button>
+                              <LinkIcon className="h-3.5 w-3.5" />
+                              {it.companyUrl}
+                            </a>
+                          ) : (
+                            <p className="text-[14px]">—</p>
                           )}
                         </div>
-                        <div className="mt-4 grid gap-3">
-                          <div className="p-4 rounded-lg bg-muted/50">
-                            <p className="text-sm text-muted-foreground mb-1">
-                              Company website
-                            </p>
-                            {it.companyUrl ? (
-                              <a
-                                href={it.companyUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-sm text-primary hover:underline break-all"
-                              >
-                                <LinkIcon className="h-3.5 w-3.5" />
-                                {it.companyUrl}
-                              </a>
-                            ) : (
-                              <p className="text-sm">—</p>
-                            )}
-                          </div>
 
-                          <div className="p-4 rounded-lg bg-muted/50">
-                            <p className="text-sm text-muted-foreground mb-1">
-                              Source job link
-                            </p>
-                            {it.sourceUrl ? (
-                              <a
-                                href={it.sourceUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-sm text-primary hover:underline break-all"
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" />
-                                {it.sourceUrl}
-                              </a>
-                            ) : (
-                              <p className="text-sm">—</p>
-                            )}
-                          </div>
-
-                          <div className="p-4 rounded-lg bg-muted/50">
-                            <p className="text-sm text-muted-foreground mb-1">
-                              Why this company
-                            </p>
-                            <p className="text-sm whitespace-pre-wrap">
-                              {it.whyCompany || "—"}
-                            </p>
-                          </div>
-
-                          <div className="p-4 rounded-lg bg-muted/50">
-                            <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                              <Users className="h-4 w-4" />
-                              Key contacts
-                            </p>
-                            {it.hrContacts?.length ? (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {it.hrContacts.map((c, i) => {
-                                  const key = c.profileUrl || c.name || `hr-${i}`;
-                                  const st = (it.contactStatuses?.[`hr:${key}`] ||
-                                    "none") as ContactStatus;
-                                  return (
-                                    <div
-                                      key={`${it.id}-contact-${i}`}
-                                      className="rounded-xl border bg-background p-3 flex items-start justify-between gap-3"
-                                    >
-                                      <div className="min-w-0">
-                                        {c?.profileUrl ? (
-                                          <a
-                                            href={c.profileUrl}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-sm font-medium text-primary hover:underline truncate block"
-                                          >
-                                            {c?.name || c.profileUrl}
-                                          </a>
-                                        ) : (
-                                          <p className="text-sm font-medium truncate">
-                                            {c?.name || "Unnamed contact"}
-                                          </p>
-                                        )}
-                                        <p className="text-xs text-muted-foreground truncate">
-                                          {c?.title || it.companyName || "—"}
-                                        </p>
-                                      </div>
-                                      <select
-                                        value={st}
-                                        disabled={savingStatus[it.id]}
-                                        onChange={(e) =>
-                                          void setStatus(
-                                            it,
-                                            "hr",
-                                            key,
-                                            e.target.value as ContactStatus
-                                          )
-                                        }
-                                        className={`text-xs rounded-md border px-2 py-1 ${statusColor(
-                                          st
-                                        )}`}
-                                      >
-                                        <option value="none">None</option>
-                                        <option value="requested">Requested</option>
-                                        <option value="accepted">Accepted</option>
-                                        <option value="messaged">Messaged</option>
-                                      </select>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <p className="text-sm">No contacts found.</p>
-                            )}
-                          </div>
-                          <div className="p-4 rounded-lg bg-muted/50">
-                            <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                              <Users className="h-4 w-4" />
-                              Potential leads
-                            </p>
-                            {it.potentialLeads?.length ? (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {it.potentialLeads.map((c, i) => {
-                                  const key = c.profileUrl || c.name || `lead-${i}`;
-                                  const st = (it.contactStatuses?.[`lead:${key}`] ||
-                                    "none") as ContactStatus;
-                                  return (
-                                    <div
-                                      key={`${it.id}-lead-${i}`}
-                                      className="rounded-xl border bg-background p-3 flex items-start justify-between gap-3"
-                                    >
-                                      <div className="min-w-0">
-                                        {c?.profileUrl ? (
-                                          <a
-                                            href={c.profileUrl}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-sm font-medium text-primary hover:underline truncate block"
-                                          >
-                                            {c?.name || c.profileUrl}
-                                          </a>
-                                        ) : (
-                                          <p className="text-sm font-medium truncate">
-                                            {c?.name || "Unnamed lead"}
-                                          </p>
-                                        )}
-                                        <p className="text-xs text-muted-foreground truncate">
-                                          {c?.title || "linkedin.com"}
-                                        </p>
-                                      </div>
-                                      <select
-                                        value={st}
-                                        disabled={savingStatus[it.id]}
-                                        onChange={(e) =>
-                                          void setStatus(
-                                            it,
-                                            "lead",
-                                            key,
-                                            e.target.value as ContactStatus
-                                          )
-                                        }
-                                        className={`text-xs rounded-md border px-2 py-1 ${statusColor(
-                                          st
-                                        )}`}
-                                      >
-                                        <option value="none">None</option>
-                                        <option value="requested">Requested</option>
-                                        <option value="accepted">Accepted</option>
-                                        <option value="messaged">Messaged</option>
-                                      </select>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <p className="text-sm">No potential leads found.</p>
-                            )}
-                          </div>
+                        <div className={PANEL}>
+                          <p className={SUBLABEL}>Source job link</p>
+                          {it.sourceUrl ? (
+                            <a
+                              href={it.sourceUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 break-all text-[14px] text-[#FF5A1F] hover:underline"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              {it.sourceUrl}
+                            </a>
+                          ) : (
+                            <p className="text-[14px]">—</p>
+                          )}
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Card>
-              </motion.div>
+
+                        <div className={PANEL}>
+                          <p className={SUBLABEL}>Why this company</p>
+                          <p className="whitespace-pre-wrap text-[14px]">
+                            {it.whyCompany || "—"}
+                          </p>
+                        </div>
+
+                        <div className={PANEL}>
+                          <p className={SUBLABEL}>Key contacts</p>
+                          <ContactList
+                            item={it}
+                            kind="hr"
+                            rows={it.hrContacts}
+                            emptyLabel="No contacts found."
+                          />
+                        </div>
+
+                        <div className={PANEL}>
+                          <p className={SUBLABEL}>Potential leads</p>
+                          <ContactList
+                            item={it}
+                            kind="lead"
+                            rows={it.potentialLeads}
+                            emptyLabel="No potential leads found."
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             );
           })}
         </div>
