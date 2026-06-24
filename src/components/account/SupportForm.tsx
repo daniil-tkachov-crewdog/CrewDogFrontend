@@ -1,19 +1,11 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { HelpCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { sendSupportMessage } from "@/services/support";
+
+const MONO_LABEL =
+  "block font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.08em] text-[#6F6C78] mb-[10px]";
+const INPUT =
+  "w-full font-['Space_Grotesk',sans-serif] text-[15px] text-[#0B0B0F] bg-[#F4F2EE] border border-[#E4E1D9] rounded-[3px] px-[14px] py-[12px] transition-colors focus:outline-none focus:border-[#FF5A1F] disabled:opacity-50";
 
 export default function SupportForm({ userEmail }: { userEmail: string }) {
   const [topic, setTopic] = useState<string>("");
@@ -21,14 +13,13 @@ export default function SupportForm({ userEmail }: { userEmail: string }) {
 
   return (
     <section>
-      <div className="flex items-center gap-2 mb-6">
-        <HelpCircle className="h-5 w-5 text-primary" />
-        <h2 className="text-2xl font-bold">Contact Support</h2>
-      </div>
+      <span className="font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.2em] text-[#FF5A1F]">
+        // contact support
+      </span>
 
-      <Card className="p-8 glass-card">
+      <div className="mt-5 rounded-md border border-[#E4E1D9] bg-white p-6 sm:p-8">
         <form
-          className="space-y-6"
+          className="space-y-5"
           onSubmit={async (e) => {
             e.preventDefault();
             if (loading) return;
@@ -65,61 +56,66 @@ export default function SupportForm({ userEmail }: { userEmail: string }) {
             }
           }}
         >
-          <div className="space-y-2">
-            <Label htmlFor="supportEmail" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
+          <div>
+            <label htmlFor="supportEmail" className={MONO_LABEL}>
               Email
-            </Label>
-            <Input
+            </label>
+            <input
               id="supportEmail"
               type="email"
               defaultValue={userEmail}
-              className="h-12"
+              className={INPUT}
               disabled={loading}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="subject" className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4" />
+          <div>
+            <label htmlFor="supportTopic" className={MONO_LABEL}>
               Subject
-            </Label>
-            <Select value={topic} onValueChange={setTopic} disabled={loading}>
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Select a topic" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="technical">Technical Issue</SelectItem>
-                <SelectItem value="billing">Billing Question</SelectItem>
-                <SelectItem value="feature">Feature Request</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
+            </label>
+            <select
+              id="supportTopic"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              disabled={loading}
+              className={INPUT + " cursor-pointer"}
+            >
+              <option value="">Select a topic</option>
+              <option value="technical">Technical Issue</option>
+              <option value="billing">Billing Question</option>
+              <option value="feature">Feature Request</option>
+              <option value="other">Other</option>
+            </select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="supportMessage">Message</Label>
-            <Textarea
+          <div>
+            <label htmlFor="supportMessage" className={MONO_LABEL}>
+              Message
+            </label>
+            <textarea
               id="supportMessage"
               placeholder="Describe your issue or question..."
-              className="min-h-[200px] resize-none"
+              className={INPUT + " min-h-[200px] resize-y leading-[1.55]"}
               disabled={loading}
             />
           </div>
 
-          <Button type="submit" size="lg" className="w-full" disabled={loading}>
-            <Mail className="mr-2 h-4 w-4" />
-            {loading ? "Sending..." : "Send Message"}
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-[2px] bg-[#FF5A1F] px-[22px] py-[13px] font-['Space_Grotesk',sans-serif] text-[15px] font-semibold text-[#0B0B0F] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {loading ? "Sending..." : "Send message"}
+          </button>
         </form>
 
-        <div className="mt-8 text-center">
-          <h3 className="font-semibold mb-2">Need immediate help?</h3>
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-7 border-t border-[#E4E1D9] pt-6 text-center">
+          <h3 className="mb-1 text-[15px] font-semibold">Need immediate help?</h3>
+          <p className="text-[14px] text-[#55525E]">
             Check our FAQs or visit the support center.
           </p>
         </div>
-      </Card>
+      </div>
     </section>
   );
 }
