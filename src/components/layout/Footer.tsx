@@ -1,18 +1,40 @@
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Sparkles,
-  Twitter,
-  Linkedin,
-  Mail,
-  ArrowUpRight,
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Twitter, Linkedin, Mail } from "lucide-react";
 import { gaEvent } from "@/analytics/gtm";
-import crewDogLogo from "@/assets/CrewDog-App-Logo.png";
+
+const sections = [
+  {
+    title: "Product",
+    links: [
+      { to: "/run", label: "Run Search" },
+      { to: "/pricing", label: "Pricing" },
+      { href: "https://crewdogcv.ai/", label: "CrewdogCV" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { to: "/support", label: "Contact" },
+      { to: "/faq", label: "FAQ" },
+      { to: "/account", label: "My Account" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { to: "/privacy", label: "Privacy Policy" },
+      { to: "/terms", label: "Terms of Use" },
+    ],
+  },
+] as const;
+
+const socials = [
+  { icon: Twitter, label: "Twitter", href: "#" },
+  { icon: Linkedin, label: "LinkedIn", href: "#" },
+  { icon: Mail, label: "Email", href: "mailto:hello@crewdog.ai" },
+];
 
 export const Footer = () => {
-  const navigate = useNavigate();
-
   function track(event: string, params?: Record<string, any>) {
     (window as any).dataLayer = (window as any).dataLayer || [];
     (window as any).dataLayer.push({ event, ...(params || {}) });
@@ -37,221 +59,97 @@ export const Footer = () => {
     location.reload();
   }
 
+  const linkCls =
+    "text-[14px] text-[#9A97A3] transition-colors hover:text-white";
+
   return (
-    <footer className="relative border-t border-border/40 mt-20 overflow-hidden">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 animate-gradient" />
-
-      {/* Floating orbs */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000" />
-
-      <div className="container mx-auto px-4 py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-12">
-          {/* Brand Section */}
-          <motion.div
-            className="md:col-span-4 space-y-6"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex items-center group">
-              <motion.img
-                src={crewDogLogo}
-                alt="CrewDog Logo"
-                className="h-36 w-36 object-contain"
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              />
-              <motion.div
-                className="relative -ml-8"
-                whileHover={{ x: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <span className="text-2xl font-bold bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
-                  CrewDog
-                </span>
-                <Sparkles className="absolute -top-1 -right-6 h-4 w-4 text-primary animate-pulse" />
-              </motion.div>
-            </div>
-
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Find jobs before they are publicly advertised.
+    <footer className="border-t border-white/10 bg-[#0B0B0F] font-['Space_Grotesk',system-ui,sans-serif] text-white">
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-14">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+          {/* Brand */}
+          <div className="md:col-span-5">
+            <span className="flex items-baseline gap-[2px] text-[24px] font-bold tracking-[-0.02em]">
+              Crew<b className="font-bold text-[#FF5A1F]">Dog</b>
+              <span className="ml-2 font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.18em] text-[#6F6C78]">
+                Radar
+              </span>
+            </span>
+            <p className="mt-4 max-w-[34ch] text-[14px] leading-[1.6] text-[#9A97A3]">
+              Read the advert. Find the lead. Competitor advert intelligence for
+              energy &amp; data-centre recruiters.
             </p>
 
-            {/* Social Links */}
-            <div className="flex gap-3">
-              {[
-                {
-                  icon: Twitter,
-                  label: "Twitter",
-                  gradient: "from-blue-400 to-blue-600",
-                  href: "#",
-                },
-                {
-                  icon: Linkedin,
-                  label: "LinkedIn",
-                  gradient: "from-blue-500 to-blue-700",
-                  href: "#",
-                },
-                {
-                  icon: Mail,
-                  label: "Email",
-                  gradient: "from-purple-500 to-pink-600",
-                  href: "mailto:hello@crewdog.ai",
-                },
-              ].map((social, index) => (
-                <motion.a
+            {/* Socials */}
+            <div className="mt-6 flex gap-3">
+              {socials.map((social) => (
+                <a
                   key={social.label}
                   href={social.href}
                   onClick={() => handleSocialClick(social.label, social.href)}
-                  className="relative p-3 rounded-xl glass-card group overflow-hidden"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  aria-label={social.label}
+                  className="flex h-10 w-10 items-center justify-center rounded-[3px] border border-white/10 text-[#9A97A3] transition-colors hover:border-[#FF5A1F] hover:text-white"
                 >
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${social.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                  />
-                  <social.icon className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors relative z-10" />
-                </motion.a>
+                  <social.icon className="h-[18px] w-[18px]" />
+                </a>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Links Sections */}
-          {[
-            {
-              title: "Product",
-              links: [
-                { to: "/run", label: "Run Search" },
-                { to: "/pricing", label: "Pricing" },
-                { href: "https://crewdogcv.ai/", label: "CrewdogCV" },
-                // { to: "/faq", label: "FAQ" },
-              ],
-            },
-            {
-              title: "Support",
-              links: [
-                { to: "/support", label: "Contact" },
-                { to: "/faq", label: "FAQ" },
-                { to: "/account", label: "My Account" },
-              ],
-            },
-            {
-              title: "Legal",
-              links: [
-                { to: "/privacy", label: "Privacy Policy" },
-                { to: "/terms", label: "Terms of Use" },
-              ],
-            },
-          ].map((section, sectionIndex) => (
-            <motion.div
-              key={section.title}
-              className="md:col-span-2"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: sectionIndex * 0.1 }}
-            >
-              <h4 className="font-semibold mb-6 text-lg bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          {/* Link columns */}
+          {sections.map((section) => (
+            <div key={section.title} className="md:col-span-2">
+              <h4 className="mb-4 font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.12em] text-[#FF5A1F]">
                 {section.title}
               </h4>
               <ul className="space-y-3">
-                {section.links.map((link, linkIndex) => (
-                  <motion.li
-                    key={link.to || link.href}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.3,
-                      delay: sectionIndex * 0.1 + linkIndex * 0.05,
-                    }}
-                  >
-{link.to ? (
+                {section.links.map((link) => (
+                  <li key={"to" in link ? link.to : link.href}>
+                    {"to" in link ? (
                       <Link
                         to={link.to}
                         onClick={() => handleFooterNavClick(link.label, link.to)}
-                        className="group text-sm text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center gap-2"
+                        className={linkCls}
                       >
-                        <span className="relative">
-                          {link.label}
-                          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
-                        </span>
-                        <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-y-1 group-hover:translate-y-0" />
+                        {link.label}
                       </Link>
                     ) : (
                       <a
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() =>
-                          handleFooterNavClick(link.label, link.href || "")
-                        }
-                        className="group text-sm text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center gap-2"
+                        onClick={() => handleFooterNavClick(link.label, link.href)}
+                        className={linkCls}
                       >
-                        <span className="relative">
-                          {link.label}
-                          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
-                        </span>
-                        <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-y-1 group-hover:translate-y-0" />
+                        {link.label}
                       </a>
                     )}
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           ))}
-
-          {/* Newsletter Section */}
-
         </div>
 
-        {/* Bottom Bar */}
-        <motion.div
-          className="pt-8 border-t border-border/40"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              © 2025{" "}
-              <span className="font-semibold text-foreground">CrewDog</span>.
-              All rights reserved.
-            </p>
-            <div className="flex items-center gap-6 text-xs text-muted-foreground">
-              <motion.button
-                type="button"
-                onClick={reopenConsent}
-                whileHover={{ scale: 1.05 }}
-                className="underline underline-offset-2"
-                title="Manage cookies"
-              >
-                Manage cookies
-              </motion.button>
-              <motion.span
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                All systems operational
-              </motion.span>
-              <motion.span whileHover={{ scale: 1.05 }}>
-                Made with ❤️ for Contractors
-              </motion.span>
-            </div>
+        {/* Bottom bar */}
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 md:flex-row md:items-center">
+          <p className="font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.04em] text-[#6F6C78]">
+            © 2025 CrewDog · Built in Aberdeen
+          </p>
+          <div className="flex items-center gap-6 font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.04em] text-[#6F6C78]">
+            <button
+              type="button"
+              onClick={reopenConsent}
+              className="underline underline-offset-2 transition-colors hover:text-white"
+              title="Manage cookies"
+            >
+              Manage cookies
+            </button>
+            <span className="flex items-center gap-2">
+              <span className="h-[6px] w-[6px] rounded-full bg-[#FF5A1F]" />
+              All systems operational
+            </span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );
