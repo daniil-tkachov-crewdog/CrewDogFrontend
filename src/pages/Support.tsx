@@ -1,32 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion, useScroll, useTransform } from "framer-motion";
-import {
-  ArrowLeft,
-  Send,
-  HeadphonesIcon,
-  Clock,
-  CheckCircle2,
-  Sparkles,
-  Zap,
-  Shield,
-} from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { sendSupportMessage } from "@/services/support";
-import faqHeroBg from "@/assets/faq-hero-bg.png";
 
 const faqs = [
   {
@@ -51,14 +28,15 @@ const faqs = [
   },
 ];
 
-export default function Support() {
-  const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
-  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+const MONO_LABEL =
+  "block font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.08em] text-[#6F6C78] mb-[10px]";
+const INPUT =
+  "w-full font-['Space_Grotesk',sans-serif] text-[15px] text-[#0B0B0F] bg-[#F4F2EE] border border-[#E4E1D9] rounded-[3px] px-[14px] py-[12px] transition-colors focus:outline-none focus:border-[#FF5A1F] disabled:opacity-50";
 
+export default function Support() {
   // form state
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(""); // if you have userEmail, set it as initial state here
+  const [email, setEmail] = useState("");
   const [topic, setTopic] = useState<string>("");
   const [message, setMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
@@ -76,7 +54,6 @@ export default function Support() {
     // bot check
     if (honeypot) return;
 
-    // basic validation to mirror SupportForm behavior
     const trimmedEmail = email.trim();
     const trimmedMessage = message.trim();
 
@@ -93,10 +70,8 @@ export default function Support() {
         email: trimmedEmail,
         message: trimmedMessage,
         topic: (topic as any) || "other",
-        // optional: name can be ignored by backend if not expected
       });
 
-      // reset fields similar to SupportForm
       setName("");
       setEmail("");
       setTopic("");
@@ -113,387 +88,190 @@ export default function Support() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#F4F2EE] text-[#0B0B0F] font-['Space_Grotesk',system-ui,sans-serif]">
       <Topbar />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border/40">
-        <motion.div className="absolute inset-0" style={{ y: heroY }}>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${faqHeroBg})`,
-              filter: "brightness(0.4)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-cyan-500/20 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-        </motion.div>
-
-        {/* Ambient particles */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-primary/30 rounded-full"
-              initial={{
-                x:
-                  Math.random() *
-                  (typeof window !== "undefined" ? window.innerWidth : 1000),
-                y: Math.random() * 300,
-              }}
-              animate={{
-                y: [null, Math.random() * 300],
-                opacity: [0.3, 0.8, 0.3],
-              }}
-              transition={{
-                duration: Math.random() * 10 + 10,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          ))}
+      {/* ── Hero ── */}
+      <header className="relative overflow-hidden bg-[#0B0B0F] text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-40 -top-20 h-[520px] w-[520px] rounded-full border border-[#FF5A1F]/20 max-[720px]:right-[-220px] max-[720px]:opacity-50"
+        >
+          <div className="absolute inset-20 rounded-full border border-[#FF5A1F]/[0.14]" />
+          <div className="absolute inset-[170px] rounded-full border border-[#FF5A1F]/10" />
         </div>
 
-        <div className="container mx-auto px-4 py-16 md:py-20 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ opacity: heroOpacity }}
-            className="max-w-3xl mx-auto text-center space-y-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-medium mb-4 border border-primary/20"
-            >
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <HeadphonesIcon className="h-4 w-4 text-primary" />
-              </motion.div>
-              <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent font-semibold">
-                24/7 Support
-              </span>
-            </motion.div>
-
-            <motion.h1
-              className="text-4xl md:text-6xl font-bold"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="bg-gradient-to-r from-white via-primary to-cyan-400 bg-clip-text text-transparent">
-                We're Here to Help
-              </span>
-            </motion.h1>
-
-            <motion.p
-              className="text-lg text-foreground/70 max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              Get in touch with our support team. We're committed to helping you
-              succeed.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex items-center justify-center gap-8 pt-4"
-            >
-              <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-primary" />
-                <span className="text-foreground/70">&lt;24h Response</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Shield className="h-4 w-4 text-primary" />
-                <span className="text-foreground/70">100% Secure</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Zap className="h-4 w-4 text-primary" />
-                <span className="text-foreground/70">Fast Support</span>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      <main className="flex-1 py-12 md:py-20">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-            {/* Form */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-cyan-400/20 rounded-2xl blur-xl opacity-50" />
-              <div className="relative glass-card p-8 rounded-2xl border border-primary/20">
-                <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-                  Send us a Message
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Fill out the form below and we'll get back to you shortly.
-                </p>
-
-                {success && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20 text-primary flex items-start gap-3"
-                  >
-                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Thank you for your message! We'll get back to you within
-                      24 hours.
-                    </span>
-                  </motion.div>
-                )}
-
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Honeypot field - hidden from users */}
-                  <input
-                    type="text"
-                    name="website"
-                    value={honeypot}
-                    onChange={(e) => setHoneypot(e.target.value)}
-                    style={{ position: "absolute", left: "-9999px" }}
-                    tabIndex={-1}
-                    aria-hidden="true"
-                  />
-
-                  <motion.div
-                    className="space-y-2"
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    <Label htmlFor="name" className="text-sm font-medium">
-                      Name (optional)
-                    </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Your name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="h-11 glass-card border-border/50 focus:border-primary/50 transition-colors"
-                    />
-                  </motion.div>
-
-                  <motion.div
-                    className="space-y-2"
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    <Label htmlFor="email" className="text-sm font-medium">
-                      Email *
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-11 glass-card border-border/50 focus:border-primary/50 transition-colors"
-                      required
-                      disabled={loading}
-                    />
-                  </motion.div>
-
-                  {/* Subject/Topic to mirror SupportForm */}
-                  <motion.div
-                    className="space-y-2"
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    <Label htmlFor="topic" className="text-sm font-medium">
-                      Subject
-                    </Label>
-                    <Select
-                      value={topic}
-                      onValueChange={setTopic}
-                      disabled={loading}
-                    >
-                      <SelectTrigger
-                        id="topic"
-                        className="h-11 glass-card border-border/50 focus:border-primary/50"
-                      >
-                        <SelectValue placeholder="Select a topic" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="technical">
-                          Technical Issue
-                        </SelectItem>
-                        <SelectItem value="billing">
-                          Billing Question
-                        </SelectItem>
-                        <SelectItem value="feature">Feature Request</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </motion.div>
-
-                  <motion.div
-                    className="space-y-2"
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    <Label htmlFor="message" className="text-sm font-medium">
-                      Message *
-                    </Label>
-                    <Textarea
-                      id="message"
-                      placeholder="Tell us how we can help..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      className="min-h-[150px] glass-card border-border/50 focus:border-primary/50 transition-colors resize-none"
-                      required
-                      disabled={loading}
-                    />
-                  </motion.div>
-
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      type="submit"
-                      className="w-full h-12 magnetic-button text-base font-medium"
-                      size="lg"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{
-                              duration: 1,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
-                            className="mr-2"
-                          >
-                            <Sparkles className="h-4 w-4" />
-                          </motion.div>
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="mr-2 h-4 w-4" />
-                          Send Message
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                </form>
-              </div>
-            </motion.div>
-
-            {/* FAQ Sidebar */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <div className="glass-card p-6 rounded-2xl border border-border/50">
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Quick Answers
-                </h3>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <motion.details
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1 }}
-                      className="group"
-                    >
-                      <summary className="font-medium cursor-pointer list-none flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <span className="text-sm">{faq.question}</span>
-                        <motion.span
-                          className="text-primary group-open:rotate-180 transition-transform flex-shrink-0 ml-2"
-                          animate={{ rotate: 0 }}
-                        >
-                          ▼
-                        </motion.span>
-                      </summary>
-                      <motion.p
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        className="px-3 pb-3 pt-2 text-sm text-muted-foreground"
-                      >
-                        {faq.answer}
-                      </motion.p>
-                    </motion.details>
-                  ))}
-                </div>
-              </div>
-
-              {/* Response Time Card */}
-              <motion.div
-                whileHover={{ scale: 1.02, y: -2 }}
-                className="relative group"
-              >
-                <div className="absolute -inset-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative glass-card p-6 rounded-2xl border border-border/50 hover:border-primary/30 transition-all">
-                  <div className="flex items-start gap-4">
-                    <motion.div
-                      className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg"
-                      whileHover={{ rotate: 5 }}
-                      transition={{ type: "spring", stiffness: 400 }}
-                    >
-                      <Clock className="h-5 w-5 text-white" />
-                    </motion.div>
-                    <div>
-                      <h4 className="font-semibold mb-1">
-                        Average Response Time
-                      </h4>
-                      <p className="text-2xl font-bold text-primary mb-1">
-                        &lt; 24 hours
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        During business days
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-
-          {/* Back to Home */}
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-[72px] pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <Link to="/">
-              <Button variant="outline" size="lg" className="group">
-                <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                Back to Home
-              </Button>
-            </Link>
+            <span className="mb-7 block font-['IBM_Plex_Mono',monospace] text-[13px] uppercase tracking-[0.22em] text-[#FF5A1F]">
+              Support · Radar
+            </span>
+            <h1 className="max-w-[15ch] text-[clamp(40px,8vw,76px)] font-bold leading-[0.98] tracking-[-0.03em]">
+              We're here to <em className="not-italic text-[#FF5A1F]">help.</em>
+            </h1>
+            <p className="mt-[26px] max-w-[54ch] text-[clamp(16px,2.2vw,19px)] leading-[1.6] text-[#C9C6CF]">
+              Get in touch with our team. Most messages get a reply within 24
+              hours on business days.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.08em] text-[#6F6C78]">
+              <span>‹24h response</span>
+              <span>100% secure</span>
+              <span>Fast support</span>
+            </div>
           </motion.div>
+        </div>
+      </header>
+
+      {/* ── Content ── */}
+      <main className="flex-1 py-16">
+        <div className="mx-auto grid w-full max-w-[1040px] grid-cols-1 gap-8 px-6 lg:grid-cols-2">
+          {/* Form */}
+          <div className="rounded-md border border-[#E4E1D9] bg-white p-7 sm:p-8">
+            <span className="font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.16em] text-[#FF5A1F]">
+              // send a message
+            </span>
+            <h2 className="mt-2 text-[24px] tracking-[-0.02em]">Contact support</h2>
+            <p className="mt-2 text-[15px] leading-[1.6] text-[#55525E]">
+              Fill out the form and we'll get back to you shortly.
+            </p>
+
+            {success && (
+              <div className="mt-6 rounded-[4px] border border-[#FF5A1F]/40 bg-[#FF5A1F]/[0.06] px-4 py-3 font-['IBM_Plex_Mono',monospace] text-[12px] tracking-[0.04em] text-[#FF5A1F]">
+                ✓ Thanks for your message! We'll get back to you within 24 hours.
+              </div>
+            )}
+
+            {error && (
+              <div className="mt-6 rounded-[4px] border border-red-300 bg-red-50 px-4 py-3 font-['IBM_Plex_Mono',monospace] text-[12px] text-red-600">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+              {/* Honeypot — hidden from users */}
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ position: "absolute", left: "-9999px" }}
+                tabIndex={-1}
+                aria-hidden="true"
+              />
+
+              <div>
+                <label htmlFor="name" className={MONO_LABEL}>
+                  Name (optional)
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={INPUT}
+                  disabled={loading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className={MONO_LABEL}>
+                  Email *
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={INPUT}
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="topic" className={MONO_LABEL}>
+                  Subject
+                </label>
+                <select
+                  id="topic"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  disabled={loading}
+                  className={INPUT + " cursor-pointer"}
+                >
+                  <option value="">Select a topic</option>
+                  <option value="technical">Technical Issue</option>
+                  <option value="billing">Billing Question</option>
+                  <option value="feature">Feature Request</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="message" className={MONO_LABEL}>
+                  Message *
+                </label>
+                <textarea
+                  id="message"
+                  placeholder="Tell us how we can help..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className={INPUT + " min-h-[150px] resize-y leading-[1.55]"}
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-[2px] bg-[#FF5A1F] px-[22px] py-[13px] font-['Space_Grotesk',sans-serif] text-[15px] font-semibold text-[#0B0B0F] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {loading ? "Sending..." : "Send message"}
+              </button>
+            </form>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <div className="rounded-md border border-[#E4E1D9] bg-white p-6 sm:p-7">
+              <span className="font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.16em] text-[#FF5A1F]">
+                // quick answers
+              </span>
+              <div className="mt-4 divide-y divide-[#E4E1D9]">
+                {faqs.map((faq, index) => (
+                  <details key={index} className="group py-1">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3 text-[15px] font-medium">
+                      <span>{faq.question}</span>
+                      <span className="flex-shrink-0 font-['IBM_Plex_Mono',monospace] text-[#FF5A1F] transition-transform group-open:rotate-90">
+                        ›
+                      </span>
+                    </summary>
+                    <p className="pb-3 text-[14px] leading-[1.6] text-[#55525E]">
+                      {faq.answer}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            {/* Response time */}
+            <div className="rounded-md border border-[#E4E1D9] border-l-4 border-l-[#FF5A1F] bg-white p-6">
+              <span className="font-['IBM_Plex_Mono',monospace] text-[12px] uppercase tracking-[0.16em] text-[#6F6C78]">
+                Average response time
+              </span>
+              <p className="mt-2 font-['IBM_Plex_Mono',monospace] text-[28px] font-semibold text-[#FF5A1F]">
+                ‹ 24 hours
+              </p>
+              <p className="mt-1 text-[14px] text-[#55525E]">During business days</p>
+            </div>
+          </div>
         </div>
       </main>
 
