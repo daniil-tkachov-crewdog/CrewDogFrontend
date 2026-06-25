@@ -72,7 +72,7 @@ export default function Home() {
                 Competitor advert intelligence · Energy &amp; Data Centres
               </span>
               <h1 className="max-w-[13ch] text-[clamp(44px,9vw,92px)] font-bold leading-[0.96] tracking-[-0.03em]">
-                Read the advert. <em className="not-italic text-[#FF5A1F]">Find the lead.</em>
+                Paste the advert. <em className="not-italic text-[#FF5A1F]">Find the lead.</em>
               </h1>
               <p className="mt-[30px] max-w-[54ch] text-[clamp(17px,2.4vw,20px)] leading-[1.6] text-[#C9C6CF]">
                 For recruiters in energy and data centres. Every competitor job post carries
