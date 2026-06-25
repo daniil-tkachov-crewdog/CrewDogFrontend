@@ -126,7 +126,7 @@ export default function Login() {
           </h1>
           <p className="mt-2 text-[15px] leading-[1.6] text-[#55525E]">
             {isLogin
-              ? "Sign in to decode the advert and reach the operator."
+              ? "Sign in to discover your next client."
               : "Create an account to find the lead behind every advert."}
           </p>
 
