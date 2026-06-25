@@ -34,7 +34,7 @@ const plans = [
     disabled: false,
   },
   {
-    name: "Platinum",
+    name: "Bronze",
     monthlyPrice: "£9.99",
     annualPrice: "£99",
     period: "per month",
