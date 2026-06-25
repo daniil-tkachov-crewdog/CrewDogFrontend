@@ -26,13 +26,13 @@ const PROCESS_STEPS = [
     num: "01",
     tone: "light" as const,
     title: "Spot the demand",
-    body: "Surface the live competitor adverts that signal a company is actively hiring — the demand that's real this week, not last quarter.",
+    body: "Find a recent competitor job advert.",
   },
   {
     num: "02",
     tone: "light" as const,
     title: "Read the signals",
-    body: "Radar reads the signals in the post and points you to the companies most likely to be hiring behind it.",
+    body: "Paste the job description in Crewdog app.",
   },
   {
     num: "03",
