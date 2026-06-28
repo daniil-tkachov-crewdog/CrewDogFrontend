@@ -23,6 +23,7 @@ import {
 
 import { fetchAccountSummary, consumeOneCredit } from "@/services/account";
 import { logHistory } from "@/services/history";
+import { getBullhornStatus } from "@/services/bullhorn";
 
 import QuotaBadge from "@/components/run/QuotaBadge";
 
@@ -154,6 +155,7 @@ export default function RunPage() {
   const [cap, setCap] = useState<number>(3);
   const [used, setUsed] = useState<number>(0);
   const [unlimited, setUnlimited] = useState<boolean>(false);
+  const [bullhornConnected, setBullhornConnected] = useState<boolean>(false);
 
 //Added by Denny - the user survey
   
@@ -182,6 +184,19 @@ export default function RunPage() {
         setCap(s.cap ?? 3);
         setUsed(s.used ?? 0);
         setUnlimited(!!s.unlimited || isAdminUser(user));
+      } catch {}
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const s = await getBullhornStatus();
+        if (mounted) setBullhornConnected(s.connected);
       } catch {}
     })();
     return () => {
@@ -624,7 +639,10 @@ export default function RunPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                   >
-                    <ResultsCard results={results as any} />
+                    <ResultsCard
+                      results={results as any}
+                      bullhornConnected={bullhornConnected}
+                    />
                   </motion.div>
                 ) : (
                   <motion.div

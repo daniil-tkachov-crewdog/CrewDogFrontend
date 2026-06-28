@@ -16,6 +16,7 @@ import ProfileInfo from "@/components/account/ProfileInfo";
 import SubscriptionCard from "@/components/account/SubscriptionCard";
 import SearchHistory from "@/components/account/SearchHistory";
 import SecuritySection from "@/components/account/SecuritySection";
+import BullhornSection from "@/components/account/BullhornSection";
 import {
   fetchAccountSummary,
   type NormalizedSummary,
@@ -172,6 +173,7 @@ export default function AccountPage() {
               </TabsContent>
 
               <TabsContent value="settings" className="space-y-8">
+                <BullhornSection />
                 <SecuritySection />
               </TabsContent>
 

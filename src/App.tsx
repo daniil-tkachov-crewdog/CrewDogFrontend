@@ -22,6 +22,7 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { RequireAuth } from "./auth/RequireAuth";
 import Verify from "./pages/Verify";
 import ResetPassword from "./pages/ResetPassword";
+import BullhornCallback from "./pages/BullhornCallback";
 import ConsentBanner from "@/components/ConsentBanner";
 import usePageViews from "@/analytics/usePageViews";
 
@@ -63,6 +64,14 @@ const App = () => (
                 element={
                   <RequireAuth>
                     <Account />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/bullhorn/callback"
+                element={
+                  <RequireAuth>
+                    <BullhornCallback />
                   </RequireAuth>
                 }
               />

@@ -1,0 +1,15 @@
+# Supabase project config for CrewDog.
+# `project_id` is used as the local stack identifier. When deploying to the
+# hosted project, target it explicitly with `--project-ref <ref>`.
+project_id = "crewdog"
+
+[functions.bullhorn-oauth-start]
+# Requires a logged-in CrewDog user; JWT is verified inside the function.
+verify_jwt = true
+
+[functions.bullhorn-oauth-callback]
+# Called by the frontend callback page with the user's JWT.
+verify_jwt = true
+
+[functions.bullhorn-push]
+verify_jwt = true

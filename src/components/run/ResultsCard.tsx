@@ -1,7 +1,9 @@
 // src/components/run/ResultsCard.tsx
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Upload, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { pushContactToBullhorn } from "@/services/bullhorn";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -48,17 +50,86 @@ const cardEnter = {
 const labelCls =
   "font-['IBM_Plex_Mono',monospace] text-[11px] uppercase tracking-[0.16em] text-[#6F6C78]";
 
+/* Push-to-Bullhorn button with per-row state. Only rendered when connected. */
+type PushState = "idle" | "pushing" | "pushed" | "duplicate" | "error";
+
+function PushToBullhornButton({
+  contact,
+}: {
+  contact: { name: string; role?: string; linkedIn?: string };
+}) {
+  const [state, setState] = useState<PushState>("idle");
+
+  async function handlePush() {
+    if (state === "pushing" || state === "pushed") return;
+    setState("pushing");
+    try {
+      const res = await pushContactToBullhorn(contact);
+      if (res.duplicate) {
+        setState("duplicate");
+        toast.info(`${contact.name} already exists in Bullhorn.`);
+      } else {
+        setState("pushed");
+        toast.success(
+          res.candidateId
+            ? `Pushed to Bullhorn (#${res.candidateId}).`
+            : "Pushed to Bullhorn.",
+        );
+      }
+    } catch (e: any) {
+      setState("error");
+      toast.error(e?.message || "Could not push to Bullhorn.");
+    }
+  }
+
+  const label =
+    state === "pushing"
+      ? "Pushing…"
+      : state === "pushed"
+        ? "In Bullhorn"
+        : state === "duplicate"
+          ? "Duplicate"
+          : state === "error"
+            ? "Retry"
+            : "Bullhorn";
+
+  const done = state === "pushed" || state === "duplicate";
+
+  return (
+    <button
+      type="button"
+      onClick={handlePush}
+      disabled={state === "pushing" || done}
+      title="Push to Bullhorn"
+      className="whitespace-nowrap rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[7px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08] disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      <span className="inline-flex items-center gap-1.5">
+        {state === "pushing" ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : done ? (
+          <Check className="h-3 w-3" />
+        ) : (
+          <Upload className="h-3 w-3" />
+        )}
+        {label}
+      </span>
+    </button>
+  );
+}
+
 /* A single contact / lead row, prototype `.contact` style. */
 function ContactRow({
   name,
   sub,
   href,
   cta,
+  pushContact,
 }: {
   name: string;
   sub?: string;
   href?: string;
   cta: string;
+  pushContact?: { name: string; role?: string; linkedIn?: string };
 }) {
   return (
     <div className="flex items-center gap-4 border-t border-[#E4E1D9] py-4 first:border-t-0">
@@ -71,16 +142,19 @@ function ContactRow({
         </div>
         {sub && <div className="truncate text-[13px] text-[#55525E]">{sub}</div>}
       </div>
-      {href && (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ml-auto whitespace-nowrap rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[7px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08]"
-        >
-          {cta} ↗
-        </a>
-      )}
+      <div className="ml-auto flex items-center gap-2">
+        {pushContact && <PushToBullhornButton contact={pushContact} />}
+        {href && (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whitespace-nowrap rounded-[2px] border border-[#FF5A1F]/[0.35] px-3 py-[7px] font-['IBM_Plex_Mono',monospace] text-[11px] tracking-[0.06em] text-[#FF5A1F] transition-colors hover:bg-[#FF5A1F]/[0.08]"
+          >
+            {cta} ↗
+          </a>
+        )}
+      </div>
     </div>
   );
 }
@@ -89,7 +163,13 @@ function ContactRow({
 /*  Main component                                                     */
 /* ------------------------------------------------------------------ */
 
-export default function ResultsCard({ results }: { results: Results }) {
+export default function ResultsCard({
+  results,
+  bullhornConnected = false,
+}: {
+  results: Results;
+  bullhornConnected?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   function handleCopyOutreach() {
@@ -217,6 +297,11 @@ export default function ResultsCard({ results }: { results: Results }) {
                 sub={c.role}
                 href={c.linkedIn}
                 cta="LinkedIn"
+                pushContact={
+                  bullhornConnected
+                    ? { name: c.name, role: c.role, linkedIn: c.linkedIn }
+                    : undefined
+                }
               />
             ))}
           </div>
